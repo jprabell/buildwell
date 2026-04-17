@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  password  String
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  name          String
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  structureType StructureType
+  status        ProjectStatus @default(DRAFT)
+  answers       Json          @default("{}")
+  summary       Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum StructureType {
+  SINGLE_FAMILY_HOME
+  CONTAINER_HOME
+  BARNDOMINIUM
+  BARN
+  LOG_CABIN
+  A_FRAME
+  SHED
+  WORKSHOP
+  GARAGE
+  TINY_HOME
+  DOME_HOME
+  QUONSET_HUT
+  SILO
+  POLE_BARN
+  EARTHSHIP
+  PASSIVE_SOLAR
+}
+
+enum ProjectStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETE
+}
