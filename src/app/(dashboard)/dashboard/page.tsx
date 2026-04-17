@@ -5,7 +5,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import Button from "@/components/ui/Button";
-import type { Project } from "@prisma/client";
+type Project = {
+  id: string;
+  name: string;
+  structureType: string;
+  status: string;
+  updatedAt: Date;
+  userId: string;
+};
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
