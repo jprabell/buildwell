@@ -149,7 +149,7 @@ export default function StructureGrid() {
                     <div className="text-xs text-stone-400 mt-0.5 leading-tight group-hover:hidden">{s.description}</div>
                     <div className="text-xs text-amber-600 mt-0.5 leading-tight hidden group-hover:block font-medium">Click to explore →</div>
                     <div className="mt-2 text-xs font-semibold text-stone-400 group-hover:text-amber-600 transition-colors">
-                      Cost: TBD
+                      {s.costNote}
                     </div>
                   </div>
                 </button>
@@ -210,9 +210,16 @@ export default function StructureGrid() {
               </p>
 
               {/* Detailed description */}
-              <p className="text-stone-600 text-sm leading-relaxed mb-6">
+              <p className="text-stone-600 text-sm leading-relaxed mb-4">
                 {DETAILED_DESCRIPTIONS[structure.value]}
               </p>
+
+              {/* Cost estimate */}
+              <div className="flex items-center gap-2 mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
+                <span className="text-amber-600 font-bold text-sm">Est. Cost:</span>
+                <span className="text-stone-700 font-semibold text-sm">{structure.costNote}</span>
+                <span className="text-stone-400 text-xs ml-auto">national avg.</span>
+              </div>
 
               {/* CTA */}
               <Link href="/register" onClick={() => setSelected(null)}>

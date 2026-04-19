@@ -8,7 +8,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏠",
     category: "Residential",
     costLevel: 3,
-    costNote: "Cost: TBD",
+    costNote: "$150–$350/sqft",
     image: "/images/structures/single-family-home.jpg",
   },
   {
@@ -18,7 +18,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "📦",
     category: "Residential",
     costLevel: 2,
-    costNote: "Cost: TBD",
+    costNote: "$100–$250/sqft",
     image: "/images/structures/container-home.jpg",
   },
   {
@@ -28,7 +28,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏡",
     category: "Residential",
     costLevel: 1,
-    costNote: "Cost: TBD",
+    costNote: "$200–$450/sqft",
     image: "/images/structures/tiny-home.jpg",
   },
   {
@@ -38,7 +38,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏚️",
     category: "Agricultural",
     costLevel: 2,
-    costNote: "Cost: TBD",
+    costNote: "$95–$200/sqft",
     image: "/images/structures/barndominium.jpg",
   },
   {
@@ -48,7 +48,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏛️",
     category: "Agricultural",
     costLevel: 1,
-    costNote: "Cost: TBD",
+    costNote: "$25–$75/sqft",
     image: "/images/structures/barn.jpg",
   },
   {
@@ -58,7 +58,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏗️",
     category: "Agricultural",
     costLevel: 1,
-    costNote: "Cost: TBD",
+    costNote: "$15–$55/sqft",
     image: "/images/structures/pole-barn.jpg",
   },
   {
@@ -68,7 +68,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🪵",
     category: "Specialty",
     costLevel: 3,
-    costNote: "Cost: TBD",
+    costNote: "$175–$400/sqft",
     image: "/images/structures/log-cabin.jpg",
   },
   {
@@ -78,7 +78,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "⛺",
     category: "Specialty",
     costLevel: 2,
-    costNote: "Cost: TBD",
+    costNote: "$150–$300/sqft",
     image: "/images/structures/a-frame.jpg",
   },
   {
@@ -88,7 +88,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "⛩️",
     category: "Specialty",
     costLevel: 3,
-    costNote: "Cost: TBD",
+    costNote: "$150–$350/sqft",
     image: "/images/structures/dome-home.jpg",
   },
   {
@@ -98,7 +98,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏟️",
     category: "Specialty",
     costLevel: 1,
-    costNote: "Cost: TBD",
+    costNote: "$15–$50/sqft",
     image: "/images/structures/quonset-hut.jpg",
   },
   {
@@ -108,7 +108,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🗼",
     category: "Specialty",
     costLevel: 3,
-    costNote: "Cost: TBD",
+    costNote: "$175–$450/sqft",
     image: "/images/structures/silo.jpg",
   },
   {
@@ -118,7 +118,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🏠",
     category: "Outbuilding",
     costLevel: 1,
-    costNote: "Cost: TBD",
+    costNote: "$15–$65/sqft",
     image: "/images/structures/shed.jpg",
   },
   {
@@ -128,7 +128,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🔨",
     category: "Outbuilding",
     costLevel: 1,
-    costNote: "Cost: TBD",
+    costNote: "$45–$130/sqft",
     image: "/images/structures/workshop.jpg",
   },
   {
@@ -138,7 +138,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🚗",
     category: "Outbuilding",
     costLevel: 2,
-    costNote: "Cost: TBD",
+    costNote: "$45–$135/sqft",
     image: "/images/structures/garage.jpg",
   },
   {
@@ -148,7 +148,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "🌍",
     category: "Sustainable",
     costLevel: 4,
-    costNote: "Cost: TBD",
+    costNote: "$150–$350/sqft",
     image: "/images/structures/earthship.jpg",
   },
   {
@@ -158,7 +158,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     icon: "☀️",
     category: "Sustainable",
     costLevel: 4,
-    costNote: "Cost: TBD",
+    costNote: "$175–$375/sqft",
     image: "/images/structures/passive-solar.jpg",
   },
 ];

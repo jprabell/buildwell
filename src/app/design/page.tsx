@@ -127,6 +127,9 @@ export default function DesignPage() {
                           {s.label}
                         </div>
                         <div className="text-xs text-stone-400 mt-0.5 leading-tight">{s.description}</div>
+                        <div className="mt-1.5 text-xs font-semibold text-stone-400 group-hover:text-amber-600 transition-colors">
+                          {s.costNote}
+                        </div>
                       </div>
                     </button>
                   ))}
