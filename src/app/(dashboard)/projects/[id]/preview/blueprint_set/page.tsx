@@ -7,7 +7,6 @@ import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import { generatePlanningReport, CodeItem } from "@/lib/planningReport";
 import { ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
-import PrintButton from "../../material-list/PrintButton";
 import FloorPlanDownloadButton from "./FloorPlanDownloadButton";
 
 function StatusBadge({ status }: { status: CodeItem["status"] }) {
@@ -55,7 +54,6 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
               <Button variant="ghost" size="sm">← Project</Button>
             </Link>
             {purchased && <FloorPlanDownloadButton projectId={id} />}
-            {purchased && <PrintButton />}
           </div>
         </div>
       </nav>

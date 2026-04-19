@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function FloorPlanDownloadButton({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(false);
 
-  async function handleDownload() {
+  async function handleDxf() {
     setLoading(true);
     try {
       const res = await fetch(`/api/projects/${projectId}/floor-plan`);
@@ -27,18 +27,26 @@ export default function FloorPlanDownloadButton({ projectId }: { projectId: stri
   }
 
   return (
-    <button
-      onClick={handleDownload}
-      disabled={loading}
-      className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-semibold px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50"
-    >
-      {loading ? (
-        <>
-          <span className="animate-spin text-xs">⏳</span> Generating…
-        </>
-      ) : (
-        <>⬇ Floor Plan (.dxf)</>
-      )}
-    </button>
+    <div className="flex items-center gap-1.5">
+      <button
+        onClick={handleDxf}
+        disabled={loading}
+        className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-semibold px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50"
+      >
+        {loading ? (
+          <>
+            <span className="animate-spin text-xs">⏳</span> Generating…
+          </>
+        ) : (
+          <>⬇ Floor Plan (.dxf)</>
+        )}
+      </button>
+      <button
+        onClick={() => window.print()}
+        className="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg text-sm transition-colors"
+      >
+        ⬇ Floor Plan (.pdf)
+      </button>
+    </div>
   );
 }
