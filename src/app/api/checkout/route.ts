@@ -31,6 +31,11 @@ export const DOCUMENT_PACKAGES = {
     description: "3 local contractors per trade with phone, address, and rating — print-ready spreadsheet",
     price: 4000, // $40 in cents
   },
+  construction_schedule: {
+    name: "Construction Schedule",
+    description: "Phase-by-phase build sequence with critical path tracking, dependency management, and live progress bar",
+    price: 14000, // $140 in cents
+  },
 };
 
 export async function POST(req: Request) {

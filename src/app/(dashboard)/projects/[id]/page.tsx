@@ -92,8 +92,8 @@ const PACKAGES = [
     id: "construction_schedule",
     icon: "📅",
     title: "Construction Schedule",
-    price: "$85",
-    priceNum: 85,
+    price: "$140",
+    priceNum: 140,
     badge: "Interactive",
     includes: [
       "Phase-by-phase build sequence",

@@ -17,6 +17,7 @@ const PACKAGE_LABELS: Record<string, string> = {
   quote_package: "Contractor Bid Package",
   spec_tier: "Good / Better / Best Spec Report",
   vendor_list: "Preferred Vendor List",
+  construction_schedule: "Construction Schedule",
 };
 
 export default async function CheckoutSuccessPage({
