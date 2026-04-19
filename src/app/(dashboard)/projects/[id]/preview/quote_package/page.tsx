@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import { getTradesForStructure } from "@/lib/contractorTrades";
+import { getBidSpecs } from "@/lib/bidPackageSpecs";
 import { ProjectAnswers } from "@/types";
 import { StructureType } from "@/types";
 import Button from "@/components/ui/Button";
@@ -101,7 +102,7 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
               <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-0.5">Project</p>
               <p className="font-bold text-stone-900">{project.name}</p>
@@ -117,6 +118,12 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
             <div>
               <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-0.5">Trades</p>
               <p className="font-bold text-stone-900">{trades.length} bid sections</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-0.5">Drawings</p>
+              <Link href={`/projects/${id}/preview/blueprint_set`} className="text-xs font-semibold text-amber-600 hover:text-amber-500 underline">
+                View Floor Plan →
+              </Link>
             </div>
           </div>
 
@@ -159,15 +166,29 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
 
         {/* Instructions box (purchased only) */}
         {purchased && (
-          <div className="bg-stone-900 text-white rounded-2xl p-5 mb-6 print:rounded-none print:bg-white print:text-stone-900 print:border print:border-stone-300">
-            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 print:text-amber-700">How to Use This Bid Package</p>
-            <ol className="text-xs space-y-1 text-stone-300 print:text-stone-600 list-decimal list-inside leading-relaxed">
-              <li>Send one bid section per trade to a minimum of 3 licensed contractors.</li>
-              <li>Fill in the &ldquo;Requested Bid Amount&rdquo; line per contractor before sending.</li>
-              <li>Compare returned bids using the notes field — verify license and insurance before awarding.</li>
-              <li>Award based on price, references, and availability — not price alone.</li>
-            </ol>
-          </div>
+          <>
+            <div className="bg-stone-900 text-white rounded-2xl p-5 mb-4 print:rounded-none print:bg-white print:text-stone-900 print:border print:border-stone-300">
+              <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 print:text-amber-700">How to Use This Bid Package</p>
+              <ol className="text-xs space-y-1 text-stone-300 print:text-stone-600 list-decimal list-inside leading-relaxed">
+                <li>Review the &ldquo;Specified Materials &amp; Standards&rdquo; in each trade section — these are your baseline specs.</li>
+                <li>Send one bid section per trade to a minimum of 3 licensed contractors.</li>
+                <li>Fill in the &ldquo;Base Bid Amount&rdquo; line per contractor before sending; include alternate pricing requests.</li>
+                <li>Compare returned bids — verify license, insurance, and references before awarding any contract.</li>
+                <li>Award based on price, references, availability, and communication quality.</li>
+              </ol>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-3 mb-6 flex items-center justify-between gap-4 print:hidden">
+              <div>
+                <p className="text-sm font-bold text-blue-900 mb-0.5">📐 Floor Plan &amp; Drawings</p>
+                <p className="text-xs text-blue-700">Send the floor plan PDF to each contractor alongside their bid section.</p>
+              </div>
+              <Link href={`/projects/${id}/preview/blueprint_set`} className="shrink-0">
+                <button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
+                  View / Print Floor Plan →
+                </button>
+              </Link>
+            </div>
+          </>
         )}
 
         {/* Bid sections */}
@@ -176,6 +197,7 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
             const isBlurred = !purchased && ti >= 3;
             const budgetLow  = tradeBudgetLow(trade.budgetPctRange);
             const budgetHigh = tradeBudgetHigh(trade.budgetPctRange);
+            const specs = getBidSpecs(trade.trade, answers, project.structureType);
 
             return (
               <div
@@ -206,42 +228,76 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
                 </div>
 
                 <div className="p-5 grid md:grid-cols-2 gap-5">
-                  {/* Scope of work */}
+                  {/* Scope + Specs */}
                   <div>
                     <p className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2">Scope of Work</p>
-                    <p className="text-sm text-stone-700 leading-relaxed mb-3">{trade.description}</p>
+                    <p className="text-sm text-stone-700 leading-relaxed mb-4">{trade.description}</p>
 
-                    <p className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-1">Licensing Requirement</p>
-                    <p className={`text-xs font-semibold mb-3 ${trade.licenseRequired ? "text-rose-600" : "text-stone-400"}`}>
-                      {trade.licenseRequired ? "✓ License Required — " : "— "}{trade.licenseNote}
-                    </p>
+                    {specs.length > 0 && (
+                      <>
+                        <p className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2">Specified Materials &amp; Standards</p>
+                        <ul className="space-y-1.5">
+                          {specs.map((item, si) => (
+                            <li key={si} className="flex items-start gap-2 text-xs text-stone-700 leading-snug">
+                              <span className="text-amber-500 shrink-0 mt-0.5">▸</span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    <div className="mt-4 pt-3 border-t border-stone-100">
+                      <p className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-1">Licensing Requirement</p>
+                      <p className={`text-xs font-semibold ${trade.licenseRequired ? "text-rose-600" : "text-stone-400"}`}>
+                        {trade.licenseRequired ? "✓ License Required — " : "— "}{trade.licenseNote}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Bid request form */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     <p className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2">Bid Request Form</p>
 
                     {[
                       "Contractor Company Name",
                       "License Number",
-                      "Insurance Certificate #",
-                      "Requested Bid Amount ($)",
+                      "Insurance Cert / Exp Date",
+                      "Base Bid Amount ($)",
+                      "Alternate / Allowance Items ($)",
                       "Estimated Start Date",
-                      "Estimated Duration",
+                      "Estimated Duration (weeks)",
+                      "Key Subcontractors (if any)",
                     ].map((field) => (
                       <div key={field}>
                         <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-0.5">{field}</p>
                         <div className="border-b border-stone-200 h-6 w-full" />
                       </div>
                     ))}
+
+                    <div className="mt-3 pt-3 border-t border-stone-100">
+                      <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wide mb-1">Materials Included in Bid?</p>
+                      <div className="flex gap-6 text-xs text-stone-500">
+                        <label className="flex items-center gap-1.5"><span className="border border-stone-300 w-3 h-3 inline-block" /> Yes — all materials</label>
+                        <label className="flex items-center gap-1.5"><span className="border border-stone-300 w-3 h-3 inline-block" /> Labor only</label>
+                        <label className="flex items-center gap-1.5"><span className="border border-stone-300 w-3 h-3 inline-block" /> Partial</label>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Notes row */}
-                <div className="border-t border-stone-100 px-5 py-3 bg-stone-50">
-                  <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wide mb-1">Notes / References</p>
-                  <div className="border-b border-stone-200 h-5 w-full mb-1" />
-                  <div className="border-b border-stone-200 h-5 w-full" />
+                {/* Exclusions + Notes row */}
+                <div className="border-t border-stone-100 px-5 py-3 bg-stone-50 grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wide mb-1">Exclusions / Clarifications</p>
+                    <div className="border-b border-stone-200 h-5 w-full mb-1" />
+                    <div className="border-b border-stone-200 h-5 w-full" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wide mb-1">References (previous projects)</p>
+                    <div className="border-b border-stone-200 h-5 w-full mb-1" />
+                    <div className="border-b border-stone-200 h-5 w-full" />
+                  </div>
                 </div>
               </div>
             );
