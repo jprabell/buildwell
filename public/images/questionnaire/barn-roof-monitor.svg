@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+  <rect width="300" height="175" fill="#bfdbfe"/>
+  <rect x="0" y="150" width="300" height="25" fill="#4ade80"/>
+  <!-- Left base slope -->
+  <polygon points="52,102 110,74 110,102" fill="#1c1917"/>
+  <!-- Right base slope -->
+  <polygon points="190,74 248,102 190,102" fill="#1c1917"/>
+  <!-- Eave line -->
+  <line x1="52" y1="102" x2="248" y2="102" stroke="#0f172a" stroke-width="2"/>
+  <!-- Monitor walls -->
+  <rect x="110" y="52" width="80" height="22" fill="#292524"/>
+  <!-- Monitor gable -->
+  <polygon points="150,38 110,52 190,52" fill="#1c1917"/>
+  <!-- Monitor windows (ventilation louvers) -->
+  <rect x="118" y="56" width="14" height="13" fill="#7dd3fc" rx="1"/>
+  <rect x="140" y="56" width="14" height="13" fill="#7dd3fc" rx="1"/>
+  <rect x="162" y="56" width="14" height="13" fill="#7dd3fc" rx="1"/>
+  <!-- Barn walls -->
+  <rect x="62" y="102" width="176" height="50" fill="#7c2d12"/>
+  <line x1="82" y1="102" x2="82" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="102" y1="102" x2="102" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="122" y1="102" x2="122" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="178" y1="102" x2="178" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="198" y1="102" x2="198" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="218" y1="102" x2="218" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <rect x="71" y="109" width="20" height="15" fill="#7dd3fc" rx="1"/>
+  <rect x="209" y="109" width="20" height="15" fill="#7dd3fc" rx="1"/>
+  <rect x="119" y="115" width="62" height="37" fill="#431407"/>
+  <line x1="150" y1="115" x2="150" y2="152" stroke="#7c2d12" stroke-width="2"/>
+  <!-- Label -->
+  <rect x="0" y="175" width="300" height="25" fill="#1c1917"/>
+  <text x="150" y="192" text-anchor="middle" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="9" font-weight="700" letter-spacing="1">MONITOR / RAISED CENTER RIDGE</text>
+</svg>

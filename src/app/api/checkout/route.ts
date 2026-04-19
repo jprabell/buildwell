@@ -62,8 +62,8 @@ export async function POST(req: Request) {
       },
     ],
     mode: "payment",
-    success_url: `${process.env.NEXTAUTH_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}&project_id=${projectId}&package=${packageType}`,
-    cancel_url: `${process.env.NEXTAUTH_URL}/projects/${projectId}`,
+    success_url: `https://ibuildwell.com/checkout/success?session_id={CHECKOUT_SESSION_ID}&project_id=${projectId}&package=${packageType}`,
+    cancel_url: `https://ibuildwell.com/projects/${projectId}`,
     metadata: {
       projectId,
       packageType,

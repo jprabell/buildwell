@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+  <rect width="300" height="175" fill="#bfdbfe"/>
+  <rect x="0" y="150" width="300" height="25" fill="#4ade80"/>
+  <!-- Shed / mono-pitch roof -->
+  <polygon points="52,65 252,102 252,106 52,69" fill="#1c1917"/>
+  <line x1="52" y1="67" x2="252" y2="104" stroke="#0f172a" stroke-width="2"/>
+  <!-- Barn walls (taller on left to match slope) -->
+  <polygon points="62,68 238,102 238,152 62,152" fill="#7c2d12"/>
+  <!-- Board lines -->
+  <line x1="82" y1="73" x2="82" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="102" y1="78" x2="102" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="122" y1="82" x2="122" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="178" y1="92" x2="178" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="198" y1="96" x2="198" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <line x1="218" y1="99" x2="218" y2="152" stroke="#6b1e0c" stroke-width="1"/>
+  <!-- Windows (adjusted for sloped wall) -->
+  <rect x="71" y="88" width="20" height="15" fill="#7dd3fc" rx="1"/>
+  <rect x="200" y="107" width="20" height="15" fill="#7dd3fc" rx="1"/>
+  <!-- Barn door -->
+  <rect x="119" y="112" width="62" height="40" fill="#431407"/>
+  <line x1="150" y1="112" x2="150" y2="152" stroke="#7c2d12" stroke-width="2"/>
+  <!-- Label -->
+  <rect x="0" y="175" width="300" height="25" fill="#1c1917"/>
+  <text x="150" y="192" text-anchor="middle" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="10" font-weight="700" letter-spacing="1.5">SHED / MONO-PITCH</text>
+</svg>

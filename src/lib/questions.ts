@@ -276,11 +276,11 @@ const STEP_EXTERIOR_AGRICULTURAL: QuestionStep = {
       type: "select",
       required: true,
       options: [
-        { value: "gable", label: "Gable", image: "/images/questionnaire/roof-gable.svg" },
-        { value: "gambrel", label: "Gambrel (barn-style)", image: "/images/questionnaire/roof-gambrel.svg" },
-        { value: "shed", label: "Shed / Mono-pitch", image: "/images/questionnaire/roof-shed.svg" },
-        { value: "monitor", label: "Monitor / Raised Center Ridge" },
-        { value: "hip", label: "Hip Roof", image: "/images/questionnaire/roof-hip.svg" },
+        { value: "gable", label: "Gable", image: "/images/questionnaire/barn-roof-gable.svg" },
+        { value: "gambrel", label: "Gambrel (barn-style)", image: "/images/questionnaire/barn-roof-gambrel.svg" },
+        { value: "shed", label: "Shed / Mono-pitch", image: "/images/questionnaire/barn-roof-shed.svg" },
+        { value: "monitor", label: "Monitor / Raised Center Ridge", image: "/images/questionnaire/barn-roof-monitor.svg" },
+        { value: "hip", label: "Hip Roof", image: "/images/questionnaire/barn-roof-hip.svg" },
       ],
     },
     {
@@ -288,9 +288,9 @@ const STEP_EXTERIOR_AGRICULTURAL: QuestionStep = {
       label: "Roof Material",
       type: "select",
       options: [
-        { value: "metal_panel", label: "Metal Panel (most common)", image: "/images/questionnaire/roofmat-metal-panel.jpg" },
-        { value: "standing_seam_metal", label: "Standing Seam Metal", image: "/images/questionnaire/roofmat-standing-seam.jpg" },
-        { value: "asphalt_shingle", label: "Asphalt Shingle", image: "/images/questionnaire/roofmat-asphalt-shingle.jpg" },
+        { value: "metal_panel", label: "Metal Panel (most common)", image: "/images/questionnaire/barn-roofmat-metal-panel.svg" },
+        { value: "standing_seam_metal", label: "Standing Seam Metal", image: "/images/questionnaire/barn-roofmat-standing-seam.svg" },
+        { value: "asphalt_shingle", label: "Asphalt Shingle", image: "/images/questionnaire/barn-roofmat-asphalt.svg" },
       ],
     },
     {
