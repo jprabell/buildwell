@@ -11,22 +11,22 @@ body {
 }
 
 /* Model animations */
-@keyframes modelBackdropIn {
+@keyframes modalBackdropIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes modelCardIn {
+@keyframes modalCardIn {
   from { opacity: 0; transform: scale(0.94) translateY(12px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.model-backdrop {
-  animation: modelBackdropIn 0.18s ease-out forwards;
+.modal-backdrop {
+  animation: modalBackdropIn 0.18s ease-out forwards;
 }
 
-.model-card {
-  animation: modelCardIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.modal-card {
+  animation: modalCardIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Shimmer text effect */
