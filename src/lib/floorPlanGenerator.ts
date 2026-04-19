@@ -215,7 +215,7 @@ function titleBlock(d: typeof Drawing, x: number, y: number, projectName: string
 
   d.drawText(x + 0.3, y + 5.6, 0.7, 0, projectName.substring(0, 22));
   d.drawText(x + 0.3, y + 4.85, 0.4, 0, structureType.replace(/_/g, " "));
-  d.drawText(x + 0.3, y + 4.1, 0.42, 0, "FLOOR PLAN + FRONT ELEVATION");
+  d.drawText(x + 0.3, y + 4.1, 0.42, 0, "FLOOR PLAN + 4 ELEVATIONS");
   d.drawText(x + 0.3, y + 3.6, 0.3, 0, "PRELIMINARY SCHEMATIC — SHEET A1");
 
   d.drawText(x + 0.3, y + 2.5, 0.28, 0, "TOTAL AREA");
@@ -235,11 +235,11 @@ function titleBlock(d: typeof Drawing, x: number, y: number, projectName: string
 
 // ─── Elevation helpers ────────────────────────────────────────────────────────
 
-function elevFooter(d: typeof Drawing, x: number, y: number, W: number, foundH: number) {
+function elevFooter(d: typeof Drawing, x: number, y: number, W: number, foundH: number, lbl = "FRONT ELEVATION") {
   d.setActiveLayer("TEXT");
   d.drawLine(x - 3, y + foundH, x + W + 3, y + foundH);
   d.drawText(x - 7.5, y + foundH - 0.3, 0.38, 0, "F.F.E.");
-  d.drawText(x + W / 2 - 5.5, y - 2.0, 0.55, 0, "FRONT ELEVATION");
+  d.drawText(x + W / 2 - lbl.length * 0.26, y - 2.0, 0.55, 0, lbl);
   d.drawText(x + W / 2 - 7.5, y - 2.9, 0.35, 0, "PRELIMINARY — NOT FOR CONSTRUCTION");
 }
 
@@ -375,7 +375,7 @@ function drawGableElevation(d: typeof Drawing, x: number, y: number, W: number, 
 }
 
 // A-Frame elevation — steep triangle, roof reaches to foundation
-function drawAFrameElevation(d: typeof Drawing, x: number, y: number, W: number) {
+function drawAFrameElevation(d: typeof Drawing, x: number, y: number, W: number, lbl = "FRONT ELEVATION") {
   const foundH = 1.5;
   const pitch = 1.1; // ~13:12 — true A-frame steepness
   const rise = (W / 2) * pitch;
@@ -416,11 +416,11 @@ function drawAFrameElevation(d: typeof Drawing, x: number, y: number, W: number)
   dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
   dim(d, x + W, baseY, x + W, baseY + rise, 4.5, ft(rise));
 
-  elevFooter(d, x, y, W, foundH);
+  elevFooter(d, x, y, W, foundH, lbl);
 }
 
 // Dome elevation — hemisphere profile
-function drawDomeElevation(d: typeof Drawing, x: number, y: number, W: number) {
+function drawDomeElevation(d: typeof Drawing, x: number, y: number, W: number, lbl = "FRONT ELEVATION") {
   const foundH = 1.5;
   const r = W / 2;
   const cx = x + W / 2;
@@ -457,11 +457,11 @@ function drawDomeElevation(d: typeof Drawing, x: number, y: number, W: number) {
   dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
   dim(d, x + W, baseY, x + W, baseY + r, 4.5, `R: ${ft(r)}`);
 
-  elevFooter(d, x, y, W, foundH);
+  elevFooter(d, x, y, W, foundH, lbl);
 }
 
 // Quonset hut elevation — semi-cylinder arch
-function drawQuonsetElevation(d: typeof Drawing, x: number, y: number, W: number) {
+function drawQuonsetElevation(d: typeof Drawing, x: number, y: number, W: number, lbl = "FRONT ELEVATION") {
   const foundH = 1.5;
   const legH = W * 0.12; // short vertical leg walls
   const archR = W / 2;
@@ -507,11 +507,11 @@ function drawQuonsetElevation(d: typeof Drawing, x: number, y: number, W: number
   dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
   dim(d, x + W, baseY, x + W, baseY + legH + archR, 4.5, ft(legH + archR));
 
-  elevFooter(d, x, y, W, foundH);
+  elevFooter(d, x, y, W, foundH, lbl);
 }
 
 // Container home elevation — flat/low roof, containers visible
-function drawContainerElevation(d: typeof Drawing, x: number, y: number, W: number, answers: ProjectAnswers) {
+function drawContainerElevation(d: typeof Drawing, x: number, y: number, W: number, answers: ProjectAnswers, lbl = "FRONT ELEVATION") {
   const foundH = 2.0;
   const cH = 9.5; // standard HC container height
   const count = Math.min(n(answers.containerCount, 2), 6);
@@ -564,11 +564,11 @@ function drawContainerElevation(d: typeof Drawing, x: number, y: number, W: numb
   dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
   dim(d, x + W, baseY, x + W, baseY + totalH, 4.5, ft(totalH));
 
-  elevFooter(d, x, y, W, foundH);
+  elevFooter(d, x, y, W, foundH, lbl);
 }
 
 // Silo elevation — cylindrical with dome cap
-function drawSiloElevation(d: typeof Drawing, x: number, y: number, W: number) {
+function drawSiloElevation(d: typeof Drawing, x: number, y: number, W: number, lbl = "FRONT ELEVATION") {
   const foundH = 2.0;
   const cylH = Math.min(W * 2.2, 50); // tall but capped
   const domR = W / 2;
@@ -606,31 +606,321 @@ function drawSiloElevation(d: typeof Drawing, x: number, y: number, W: number) {
   dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
   dim(d, x + W, baseY, x + W, baseY + cylH, 4.5, ft(cylH));
 
-  elevFooter(d, x, y, W, foundH);
+  elevFooter(d, x, y, W, foundH, lbl);
 }
 
 // ─── Front elevation dispatcher ───────────────────────────────────────────────
 
 function drawFrontElevation(d: typeof Drawing, x: number, y: number, W: number, structureType: string, answers: ProjectAnswers) {
   switch (structureType) {
-    case "A_FRAME":
-      drawAFrameElevation(d, x, y, W);
-      break;
-    case "DOME_HOME":
-      drawDomeElevation(d, x, y, W);
-      break;
-    case "QUONSET_HUT":
-      drawQuonsetElevation(d, x, y, W);
-      break;
-    case "CONTAINER_HOME":
-      drawContainerElevation(d, x, y, W, answers);
-      break;
-    case "SILO":
-      drawSiloElevation(d, x, y, W);
-      break;
-    default:
-      drawGableElevation(d, x, y, W, structureType, answers);
-      break;
+    case "A_FRAME":      drawAFrameElevation(d, x, y, W); break;
+    case "DOME_HOME":    drawDomeElevation(d, x, y, W); break;
+    case "QUONSET_HUT":  drawQuonsetElevation(d, x, y, W); break;
+    case "CONTAINER_HOME": drawContainerElevation(d, x, y, W, answers); break;
+    case "SILO":         drawSiloElevation(d, x, y, W); break;
+    default:             drawGableElevation(d, x, y, W, structureType, answers); break;
+  }
+}
+
+// ─── Rear elevation functions ─────────────────────────────────────────────────
+
+// Gable rear elevation — like front but with patio door, no garage, different windows
+function drawGableRearElevation(d: typeof Drawing, x: number, y: number, W: number, structureType: string, answers: ProjectAnswers) {
+  const cat = structureCategory(structureType);
+  const wallHt = structureType === "TINY_HOME" ? 8.0 : 9.0;
+  const isBarn = cat === "barndominium" || cat === "agricultural";
+  const pitch = isBarn ? 3 / 12 : 5.5 / 12;
+  const rise = (W / 2) * pitch;
+  const foundH = 2.0;
+  const overhang = isBarn ? 1.0 : 2.0;
+
+  elevFoundation(d, x, y, W, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  rect(d, x, y + foundH, W, wallHt);
+  if (structureType === "LOG_CABIN") {
+    const logH = 0.65;
+    for (let ly = foundH + logH; ly < foundH + wallHt; ly += logH) {
+      d.drawLine(x, y + ly, x + W, y + ly);
+    }
+  }
+
+  const plateY = y + foundH + wallHt;
+  d.drawLine(x - overhang, plateY, x + W + overhang, plateY);
+  d.drawLine(x - overhang, plateY, x + W / 2, plateY + rise + 0.5);
+  d.drawLine(x + W + overhang, plateY, x + W / 2, plateY + rise + 0.5);
+  d.drawLine(x + W / 2 - 0.15, plateY, x + W / 2 - 0.15, plateY + rise + 0.5);
+  d.drawLine(x + W / 2 + 0.15, plateY, x + W / 2 + 0.15, plateY + rise + 0.5);
+
+  if (isBarn) {
+    const ribCount = Math.floor(W / 3);
+    for (let i = 1; i < ribCount; i++) {
+      const bx = x + i * (W / ribCount);
+      const brise = (bx <= x + W / 2) ? (bx - x) * pitch : (x + W - bx) * pitch;
+      d.drawLine(bx, plateY, bx, plateY + brise);
+    }
+  }
+
+  // Rear door
+  d.setActiveLayer("DOORS");
+  if (!isBarn) {
+    // Patio slider (residential/cabin)
+    const pdW = 6.0, pdH = 8.0, pdX = x + W * 0.42;
+    rect(d, pdX, y + foundH, pdW, pdH);
+    d.drawLine(pdX + pdW / 2, y + foundH, pdX + pdW / 2, y + foundH + pdH);
+    d.drawLine(pdX, y + foundH + pdH * 0.5, pdX + pdW, y + foundH + pdH * 0.5);
+  } else {
+    const bdW = W * 0.35, bdX = x + (W - bdW) / 2;
+    rect(d, bdX, y + foundH, bdW, 10.0);
+    d.drawLine(bdX + bdW / 2, y + foundH, bdX + bdW / 2, y + foundH + 10.0);
+  }
+
+  // Rear windows
+  d.setActiveLayer("WINDOWS");
+  const winW = structureType === "TINY_HOME" ? 2.5 : 4.0;
+  const winHt = structureType === "TINY_HOME" ? 3.0 : 4.5;
+  const winY = y + foundH + 2.8;
+  if (!isBarn) {
+    rect(d, x + W * 0.08, winY, winW, winHt);
+    rect(d, x + W * 0.72, winY, winW, winHt);
+    d.drawLine(x + W * 0.08 + winW / 2, winY, x + W * 0.08 + winW / 2, winY + winHt);
+    d.drawLine(x + W * 0.72 + winW / 2, winY, x + W * 0.72 + winW / 2, winY + winHt);
+    d.drawLine(x + W * 0.08, winY + winHt / 2, x + W * 0.08 + winW, winY + winHt / 2);
+    d.drawLine(x + W * 0.72, winY + winHt / 2, x + W * 0.72 + winW, winY + winHt / 2);
+  } else {
+    rect(d, x + W * 0.10, winY, 3.5, 3.5);
+    rect(d, x + W * 0.72, winY, 3.5, 3.5);
+  }
+
+  if (cat === "residential" && structureType !== "TINY_HOME") {
+    d.setActiveLayer("WALLS");
+    const chX = x + W * 0.28, chW = 2.5;
+    const chTop = plateY + rise * 0.55 + 3.0;
+    rect(d, chX, plateY - 1, chW, chTop - plateY + 1);
+    d.drawLine(chX - 0.4, chTop, chX + chW + 0.4, chTop);
+  }
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, y + foundH, x + W, y + foundH, -3.5, ft(W));
+
+  elevFooter(d, x, y, W, foundH, "REAR ELEVATION");
+}
+
+// Gable side elevation — shows eave side profile with roof cap; used for LEFT + RIGHT
+function drawGableSideElevation(d: typeof Drawing, x: number, y: number, H_depth: number, W: number, structureType: string, lbl: string) {
+  const cat = structureCategory(structureType);
+  const wallHt = structureType === "TINY_HOME" ? 8.0 : 9.0;
+  const isBarn = cat === "barndominium" || cat === "agricultural";
+  const pitch = isBarn ? 3 / 12 : 5.5 / 12;
+  const rise = (W / 2) * pitch;
+  const foundH = 2.0;
+  const gableOvhg = isBarn ? 0.5 : 1.5; // front/rear overhangs visible at ends
+
+  elevFoundation(d, x, y, H_depth, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  rect(d, x, y + foundH, H_depth, wallHt);
+  if (structureType === "LOG_CABIN") {
+    const logH = 0.65;
+    for (let ly = foundH + logH; ly < foundH + wallHt; ly += logH) {
+      d.drawLine(x, y + ly, x + H_depth, y + ly);
+    }
+  }
+
+  const plateY = y + foundH + wallHt;
+  // Eave line (full depth + gable overhangs)
+  d.drawLine(x - gableOvhg, plateY, x + H_depth + gableOvhg, plateY);
+  // Ridge line
+  d.drawLine(x - gableOvhg, plateY + rise, x + H_depth + gableOvhg, plateY + rise);
+  // Gable-end vertical lines at each side of view
+  d.drawLine(x - gableOvhg, plateY, x - gableOvhg, plateY + rise);
+  d.drawLine(x + H_depth + gableOvhg, plateY, x + H_depth + gableOvhg, plateY + rise);
+
+  if (isBarn) {
+    const ribCount = Math.floor(H_depth / 3);
+    for (let i = 1; i < ribCount; i++) {
+      d.drawLine(x + i * (H_depth / ribCount), plateY, x + i * (H_depth / ribCount), plateY + rise);
+    }
+  }
+
+  if (cat === "residential" && structureType !== "TINY_HOME") {
+    d.setActiveLayer("WALLS");
+    const chX = x + H_depth * 0.6, chW = 2.5;
+    const chTop = plateY + rise * 0.55 + 3.0;
+    rect(d, chX, plateY - 1, chW, chTop - plateY + 1);
+    d.drawLine(chX - 0.4, chTop, chX + chW + 0.4, chTop);
+  }
+
+  d.setActiveLayer("WINDOWS");
+  const winW = 3.5, winHt2 = 4.0, winY = y + foundH + 2.5;
+  rect(d, x + H_depth * 0.14, winY, winW, winHt2);
+  d.drawLine(x + H_depth * 0.14 + winW / 2, winY, x + H_depth * 0.14 + winW / 2, winY + winHt2);
+  d.drawLine(x + H_depth * 0.14, winY + winHt2 / 2, x + H_depth * 0.14 + winW, winY + winHt2 / 2);
+  if (H_depth > 30) {
+    rect(d, x + H_depth * 0.46, winY, winW, winHt2);
+    d.drawLine(x + H_depth * 0.46 + winW / 2, winY, x + H_depth * 0.46 + winW / 2, winY + winHt2);
+    d.drawLine(x + H_depth * 0.46, winY + winHt2 / 2, x + H_depth * 0.46 + winW, winY + winHt2 / 2);
+  }
+  rect(d, x + H_depth * 0.74, winY, winW, winHt2);
+  d.drawLine(x + H_depth * 0.74 + winW / 2, winY, x + H_depth * 0.74 + winW / 2, winY + winHt2);
+  d.drawLine(x + H_depth * 0.74, winY + winHt2 / 2, x + H_depth * 0.74 + winW, winY + winHt2 / 2);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, y + foundH, x + H_depth, y + foundH, -3.5, ft(H_depth));
+  dim(d, x + H_depth, y + foundH, x + H_depth, plateY, 4.5, `PLATE: ${wallHt}'-0"`);
+  dim(d, x + H_depth, plateY, x + H_depth, plateY + rise, 4.5, `RIDGE: +${ft(rise)}`);
+
+  elevFooter(d, x, y, H_depth, foundH, lbl);
+}
+
+// A-Frame side elevation — long roof slope profile
+function drawAFrameSideElevation(d: typeof Drawing, x: number, y: number, H_depth: number, W: number, lbl: string) {
+  const foundH = 1.5;
+  const pitch = 1.1;
+  const rise = (W / 2) * pitch;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, H_depth, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  // Eave at baseY (base of roof slopes)
+  d.drawLine(x - 1.5, baseY, x + H_depth + 1.5, baseY);
+  // Ridge at top — runs full depth at constant height
+  d.drawLine(x - 1.5, baseY + rise, x + H_depth + 1.5, baseY + rise);
+  // Gable-end edges visible at each end of depth
+  d.drawLine(x - 1.5, baseY, x - 1.5, baseY + rise);
+  d.drawLine(x + H_depth + 1.5, baseY, x + H_depth + 1.5, baseY + rise);
+  // Vertical ribs showing roof surface panels
+  const ribCount = Math.floor(H_depth / 5);
+  for (let i = 1; i < ribCount; i++) {
+    d.drawLine(x + i * H_depth / ribCount, baseY, x + i * H_depth / ribCount, baseY + rise * 0.95);
+  }
+
+  // Large side glazing panels (A-frame feature)
+  d.setActiveLayer("WINDOWS");
+  const gW = H_depth * 0.22, gH = rise * 0.62;
+  rect(d, x + H_depth * 0.12, baseY + 0.3, gW, gH);
+  d.drawLine(x + H_depth * 0.12 + gW / 3, baseY + 0.3, x + H_depth * 0.12 + gW / 3, baseY + 0.3 + gH);
+  d.drawLine(x + H_depth * 0.12 + gW * 2 / 3, baseY + 0.3, x + H_depth * 0.12 + gW * 2 / 3, baseY + 0.3 + gH);
+  rect(d, x + H_depth * 0.65, baseY + 0.3, gW, gH);
+  d.drawLine(x + H_depth * 0.65 + gW / 2, baseY + 0.3, x + H_depth * 0.65 + gW / 2, baseY + 0.3 + gH);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + H_depth, baseY, -3.5, ft(H_depth));
+  dim(d, x + H_depth, baseY, x + H_depth, baseY + rise, 4.5, `RIDGE: ${ft(rise)}`);
+
+  elevFooter(d, x, y, H_depth, foundH, lbl);
+}
+
+// Quonset side elevation — long rectangular profile, arch runs into the view
+function drawQuonsetSideElevation(d: typeof Drawing, x: number, y: number, H_depth: number, W: number, lbl: string) {
+  const foundH = 1.5;
+  const legH = W * 0.12;
+  const archR = W / 2;
+  const totalH = legH + archR;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, H_depth, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  // Side walls — long rectangular profile
+  d.drawLine(x, baseY, x + H_depth, baseY);
+  d.drawLine(x, baseY, x, baseY + totalH);
+  d.drawLine(x + H_depth, baseY, x + H_depth, baseY + totalH);
+  d.drawLine(x, baseY + totalH, x + H_depth, baseY + totalH);
+  // Inner shell thickness
+  d.drawLine(x, baseY + totalH - 0.5, x + H_depth, baseY + totalH - 0.5);
+  // Corrugation ribs along the length
+  const ribCount = Math.floor(H_depth / 5);
+  for (let i = 1; i < ribCount; i++) {
+    d.drawLine(x + i * H_depth / ribCount, baseY, x + i * H_depth / ribCount, baseY + totalH);
+  }
+
+  // Walk doors on near side
+  d.setActiveLayer("DOORS");
+  rect(d, x + H_depth * 0.12, baseY, 3.0, 7.0);
+  rect(d, x + H_depth * 0.72, baseY, 3.0, 7.0);
+
+  // Side windows
+  d.setActiveLayer("WINDOWS");
+  d.drawCircle(x + H_depth * 0.42, baseY + totalH * 0.62, 1.8);
+  d.drawCircle(x + H_depth * 0.58, baseY + totalH * 0.62, 1.8);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + H_depth, baseY, -3.5, ft(H_depth));
+  dim(d, x + H_depth, baseY, x + H_depth, baseY + totalH, 4.5, ft(totalH));
+
+  elevFooter(d, x, y, H_depth, foundH, lbl);
+}
+
+// Container side elevation — shows short 8ft face or long 40ft face
+function drawContainerSideElevation(d: typeof Drawing, x: number, y: number, H_depth: number, W: number, answers: ProjectAnswers, lbl: string) {
+  const foundH = 2.0;
+  const cH = 9.5;
+  const count = Math.min(n(answers.containerCount, 2), 6);
+  const stacked = Math.ceil(count / 2);
+  const totalH = stacked * cH;
+  const cx = x + H_depth / 2;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, H_depth, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  for (let i = 0; i < stacked; i++) {
+    const cY = baseY + i * cH;
+    rect(d, x, cY, H_depth, cH);
+    const ribCount2 = Math.floor(H_depth / 5);
+    for (let r = 1; r < ribCount2; r++) d.drawLine(x + r * H_depth / ribCount2, cY, x + r * H_depth / ribCount2, cY + cH);
+  }
+  d.drawLine(x - 1.5, baseY + totalH, x + H_depth + 1.5, baseY + totalH);
+  d.drawLine(x - 1.5, baseY + totalH - 0.5, x - 1.5, baseY + totalH);
+  d.drawLine(x + H_depth + 1.5, baseY + totalH - 0.5, x + H_depth + 1.5, baseY + totalH);
+
+  d.setActiveLayer("DOORS");
+  rect(d, cx - 1.5, baseY, 3.0, 7.5);
+  d.drawLine(cx, baseY, cx, baseY + 7.5);
+  d.drawLine(cx - 1.5, baseY + 7.5 * 0.45, cx + 1.5, baseY + 7.5 * 0.45);
+
+  d.setActiveLayer("WINDOWS");
+  const winW3 = 3.5, winHt3 = 3.5;
+  for (let i = 0; i < stacked; i++) {
+    const wY = baseY + i * cH + 2.5;
+    rect(d, x + H_depth * 0.12, wY, winW3, winHt3);
+    rect(d, x + H_depth * 0.68, wY, winW3, winHt3);
+    d.drawLine(x + H_depth * 0.12 + winW3 / 2, wY, x + H_depth * 0.12 + winW3 / 2, wY + winHt3);
+    d.drawLine(x + H_depth * 0.68 + winW3 / 2, wY, x + H_depth * 0.68 + winW3 / 2, wY + winHt3);
+  }
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + H_depth, baseY, -3.5, ft(H_depth));
+  dim(d, x + H_depth, baseY, x + H_depth, baseY + totalH, 4.5, ft(totalH));
+
+  elevFooter(d, x, y, H_depth, foundH, lbl);
+}
+
+// ─── Rear elevation dispatcher ────────────────────────────────────────────────
+
+function drawRearElevation(d: typeof Drawing, x: number, y: number, W: number, structureType: string, answers: ProjectAnswers) {
+  switch (structureType) {
+    case "A_FRAME":        drawAFrameElevation(d, x, y, W, "REAR ELEVATION"); break;
+    case "DOME_HOME":      drawDomeElevation(d, x, y, W, "REAR ELEVATION"); break;
+    case "QUONSET_HUT":    drawQuonsetElevation(d, x, y, W, "REAR ELEVATION"); break;
+    case "CONTAINER_HOME": drawContainerElevation(d, x, y, W, answers, "REAR ELEVATION"); break;
+    case "SILO":           drawSiloElevation(d, x, y, W, "REAR ELEVATION"); break;
+    default:               drawGableRearElevation(d, x, y, W, structureType, answers); break;
+  }
+}
+
+// ─── Side elevation dispatcher ────────────────────────────────────────────────
+
+function drawSideElevation(d: typeof Drawing, x: number, y: number, H_depth: number, W: number, structureType: string, answers: ProjectAnswers, lbl: string) {
+  switch (structureType) {
+    case "A_FRAME":        drawAFrameSideElevation(d, x, y, H_depth, W, lbl); break;
+    case "DOME_HOME":      drawDomeElevation(d, x, y, H_depth, lbl); break;
+    case "QUONSET_HUT":    drawQuonsetSideElevation(d, x, y, H_depth, W, lbl); break;
+    case "CONTAINER_HOME": drawContainerSideElevation(d, x, y, H_depth, W, answers, lbl); break;
+    case "SILO":           drawSiloElevation(d, x, y, H_depth, lbl); break;
+    default:               drawGableSideElevation(d, x, y, H_depth, W, structureType, lbl); break;
   }
 }
 
@@ -1150,15 +1440,28 @@ export function generateFloorPlanDXF(
   dim(d, 0, 0, W, 0, -7, ft(W));
   dim(d, 0, 0, 0, H, -7, ft(H));
 
-  // Front elevation (placed below floor plan)
-  const elevGap = 20;
-  const elevTotalH = structureType === "SILO" ? 70 : 30; // silo elevations are very tall
-  const elevY = -(elevGap + elevTotalH);
-  drawFrontElevation(d, 0, elevY, W, structureType, answers);
+  // ── Elevation layout ──────────────────────────────────────────────────────
+  // Row 1 (below floor plan): FRONT  |  REAR      (both W wide)
+  // Row 2 (below row 1):      LEFT   |  RIGHT     (both H wide)
+  const elevGap = 20;           // gap between floor plan bottom and row 1
+  const elevTotalH = structureType === "SILO" ? 70 : 30;
+  const elevHGap = 14;          // horizontal gap between elevations in same row
+  const elevVGap = 18;          // vertical gap between row 1 and row 2
 
-  // Section label between floor plan and elevation
+  // Row 1
+  const row1Y = -(elevGap + elevTotalH);
+  drawFrontElevation(d, 0,          row1Y, W, structureType, answers);
+  drawRearElevation( d, W + elevHGap, row1Y, W, structureType, answers);
+
+  // Row 2
+  const row2Y = row1Y - elevVGap - elevTotalH;
+  drawSideElevation(d, 0,          row2Y, H, W, structureType, answers, "LEFT ELEVATION");
+  drawSideElevation(d, H + elevHGap, row2Y, H, W, structureType, answers, "RIGHT ELEVATION");
+
+  // Section labels
   d.setActiveLayer("TITLE");
-  d.drawText(W / 2 - 6, -elevGap / 2 - 0.3, 0.45, 0, "▼ FRONT ELEVATION BELOW");
+  d.drawText(W / 2 - 8.5, -elevGap / 2 - 0.3, 0.45, 0, "▼ FRONT ELEVATION (LEFT)   REAR ELEVATION (RIGHT)");
+  d.drawText(H / 2 - 8.5, row1Y - elevVGap / 2 - 0.3, 0.42, 0, "▼ LEFT ELEVATION (LEFT)   RIGHT ELEVATION (RIGHT)");
 
   // North arrow
   northArrow(d, W + 8, H * 0.65);
@@ -1170,18 +1473,16 @@ export function generateFloorPlanDXF(
   // Title block
   titleBlock(d, W + 4, 0, projectName, structureType, sqft);
 
-  // Sheet border
-  const sheetW = W + 28;
-  const sheetH = H + 12 + elevGap + elevTotalH + 10;
+  // Sheet border — encompasses floor plan + all 4 elevations
+  const totalElevWidth = Math.max(W * 2 + elevHGap, H * 2 + elevHGap);
+  const sheetW = totalElevWidth + 30;
+  const sheetH = H + 12 + elevGap + elevTotalH + elevVGap + elevTotalH + 14;
   const sheetX = -8;
-  const sheetY = elevY - 12;
+  const sheetY = row2Y - 14;
   d.setActiveLayer("TITLE");
-  // Outer border
   rect(d, sheetX, sheetY, sheetW, sheetH);
-  // Inner border (title margin)
   rect(d, sheetX + 0.5, sheetY + 0.5, sheetW - 1, sheetH - 1);
-  // Sheet header
-  d.drawText(sheetX + 1, sheetY + sheetH - 3.5, 0.65, 0, "FLOOR PLAN — SHEET A1");
+  d.drawText(sheetX + 1, sheetY + sheetH - 3.5, 0.65, 0, "FLOOR PLAN + ELEVATIONS — SHEET A1");
   d.drawText(sheetX + 1, sheetY + sheetH - 4.4, 0.38, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
   d.drawText(sheetX + 1, sheetY + sheetH - 5.1, 0.35, 0, `PROJECT: ${projectName.substring(0, 30)}`);
 
