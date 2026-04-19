@@ -254,7 +254,42 @@ export default function LandingPage() {
                 <h3 className="text-xl font-black mb-1">Preferred Vendor List</h3>
                 <div className="text-3xl font-black text-amber-400 mb-4">$40</div>
                 <ul className="space-y-2 text-sm text-stone-300 mb-6">
-                  {["3 local contractors per trade", "Phone & address per listing", "Yelp rating & review count", "All trades in build sequence", "Notes section per trade", "Print-ready procurement doc"].map((item) => (
+                  {["3 local contractors per trade", "Phone & address per listing", "Google rating & review count", "All trades in build sequence", "Notes section per trade", "Print-ready procurement doc"].map((item) => (
+                    <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
+                  ))}
+                </ul>
+                <Link href="/register">
+                  <button className="w-full bg-stone-700 hover:bg-stone-600 text-white font-black py-3 rounded-xl transition-all duration-200">Start Your Design</button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Construction Schedule */}
+            <div className="group bg-stone-900 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/80 transition-all duration-300 hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] hover:-translate-y-1">
+              <div className="relative h-48 bg-stone-800 overflow-hidden flex items-center justify-center">
+                <div className="text-center px-6">
+                  {/* Mini critical path diagram */}
+                  <div className="flex items-center justify-center gap-1 mb-3">
+                    {["Pre", "Found", "Frame", "MEP", "Finish", "CO"].map((label, i) => (
+                      <div key={label} className="flex items-center gap-1">
+                        <div className={`text-[9px] font-black px-1.5 py-1 rounded ${i % 2 === 0 ? "bg-amber-600 text-white" : "bg-stone-600 text-stone-300"}`}>
+                          {label}
+                        </div>
+                        {i < 5 && <div className="w-2 h-px bg-stone-500" />}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-stone-400 font-semibold tracking-widest uppercase">Critical Path · Phase by Phase</p>
+                </div>
+                <div className="absolute top-4 right-4">
+                  <span className="bg-blue-600 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wide">Interactive</span>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-black mb-1">Construction Schedule</h3>
+                <div className="text-3xl font-black text-amber-400 mb-4">$85</div>
+                <ul className="space-y-2 text-sm text-stone-300 mb-6">
+                  {["Phase-by-phase build sequence", "Critical path tasks highlighted", "Duration estimates per task", "Dependency tracking between tasks", "Check off tasks as you progress", "Live progress bar & completion %"].map((item) => (
                     <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
                   ))}
                 </ul>
@@ -267,8 +302,8 @@ export default function LandingPage() {
 
           <div className="mt-10 text-center bg-stone-900/50 border border-stone-800 rounded-2xl p-6 max-w-2xl mx-auto">
             <p className="text-stone-400 text-sm">
-              Get everything — all 5 documents — for{" "}
-              <span className="text-amber-400 font-bold">$715 total</span>.
+              Get everything — all 6 documents — for{" "}
+              <span className="text-amber-400 font-bold">$800 total</span>.
               A traditional architect charges <span className="text-stone-300 font-semibold">$5,000–$15,000</span> for comparable documentation.
             </p>
           </div>

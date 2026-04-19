@@ -5,7 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import { getTradesForStructure } from "@/lib/contractorTrades";
-import { findContractors, ContractorResult } from "@/lib/googlePlaces";
+import { findContractors, geocodeZip, ContractorResult } from "@/lib/googlePlaces";
 import { ProjectAnswers } from "@/types";
 import { StructureType } from "@/types";
 import Button from "@/components/ui/Button";
@@ -53,10 +53,14 @@ export default async function ContractorsPage({ params }: { params: Promise<{ id
   let tradeResults: TradeWithContractors[] = [];
 
   if (purchased && hasGoogleKey) {
+    // Geocode the zip once so every trade search uses a hard radius constraint
+    // instead of relying on a text-embedded location string.
+    const coords = hasZip ? await geocodeZip(zipCode) : null;
+
     tradeResults = await Promise.all(
       trades.map(async (trade) => ({
         trade,
-        contractors: await findContractors(trade.searchKeywords, location),
+        contractors: await findContractors(trade.searchKeywords, location, coords),
       }))
     );
   } else {

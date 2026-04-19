@@ -88,6 +88,22 @@ const PACKAGES = [
       "Print-ready procurement doc",
     ],
   },
+  {
+    id: "construction_schedule",
+    icon: "📅",
+    title: "Construction Schedule",
+    price: "$85",
+    priceNum: 85,
+    badge: "Interactive",
+    includes: [
+      "Phase-by-phase build sequence",
+      "Critical path tasks highlighted",
+      "Duration estimates per task",
+      "Dependency tracking between tasks",
+      "Check off tasks as you progress",
+      "Live progress bar & completion %",
+    ],
+  },
 ];
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -186,9 +202,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           packages={PACKAGES.map((pkg) => ({
             ...pkg,
             viewPath: `/projects/${project.id}/${
-              pkg.id === "material_list" ? "material-list"
-              : pkg.id === "spec_tier" ? "spec-tier"
-              : pkg.id === "vendor_list" ? "contractors"
+              pkg.id === "material_list"          ? "material-list"
+              : pkg.id === "spec_tier"            ? "spec-tier"
+              : pkg.id === "vendor_list"          ? "contractors"
+              : pkg.id === "construction_schedule"? "schedule"
               : `preview/${pkg.id}`
             }`,
           }))}
