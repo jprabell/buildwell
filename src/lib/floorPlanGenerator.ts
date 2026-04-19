@@ -1373,6 +1373,532 @@ function structureCategory(structureType: string): StructureCategory {
   return map[structureType] ?? "residential";
 }
 
+// ─── MEP Symbol helpers ────────────────────────────────────────────────────────
+
+// ── Electrical ──
+function symOutlet(d: typeof Drawing, x: number, y: number, toward: "N"|"S"|"E"|"W" = "S") {
+  const a: Record<string,number> = { N:90, S:270, E:0, W:180 };
+  const rad = (a[toward] * Math.PI) / 180;
+  const cos = Math.cos(rad), sin = Math.sin(rad);
+  d.drawCircle(x, y, 0.42);
+  d.drawLine(x + 0.42*cos, y + 0.42*sin, x + 0.92*cos, y + 0.92*sin);
+  d.drawLine(x + 0.92*cos - 0.25*sin, y + 0.92*sin + 0.25*cos, x + 0.92*cos + 0.25*sin, y + 0.92*sin - 0.25*cos);
+}
+function symGFCI(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.42);
+  d.drawLine(x + 0.42, y, x + 0.92, y);
+  d.drawLine(x + 0.67, y + 0.25, x + 0.67, y - 0.25);
+  d.drawText(x + 0.35, y + 0.5, 0.28, 0, "GFI");
+}
+function sym240V(d: typeof Drawing, x: number, y: number) {
+  d.drawLine(x-0.45, y-0.4, x+0.45, y-0.4);
+  d.drawLine(x-0.45, y-0.4, x, y+0.42);
+  d.drawLine(x+0.45, y-0.4, x, y+0.42);
+  d.drawText(x-0.5, y-0.82, 0.28, 0, "240V");
+}
+function symSwitch(d: typeof Drawing, x: number, y: number) {
+  d.drawText(x-0.22, y-0.22, 0.52, 0, "S");
+  d.drawLine(x+0.25, y+0.22, x+0.72, y+0.7);
+}
+function symLight(d: typeof Drawing, x: number, y: number, r = 0.82) {
+  d.drawCircle(x, y, r);
+  const e = r + 0.48;
+  d.drawLine(x-r, y, x-e, y);  d.drawLine(x+r, y, x+e, y);
+  d.drawLine(x, y-r, x, y-e);  d.drawLine(x, y+r, x, y+e);
+}
+function symFan(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 1.1);
+  d.drawArc(x, y, 0.75, 30, 150);  d.drawArc(x, y, 0.75, 120, 240);
+  d.drawArc(x, y, 0.75, 210, 330);  d.drawArc(x, y, 0.75, 300, 60);
+  d.drawText(x-0.38, y-0.2, 0.38, 0, "CF");
+}
+function symExhFan(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.55);
+  d.drawText(x-0.28, y-0.2, 0.38, 0, "EF");
+  d.drawLine(x, y+0.55, x, y+1.1);
+  d.drawLine(x-0.25, y+0.85, x, y+1.1);
+  d.drawLine(x+0.25, y+0.85, x, y+1.1);
+}
+function symSmoke(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.55);
+  d.drawText(x-0.3, y-0.2, 0.38, 0, "SD");
+}
+function symPanel(d: typeof Drawing, x: number, y: number) {
+  rect(d, x-2.0, y-2.8, 4.0, 5.6);
+  d.drawText(x-1.5, y+1.4, 0.42, 0, "MAIN");
+  d.drawText(x-1.8, y+0.65, 0.42, 0, "PANEL");
+  d.drawText(x-1.3, y-0.15, 0.35, 0, "200 AMP");
+  d.drawText(x-1.65, y-0.85, 0.3, 0, "120/240V 1Φ");
+}
+
+// ── Plumbing ──
+function symWH(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 1.7);
+  d.drawText(x-0.38, y+0.35, 0.42, 0, "WH");
+  d.drawText(x-0.72, y-0.3, 0.32, 0, "50 GAL");
+  d.drawLine(x-0.55, y+1.7, x-0.55, y+2.8);
+  d.drawLine(x+0.55, y+1.7, x+0.55, y+2.8);
+  d.drawText(x-0.75, y+2.95, 0.28, 0, "HW");
+  d.drawText(x+0.3, y+2.95, 0.28, 0, "CW");
+}
+function symFloorDrain(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.62);
+  d.drawCircle(x, y, 0.26);
+  d.drawLine(x-0.44, y-0.44, x+0.44, y+0.44);
+  d.drawLine(x+0.44, y-0.44, x-0.44, y+0.44);
+  d.drawText(x-0.22, y-0.95, 0.3, 0, "FD");
+}
+function symCleanout(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.55);
+  d.drawText(x-0.3, y-0.2, 0.38, 0, "CO");
+}
+function symHoseBib(d: typeof Drawing, x: number, y: number) {
+  rect(d, x-0.55, y-0.38, 1.1, 0.76);
+  d.drawText(x-0.35, y-0.2, 0.38, 0, "HB");
+}
+function symVentStack(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.6);
+  d.drawLine(x, y+0.6, x, y+1.5);
+  d.drawText(x-0.3, y-0.2, 0.38, 0, "VS");
+  d.drawText(x-0.4, y+1.65, 0.26, 0, "TO ROOF");
+}
+function symCWLine(d: typeof Drawing, x1: number, y1: number, x2: number, y2: number) {
+  d.drawLine(x1, y1, x2, y2);
+  d.drawText((x1+x2)/2-0.3, (y1+y2)/2+0.2, 0.28, 0, "CW");
+}
+function symHWLine(d: typeof Drawing, x1: number, y1: number, x2: number, y2: number) {
+  d.drawLine(x1, y1, x2, y2);
+  d.drawText((x1+x2)/2-0.3, (y1+y2)/2+0.2, 0.28, 0, "HW");
+}
+
+// ── HVAC ──
+function symSupplyReg(d: typeof Drawing, x: number, y: number, w = 2.6, h = 1.3) {
+  rect(d, x-w/2, y-h/2, w, h);
+  const n2 = Math.max(2, Math.floor(w/0.65));
+  for (let i = 1; i < n2; i++) d.drawLine(x-w/2+i*w/n2, y-h/2, x-w/2+i*w/n2, y+h/2);
+  d.drawText(x-0.18, y-0.2, 0.32, 0, "S");
+}
+function symReturnReg(d: typeof Drawing, x: number, y: number, w = 3.2, h = 1.6) {
+  rect(d, x-w/2, y-h/2, w, h);
+  hatch(d, x-w/2+0.05, y-h/2+0.05, w-0.1, h-0.1, 0.7);
+  d.drawText(x-0.18, y-0.2, 0.32, 0, "R");
+}
+function symThermostat(d: typeof Drawing, x: number, y: number) {
+  d.drawCircle(x, y, 0.7);
+  d.drawText(x-0.2, y-0.24, 0.48, 0, "T");
+}
+function symAHU(d: typeof Drawing, x: number, y: number) {
+  rect(d, x-2.8, y-2.2, 5.6, 4.4);
+  d.drawText(x-1.2, y+0.9, 0.42, 0, "AHU");
+  d.drawText(x-2.0, y+0.1, 0.38, 0, "FURNACE /");
+  d.drawText(x-1.8, y-0.65, 0.38, 0, "AIR HANDLER");
+  d.drawLine(x-2.8+0.5, y-2.2, x-2.8+0.5, y+2.2);
+  d.drawLine(x+2.8-0.5, y-2.2, x+2.8-0.5, y+2.2);
+}
+function symCondenser(d: typeof Drawing, x: number, y: number) {
+  rect(d, x-2.4, y-2.4, 4.8, 4.8);
+  d.drawCircle(x, y, 1.6);
+  d.drawText(x-2.2, y+2.6, 0.38, 0, "A/C CONDENSER");
+  d.drawText(x-1.5, y+1.9, 0.3, 0, "(EXTERIOR UNIT)");
+}
+function symUnitHeater(d: typeof Drawing, x: number, y: number) {
+  rect(d, x-2.0, y-1.0, 4.0, 2.0);
+  d.drawText(x-1.7, y-0.22, 0.38, 0, "UNIT HEATER");
+  d.drawLine(x-1.0, y+1.0, x-1.0, y+2.2);
+  d.drawLine(x+1.0, y+1.0, x+1.0, y+2.2);
+  d.drawLine(x-1.0, y+2.2, x+1.0, y+2.2);
+}
+function symDuctH(d: typeof Drawing, x: number, y: number, w: number, lbl = "") {
+  rect(d, x, y-0.55, w, 1.1);
+  if (lbl) d.drawText(x+w/2-lbl.length*0.12, y-0.2, 0.3, 0, lbl);
+}
+function symDuctV(d: typeof Drawing, x: number, y: number, h: number, lbl = "") {
+  rect(d, x-0.55, y, 1.1, h);
+  if (lbl) d.drawText(x-0.2, y+h/2-0.18, 0.3, 90, lbl);
+}
+
+// ─── MEP background floor plan ────────────────────────────────────────────────
+// Lightweight background used on E1, P1, M1 sheets
+
+function drawMEPBackground(d: typeof Drawing, x: number, y: number, W: number, H: number, structureType: string, answers: ProjectAnswers) {
+  const cat = structureCategory(structureType);
+  const hasGarage = !s(answers.garageType, "none").startsWith("none");
+
+  d.setActiveLayer("MEP_BG");
+  rect(d, x, y, W, H);
+
+  if (cat === "residential") {
+    const xB = rn(W*0.32), xC = rn(W*0.49), xD = rn(W*0.79);
+    const yB = rn(H*0.20), yC = rn(H*0.50), yBh = rn(H*0.35), yD = rn(H*0.75);
+    d.drawLine(x+xB, y, x+xB, y+yC);
+    d.drawLine(x+xC, y, x+xC, y+H);
+    d.drawLine(x, y+yB, x+xC, y+yB);
+    d.drawLine(x+xB, y+yBh, x+xC, y+yBh);
+    d.drawLine(x, y+yC, x+W, y+yC);
+    d.drawLine(x+xC, y+yD, x+W, y+yD);
+    d.setActiveLayer("TEXT");
+    if (hasGarage) d.drawText(x+xC*0.22, y+yB*0.38, 0.32, 0, "GARAGE");
+    else { d.drawText(x+xB*0.18, y+yB*0.38, 0.32, 0, "UTILITY"); }
+    d.drawText(x+xC+(W-xC)*0.2, y+yB*0.38, 0.32, 0, "FOYER");
+    d.drawText(x+xB*0.18, y+yB+(yC-yB)*0.35, 0.32, 0, "BED 2");
+    d.drawText(x+xB+(xC-xB)*0.08, y+yBh+(yC-yBh)*0.35, 0.3, 0, "BATH");
+    d.drawText(x+xC+(xD-xC)*0.18, y+yB+(yC-yB)*0.35, 0.32, 0, "KITCHEN");
+    d.drawText(x+xD+(W-xD)*0.15, y+yB+(yC-yB)*0.35, 0.32, 0, "DINING");
+    d.drawText(x+xB*0.15, y+yC+(H-yC)*0.35, 0.32, 0, "MASTER BED");
+    d.drawText(x+xB+(xC-xB)*0.05, y+yC+(yD-yC)*0.35, 0.3, 0, "M.BATH");
+    d.drawText(x+xC+(W-xC)*0.18, y+yC+(H-yC)*0.35, 0.32, 0, "LIVING");
+  } else if (cat === "barndominium") {
+    const shopW = rn(W*0.55);
+    d.drawLine(x+shopW, y, x+shopW, y+H);
+    d.drawLine(x+shopW, y+rn(H*0.18), x+W, y+rn(H*0.18));
+    d.drawLine(x+shopW, y+rn(H*0.50), x+W, y+rn(H*0.50));
+    d.drawLine(x+shopW, y+rn(H*0.72), x+W, y+rn(H*0.72));
+    d.setActiveLayer("TEXT");
+    d.drawText(x+shopW*0.32, y+H*0.45, 0.38, 0, "SHOP");
+    d.drawText(x+shopW+(W-shopW)*0.18, y+H*0.3, 0.32, 0, "LIVING");
+  } else if (cat === "agricultural") {
+    const cols = Math.max(1, Math.ceil(W/12));
+    for (let c = 1; c < cols; c++) d.drawLine(x+c*12, y, x+c*12, y+H);
+  }
+}
+
+// ─── MEP sheet title helper ───────────────────────────────────────────────────
+
+function mepSheetTitle(d: typeof Drawing, sheetX: number, sheetY: number, sheetW: number, sheetH: number, sheetNum: string, sheetTitle: string, projectName: string) {
+  d.setActiveLayer("TITLE");
+  rect(d, sheetX, sheetY, sheetW, sheetH);
+  rect(d, sheetX+0.5, sheetY+0.5, sheetW-1, sheetH-1);
+  d.drawText(sheetX+1, sheetY+sheetH-3.5, 0.65, 0, `${sheetTitle} — ${sheetNum}`);
+  d.drawText(sheetX+1, sheetY+sheetH-4.4, 0.38, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
+  d.drawText(sheetX+1, sheetY+sheetH-5.1, 0.35, 0, `PROJECT: ${projectName.substring(0, 30)}`);
+}
+
+// ─── Electrical Plan (Sheet E1) ───────────────────────────────────────────────
+
+function drawElectricalPlan(d: typeof Drawing, x: number, y: number, W: number, H: number, structureType: string, answers: ProjectAnswers, bedrooms: number) {
+  const cat = structureCategory(structureType);
+  const hasGarage = !s(answers.garageType, "none").startsWith("none");
+  drawMEPBackground(d, x, y, W, H, structureType, answers);
+  d.setActiveLayer("ELECTRICAL");
+
+  if (cat === "residential") {
+    const xB = rn(W*0.32), xC = rn(W*0.49), xD = rn(W*0.79);
+    const yB = rn(H*0.20), yC = rn(H*0.50), yBh = rn(H*0.35), yD = rn(H*0.75);
+
+    // UTILITY / GARAGE
+    if (hasGarage) {
+      symPanel(d, x+xC*0.14, y+yB*0.52);
+      sym240V(d, x+xC*0.8, y+yB*0.52);
+      symLight(d, x+xC*0.5, y+yB*0.5, 0.82);
+      symSwitch(d, x+xC-1.2, y+0.9);
+      symOutlet(d, x+xC*0.28, y+0.5, "N");
+      symOutlet(d, x+xC*0.65, y+0.5, "N");
+    } else {
+      symPanel(d, x+xB*0.14, y+yB*0.52);
+      sym240V(d, x+xB*0.72, y+yB*0.52);
+      symLight(d, x+xB*0.5, y+yB*0.5, 0.65);
+      symSwitch(d, x+xB-0.8, y+0.9);
+    }
+    // FOYER
+    symLight(d, x+xC+(W-xC)*0.5, y+yB*0.5, 0.65);
+    symSwitch(d, x+xC+1.0, y+0.9);
+    symSmoke(d, x+xC+(W-xC)*0.75, y+yB*0.88);
+
+    // BED 2 (and BED 3 if 3+ bedrooms)
+    symFan(d, x+xB*0.5, y+yB+(yC-yB)*0.5);
+    symSwitch(d, x+0.5, y+yB+1.0);
+    symOutlet(d, x+0.5, y+yB+2.8, "E");
+    symOutlet(d, x+0.5, y+yC-2.5, "E");
+    symSmoke(d, x+xB*0.82, y+yB+1.0);
+    if (bedrooms >= 3) {
+      symFan(d, x+xB*0.75, y+yB+(yC-yB)*0.5);
+      symSwitch(d, x+xB-0.5, y+yB+1.0);
+    }
+    // HALL
+    symLight(d, x+xB+(xC-xB)*0.5, y+(yBh+yB)*0.55, 0.55);
+    // BATH
+    symExhFan(d, x+xB+(xC-xB)*0.55, y+yBh+(yC-yBh)*0.78);
+    symLight(d, x+xB+(xC-xB)*0.5, y+yBh+(yC-yBh)*0.45, 0.6);
+    symGFCI(d, x+xB+0.9, y+yBh+1.6);
+    symSwitch(d, x+xB+0.5, y+yBh+0.9);
+    // KITCHEN
+    symLight(d, x+xC+(xD-xC)*0.3, y+yB+(yC-yB)*0.5, 0.72);
+    symLight(d, x+xC+(xD-xC)*0.75, y+yB+(yC-yB)*0.5, 0.72);
+    sym240V(d, x+xC+(xD-xC)*0.52, y+yC-1.8);
+    sym240V(d, x+xD-2.8, y+yB+2.2);
+    symGFCI(d, x+xC+1.5, y+yB+2.6);
+    symGFCI(d, x+xD-1.8, y+yB+2.6);
+    symSwitch(d, x+xC+1.0, y+yB+0.9);
+    symSmoke(d, x+xC+(xD-xC)*0.5, y+yB+0.9);
+    // DINING
+    symLight(d, x+xD+(W-xD)*0.5, y+yB+(yC-yB)*0.5, 0.72);
+    symOutlet(d, x+W-0.5, y+yB+2.5, "W");
+    symOutlet(d, x+W-0.5, y+yC-2.5, "W");
+    // MASTER BEDROOM
+    symFan(d, x+xB*0.5, y+yC+(H-yC)*0.45);
+    symSwitch(d, x+0.5, y+yC+1.0);
+    symOutlet(d, x+0.5, y+yC+2.8, "E");
+    symOutlet(d, x+0.5, y+yD-2.0, "E");
+    symSmoke(d, x+xB*0.82, y+yC+1.0);
+    // MASTER BATH
+    symExhFan(d, x+xB+(xC-xB)*0.5, y+yD-1.2);
+    symLight(d, x+xB+(xC-xB)*0.5, y+yC+(yD-yC)*0.5, 0.6);
+    symGFCI(d, x+xB+0.9, y+yC+1.6);
+    // W.I.C.
+    symLight(d, x+xB+(xC-xB)*0.5, y+yD+(H-yD)*0.5, 0.55);
+    // LIVING ROOM
+    symFan(d, x+xC+(W-xC)*0.45, y+yC+(H-yC)*0.45);
+    symSwitch(d, x+xC+1.0, y+yC+1.0);
+    symOutlet(d, x+xC+2.5, y+yC+0.5, "N");
+    symOutlet(d, x+W-0.5, y+yC+(H-yC)*0.28, "W");
+    symOutlet(d, x+W-0.5, y+yC+(H-yC)*0.72, "W");
+    symOutlet(d, x+xC+(W-xC)*0.5, y+H-0.5, "S");
+    symSmoke(d, x+xC+(W-xC)*0.78, y+yC+1.0);
+
+  } else if (cat === "barndominium") {
+    const shopW = rn(W*0.55);
+    symPanel(d, x+shopW*0.12, y+H*0.5);
+    symLight(d, x+shopW*0.35, y+H*0.25, 1.0); symLight(d, x+shopW*0.7, y+H*0.25, 1.0);
+    symLight(d, x+shopW*0.35, y+H*0.75, 1.0); symLight(d, x+shopW*0.7, y+H*0.75, 1.0);
+    sym240V(d, x+shopW*0.25, y+H*0.52); sym240V(d, x+shopW*0.62, y+H*0.52);
+    symOutlet(d, x+shopW*0.4, y+0.5, "N"); symOutlet(d, x+shopW*0.72, y+0.5, "N");
+    symSmoke(d, x+shopW*0.5, y+H*0.1); symSmoke(d, x+shopW*0.8, y+H*0.1);
+    symPanel(d, x+shopW+(W-shopW)*0.12, y+H*0.08);
+    symFan(d, x+shopW+(W-shopW)*0.5, y+H*0.32);
+    symFan(d, x+shopW+(W-shopW)*0.5, y+H*0.62);
+    symFan(d, x+shopW+(W-shopW)*0.5, y+H*0.86);
+    symGFCI(d, x+shopW+1.6, y+H*0.27); symExhFan(d, x+W-1.6, y+H*0.62);
+    sym240V(d, x+shopW+(W-shopW)*0.72, y+H*0.43);
+    symSmoke(d, x+shopW+(W-shopW)*0.82, y+H*0.15);
+
+  } else if (cat === "agricultural") {
+    const cols = Math.max(1, Math.floor(W/20)), rows = Math.max(1, Math.floor(H/20));
+    for (let c = 0; c <= cols; c++)
+      for (let r = 0; r <= rows; r++)
+        symLight(d, x+(c+0.5)*W/(cols+1), y+(r+0.5)*H/(rows+1), 0.82);
+    symPanel(d, x+2.8, y+H*0.5);
+    sym240V(d, x+W*0.45, y+H*0.06);
+    symSmoke(d, x+W*0.25, y+H*0.08); symSmoke(d, x+W*0.75, y+H*0.08);
+
+  } else {
+    symPanel(d, x+2.8, y+H*0.5);
+    const bays = n(answers.garageBays, 1);
+    for (let b = 0; b < bays; b++) {
+      const bx = x + (b+0.5)*(W/bays);
+      symLight(d, bx, y+H*0.5, 0.82);
+      sym240V(d, bx-W/bays*0.25, y+H*0.85);
+      symOutlet(d, bx, y+H-0.5, "S");
+    }
+    symSmoke(d, x+W*0.5, y+H*0.1);
+  }
+
+  // Legend
+  d.setActiveLayer("ELECTRICAL");
+  const lx = x+W+2.8, ly = y+H;
+  d.drawText(lx, ly-0.5, 0.48, 0, "ELECTRICAL LEGEND");
+  d.drawLine(lx, ly-0.85, lx+16, ly-0.85);
+  symLight(d, lx+1.0, ly-2.1);     d.drawText(lx+2.5, ly-2.3, 0.35, 0, "CEILING LIGHT FIXTURE");
+  symFan(d, lx+1.1, ly-4.0);        d.drawText(lx+2.5, ly-4.2, 0.35, 0, "CEILING FAN WITH LIGHT");
+  symOutlet(d, lx+0.5, ly-5.7);     d.drawText(lx+2.5, ly-5.9, 0.35, 0, "DUPLEX OUTLET (120V)");
+  symGFCI(d, lx+0.5, ly-7.3);       d.drawText(lx+2.5, ly-7.5, 0.35, 0, "GFCI OUTLET (KIT/BATH)");
+  sym240V(d, lx+0.5, ly-8.9);       d.drawText(lx+2.5, ly-9.1, 0.35, 0, "240V DEDICATED CIRCUIT");
+  symSwitch(d, lx+0.5, ly-10.4);    d.drawText(lx+2.5, ly-10.6, 0.35, 0, "SINGLE-POLE SWITCH");
+  symExhFan(d, lx+0.5, ly-12.0);    d.drawText(lx+2.5, ly-12.2, 0.35, 0, "EXHAUST FAN (BATH/KIT)");
+  symSmoke(d, lx+0.5, ly-13.5);     d.drawText(lx+2.5, ly-13.7, 0.35, 0, "SMOKE DETECTOR");
+  symPanel(d, lx+2.0, ly-17.2);     d.drawText(lx+2.5, ly-19.3, 0.35, 0, "200A MAIN PANEL");
+  d.setActiveLayer("TEXT");
+  d.drawText(lx, ly-21.5, 0.32, 0, "ALL ELECTRICAL WORK TO");
+  d.drawText(lx, ly-22.15, 0.32, 0, "COMPLY WITH NEC 2020 AND");
+  d.drawText(lx, ly-22.8, 0.32, 0, "LOCAL AUTHORITY (AHJ).");
+}
+
+// ─── Plumbing Plan (Sheet P1) ─────────────────────────────────────────────────
+
+function drawPlumbingPlan(d: typeof Drawing, x: number, y: number, W: number, H: number, structureType: string, answers: ProjectAnswers, bedrooms: number) {
+  const cat = structureCategory(structureType);
+  drawMEPBackground(d, x, y, W, H, structureType, answers);
+  d.setActiveLayer("PLUMBING");
+
+  if (cat === "residential") {
+    const xB = rn(W*0.32), xC = rn(W*0.49), xD = rn(W*0.79);
+    const yB = rn(H*0.20), yC = rn(H*0.50), yBh = rn(H*0.35), yD = rn(H*0.75);
+
+    // Water heater in utility area
+    symWH(d, x+xB*0.5, y+yB*0.52);
+    // Main cold water service
+    d.drawLine(x, y+yB*0.52, x+xB*0.5-1.7, y+yB*0.52);
+    d.drawText(x+0.4, y+yB*0.52+0.4, 0.28, 0, "WATER MAIN");
+    // Cold trunk to kitchen and baths
+    symCWLine(d, x+xB*0.5+1.7, y+yB*0.52, x+xC, y+yB*0.52);
+    symCWLine(d, x+xC, y+yB*0.52, x+xD-1.0, y+yB*0.52);
+    // Hot trunk from WH
+    symHWLine(d, x+xB*0.5, y+yB*0.52+1.7, x+xB*0.5, y+yD-0.5);
+
+    // Hall bath
+    symCWLine(d, x+xB+0.6, y+yBh+0.5, x+xB+0.6, y+yC-0.5);
+    symHWLine(d, x+xB+1.3, y+yBh+0.5, x+xB+1.3, y+yC-0.5);
+    symFloorDrain(d, x+xB+(xC-xB)*0.5, y+yBh+(yC-yBh)*0.5);
+    symVentStack(d, x+xC-1.2, y+yBh+(yC-yBh)*0.5);
+    symCleanout(d, x+xB+(xC-xB)*0.5, y+yBh+0.9);
+
+    // Master bath
+    symCWLine(d, x+xB+0.6, y+yC+0.5, x+xB+0.6, y+yD-0.5);
+    symHWLine(d, x+xB+1.3, y+yC+0.5, x+xB+1.3, y+yD-0.5);
+    symFloorDrain(d, x+xB+(xC-xB)*0.5, y+yC+(yD-yC)*0.5);
+    symVentStack(d, x+xC-1.2, y+yC+(yD-yC)*0.5);
+    symCleanout(d, x+xB+(xC-xB)*0.5, y+yC+0.9);
+
+    // Kitchen
+    symCWLine(d, x+xC+0.6, y+yC-1.5, x+xD-1.5, y+yC-1.5);
+    symHWLine(d, x+xC+0.6, y+yC-2.5, x+xD-1.5, y+yC-2.5);
+    symVentStack(d, x+xD-2.2, y+yB+(yC-yB)*0.5);
+    symCleanout(d, x+xC+(xD-xC)*0.5, y+yB+0.8);
+
+    // Laundry
+    symFloorDrain(d, x+xB*0.65, y+yB*0.75);
+    symCWLine(d, x+xB*0.3, y+yB*0.25, x+xB*0.3, y+yB*0.48);
+
+    // Hose bibs exterior
+    symHoseBib(d, x+W*0.3, y);
+    symHoseBib(d, x+W*0.3, y+H);
+    // Main cleanout
+    symCleanout(d, x+W*0.5, y);
+    d.drawText(x+W*0.52, y-0.8, 0.3, 0, "MAIN CO");
+
+  } else if (cat === "barndominium") {
+    const shopW = rn(W*0.55);
+    symWH(d, x+shopW+(W-shopW)*0.14, y+H*0.08);
+    symFloorDrain(d, x+shopW*0.25, y+H*0.5);
+    symFloorDrain(d, x+shopW*0.55, y+H*0.5);
+    symFloorDrain(d, x+shopW*0.82, y+H*0.5);
+    symCleanout(d, x+shopW*0.5, y+0.6);
+    symHoseBib(d, x, y+H*0.5);
+    symHoseBib(d, x+shopW*0.5, y+H);
+    symVentStack(d, x+shopW+(W-shopW)*0.55, y+H*0.62);
+    symCWLine(d, x, y+H*0.35, x+shopW*0.25, y+H*0.35);
+    d.drawText(x+0.4, y+H*0.35+0.3, 0.28, 0, "WATER MAIN");
+
+  } else if (cat === "agricultural") {
+    symHoseBib(d, x, y+H*0.25); symHoseBib(d, x, y+H*0.75);
+    symHoseBib(d, x+W, y+H*0.5);
+    symFloorDrain(d, x+W*0.25, y+H*0.5);
+    symFloorDrain(d, x+W*0.75, y+H*0.5);
+    symCleanout(d, x+W*0.5, y+H*0.05);
+
+  } else {
+    symHoseBib(d, x+W*0.5, y);
+    symFloorDrain(d, x+W*0.5, y+H*0.5);
+    symCleanout(d, x+W*0.5, y+H-0.6);
+  }
+
+  // Legend
+  d.setActiveLayer("PLUMBING");
+  const lx = x+W+2.8, ly = y+H;
+  d.drawText(lx, ly-0.5, 0.48, 0, "PLUMBING LEGEND");
+  d.drawLine(lx, ly-0.85, lx+16, ly-0.85);
+  symWH(d, lx+1.7, ly-3.8);         d.drawText(lx+2.5, ly-2.2, 0.35, 0, "WATER HEATER (50 GAL)");
+  symFloorDrain(d, lx+0.62, ly-6.4); d.drawText(lx+2.5, ly-6.6, 0.35, 0, "FLOOR DRAIN");
+  symVentStack(d, lx+0.62, ly-8.5); d.drawText(lx+2.5, ly-8.7, 0.35, 0, "VENT STACK (THRU ROOF)");
+  symCleanout(d, lx+0.55, ly-10.3); d.drawText(lx+2.5, ly-10.5, 0.35, 0, "CLEANOUT ACCESS");
+  symHoseBib(d, lx+0.55, ly-11.9); d.drawText(lx+2.5, ly-12.1, 0.35, 0, "HOSE BIB (EXTERIOR)");
+  d.drawText(lx, ly-13.8, 0.38, 0, "─── CW   COLD WATER SUPPLY");
+  d.drawText(lx, ly-14.7, 0.38, 0, "- - HW   HOT WATER SUPPLY");
+  d.setActiveLayer("TEXT");
+  d.drawText(lx, ly-16.8, 0.32, 0, "ALL PLUMBING TO COMPLY");
+  d.drawText(lx, ly-17.45, 0.32, 0, "WITH UPC 2021 AND LOCAL");
+  d.drawText(lx, ly-18.1, 0.32, 0, "CODES. VERIFY WITH AHJ.");
+}
+
+// ─── HVAC / Mechanical Plan (Sheet M1) ────────────────────────────────────────
+
+function drawHVACPlan(d: typeof Drawing, x: number, y: number, W: number, H: number, structureType: string, answers: ProjectAnswers, bedrooms: number) {
+  const cat = structureCategory(structureType);
+  drawMEPBackground(d, x, y, W, H, structureType, answers);
+  d.setActiveLayer("HVAC");
+
+  if (cat === "residential") {
+    const xB = rn(W*0.32), xC = rn(W*0.49), xD = rn(W*0.79);
+    const yB = rn(H*0.20), yC = rn(H*0.50), yD = rn(H*0.75);
+
+    // AHU in utility area
+    symAHU(d, x+xB*0.5, y+yB*0.52);
+
+    // Main trunk ducts
+    symDuctH(d, x+xB+0.5, y+yB*0.52, xC-xB-1.0, "10\" MAIN TRUNK");
+    symDuctH(d, x+xC, y+yB*0.52, W-xC-0.5, "8\" BRANCH");
+    symDuctV(d, x+xB*0.5, y+yB+0.5, yC-yB-1.0, "8\"");
+    symDuctV(d, x+xC*(0.85), y+yC, H-yC-0.5, "8\"");
+
+    // Supply registers (near ext walls, in floor or low wall)
+    symSupplyReg(d, x+xC*0.5, y+yB-0.65);       // utility
+    symSupplyReg(d, x+xC+(W-xC)*0.5, y+yB-0.65); // foyer
+    symSupplyReg(d, x+0.65, y+yB+(yC-yB)*0.5);   // bed 2
+    symSupplyReg(d, x+xC+(xD-xC)*0.5, y+yB+0.65);// kitchen
+    symSupplyReg(d, x+xD+(W-xD)*0.5, y+yB+0.65); // dining
+    symSupplyReg(d, x+0.65, y+yC+(H-yC)*0.45);   // master bed
+    symSupplyReg(d, x+xC+(W-xC)*0.5, y+H-0.65);  // living
+    if (bedrooms >= 3) symSupplyReg(d, x+xB*0.75, y+yB+0.65); // bed 3
+
+    // Return air grilles (central hall/living)
+    symReturnReg(d, x+xB+(xC-xB)*0.5, y+(yB+yC)*0.5);
+    symReturnReg(d, x+xC+(W-xC)*0.45, y+yC+(H-yC)*0.5);
+
+    // Thermostat (hallway)
+    symThermostat(d, x+xB+2.5, y+yC-2.2);
+
+    // Outdoor condenser (shown outside building below)
+    symCondenser(d, x+W*0.82, y-9.0);
+    d.drawLine(x+W*0.82, y, x+W*0.82, y-6.5);
+    d.drawText(x+W*0.84, y-3.2, 0.3, 0, "REFRIG.");
+    d.drawText(x+W*0.84, y-3.8, 0.3, 0, "LINES");
+
+  } else if (cat === "barndominium") {
+    const shopW = rn(W*0.55);
+    // Shop: unit heaters
+    symUnitHeater(d, x+shopW*0.25, y+H*0.78);
+    symUnitHeater(d, x+shopW*0.72, y+H*0.78);
+    // Living: AHU + registers
+    symAHU(d, x+shopW+(W-shopW)*0.15, y+H*0.08);
+    symSupplyReg(d, x+shopW+(W-shopW)*0.5, y+H*0.17);
+    symSupplyReg(d, x+shopW+(W-shopW)*0.5, y+H*0.38);
+    symSupplyReg(d, x+shopW+(W-shopW)*0.5, y+H*0.62);
+    symSupplyReg(d, x+shopW+(W-shopW)*0.5, y+H*0.86);
+    symReturnReg(d, x+shopW+(W-shopW)*0.82, y+H*0.5);
+    symThermostat(d, x+shopW+1.8, y+H*0.5);
+    symCondenser(d, x+W+3.5, y+H*0.5);
+    d.drawLine(x+W, y+H*0.5, x+W+1.2, y+H*0.5);
+
+  } else if (cat === "agricultural") {
+    const heaterCount = Math.max(2, Math.floor(W/30));
+    for (let i = 0; i < heaterCount; i++)
+      symUnitHeater(d, x+(i+0.5)*W/heaterCount, y+H-2.2);
+    symThermostat(d, x+W*0.5, y+H*0.5);
+    symSupplyReg(d, x+W*0.25, y+0.65); symSupplyReg(d, x+W*0.75, y+0.65);
+
+  } else {
+    symUnitHeater(d, x+W*0.5, y+H*0.78);
+    symThermostat(d, x+W*0.25, y+H*0.5);
+    symSupplyReg(d, x+W*0.5, y+0.65);
+    symReturnReg(d, x+W*0.5, y+H-0.65);
+  }
+
+  // Legend
+  d.setActiveLayer("HVAC");
+  const lx = x+W+2.8, ly = y+H;
+  d.drawText(lx, ly-0.5, 0.48, 0, "HVAC / MECHANICAL LEGEND");
+  d.drawLine(lx, ly-0.85, lx+18, ly-0.85);
+  symSupplyReg(d, lx+1.3, ly-2.1);  d.drawText(lx+3.0, ly-2.3, 0.35, 0, "SUPPLY AIR REGISTER");
+  symReturnReg(d, lx+1.6, ly-4.0);  d.drawText(lx+3.4, ly-4.2, 0.35, 0, "RETURN AIR GRILLE");
+  symThermostat(d, lx+0.7, ly-5.6); d.drawText(lx+2.5, ly-5.8, 0.35, 0, "PROGRAMMABLE THERMOSTAT");
+  symAHU(d, lx+2.8, ly-9.5);        d.drawText(lx+2.5, ly-12.2, 0.35, 0, "AIR HANDLER / FURNACE");
+  symCondenser(d, lx+2.4, ly-16.0); d.drawText(lx+2.5, ly-18.8, 0.35, 0, "A/C CONDENSER (EXTERIOR)");
+  symUnitHeater(d, lx+2.0, ly-20.5);d.drawText(lx+2.5, ly-20.7, 0.35, 0, "UNIT HEATER (SHOP/AG.)");
+  d.setActiveLayer("TEXT");
+  d.drawText(lx, ly-23.0, 0.32, 0, "ALL HVAC TO COMPLY WITH");
+  d.drawText(lx, ly-23.65, 0.32, 0, "IMC 2021 AND LOCAL CODES.");
+  d.drawText(lx, ly-24.3, 0.32, 0, "SIZING BY MECH. ENGINEER.");
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export function generateFloorPlanDXF(
@@ -1400,6 +1926,10 @@ export function generateFloorPlanDXF(
   d.addLayer("DIMENSIONS", Drawing.ACI.YELLOW, "CONTINUOUS");
   d.addLayer("TEXT", Drawing.ACI.WHITE, "CONTINUOUS");
   d.addLayer("TITLE", Drawing.ACI.WHITE, "CONTINUOUS");
+  d.addLayer("ELECTRICAL", Drawing.ACI.YELLOW, "CONTINUOUS");
+  d.addLayer("PLUMBING", Drawing.ACI.CYAN, "CONTINUOUS");
+  d.addLayer("HVAC", 6, "CONTINUOUS");
+  d.addLayer("MEP_BG", 8, "CONTINUOUS");
 
   // Exterior shell
   d.setActiveLayer("EXTERIOR");
@@ -1485,6 +2015,30 @@ export function generateFloorPlanDXF(
   d.drawText(sheetX + 1, sheetY + sheetH - 3.5, 0.65, 0, "FLOOR PLAN + ELEVATIONS — SHEET A1");
   d.drawText(sheetX + 1, sheetY + sheetH - 4.4, 0.38, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
   d.drawText(sheetX + 1, sheetY + sheetH - 5.1, 0.35, 0, `PROJECT: ${projectName.substring(0, 30)}`);
+
+  // ── MEP Sheets (E1, P1, M1) — placed to the right of A1 ──────────────────
+  const mepPad = 8;
+  const mepSheetW = W + mepPad * 2 + 22;   // floor plan width + padding + legend
+  const mepSheetH = sheetH;
+  const mepSheetY = sheetY;
+  const mepStartX = sheetX + sheetW + 10;
+
+  // E1 — Electrical
+  drawElectricalPlan(d, mepStartX + mepPad, 0, W, H, structureType, answers, bedrooms);
+  mepSheetTitle(d, mepStartX, mepSheetY, mepSheetW, mepSheetH, "SHEET E1", "ELECTRICAL PLAN", projectName);
+  titleBlock(d, mepStartX + mepPad + W + 2, 0, projectName, structureType, sqft);
+
+  // P1 — Plumbing
+  const p1X = mepStartX + mepSheetW + 10;
+  drawPlumbingPlan(d, p1X + mepPad, 0, W, H, structureType, answers, bedrooms);
+  mepSheetTitle(d, p1X, mepSheetY, mepSheetW, mepSheetH, "SHEET P1", "PLUMBING PLAN", projectName);
+  titleBlock(d, p1X + mepPad + W + 2, 0, projectName, structureType, sqft);
+
+  // M1 — HVAC / Mechanical
+  const m1X = p1X + mepSheetW + 10;
+  drawHVACPlan(d, m1X + mepPad, 0, W, H, structureType, answers, bedrooms);
+  mepSheetTitle(d, m1X, mepSheetY, mepSheetW, mepSheetH, "SHEET M1", "HVAC PLAN", projectName);
+  titleBlock(d, m1X + mepPad + W + 2, 0, projectName, structureType, sqft);
 
   // Draft watermark
   if (isDraft) {
