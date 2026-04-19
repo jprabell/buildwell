@@ -51,6 +51,20 @@ const PACKAGES = [
       "Ready to send to contractors",
     ],
   },
+  {
+    id: "spec_tier",
+    icon: "⭐",
+    title: "Good / Better / Best Spec Tier",
+    price: "$150",
+    includes: [
+      "3-tier verified material specs",
+      "Brand examples per category",
+      "Installed cost ranges",
+      "Warranty info by product",
+      "Framing, insulation, windows",
+      "HVAC, flooring, cabinets & more",
+    ],
+  },
 ];
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
@@ -188,17 +202,25 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                         </button>
                       </a>
                     ) : (
-                      <Link href={`/projects/${project.id}/${pkg.id === "material_list" ? "material-list" : `preview/${pkg.id}`}`}>
+                      <Link href={`/projects/${project.id}/${
+                        pkg.id === "material_list" ? "material-list"
+                        : pkg.id === "spec_tier" ? "spec-tier"
+                        : `preview/${pkg.id}`
+                      }`}>
                         <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
-                          {pkg.id === "material_list" ? "View Material List" : "Download Full Document"}
+                          {pkg.id === "material_list" ? "View Material List"
+                           : pkg.id === "spec_tier" ? "View Spec Tier Report"
+                           : "Download Full Document"}
                         </button>
                       </Link>
                     )}
-                    <Link href={`/projects/${project.id}/preview/${pkg.id}`}>
-                      <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
-                        View Preview
-                      </button>
-                    </Link>
+                    {pkg.id !== "blueprint_set" && pkg.id !== "spec_tier" && (
+                      <Link href={`/projects/${project.id}/preview/${pkg.id}`}>
+                        <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
+                          View Preview
+                        </button>
+                      </Link>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -207,7 +229,11 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                       projectId={project.id}
                       label={`Purchase — ${pkg.price}`}
                     />
-                    <Link href={pkg.id === "material_list" ? `/projects/${project.id}/material-list` : `/projects/${project.id}/preview/${pkg.id}`}>
+                    <Link href={`/projects/${project.id}/${
+                      pkg.id === "material_list" ? "material-list"
+                      : pkg.id === "spec_tier" ? "spec-tier"
+                      : `preview/${pkg.id}`
+                    }`}>
                       <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
                         Preview Free (watermarked)
                       </button>
