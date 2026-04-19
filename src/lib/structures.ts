@@ -19,7 +19,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Residential",
     costLevel: 2,
     costNote: "$100–$175/sq ft",
-    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "TINY_HOME",
@@ -29,7 +29,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Residential",
     costLevel: 1,
     costNote: "$30k–$80k total",
-    image: "https://images.unsplash.com/photo-1499916078039-922301b0eb9b?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "BARNDOMINIUM",
@@ -39,7 +39,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Agricultural",
     costLevel: 2,
     costNote: "$95–$150/sq ft",
-    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1625602812206-5ec545ca1231?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "BARN",
@@ -59,7 +59,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Agricultural",
     costLevel: 1,
     costNote: "$20–$60/sq ft",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "LOG_CABIN",
@@ -99,7 +99,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Specialty",
     costLevel: 1,
     costNote: "$25–$70/sq ft",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "SILO",
@@ -129,7 +129,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Outbuilding",
     costLevel: 1,
     costNote: "$25–$75/sq ft",
-    image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "GARAGE",
