@@ -6,6 +6,7 @@ import Link from "next/link";
 import { calculateMaterials, MaterialLineItem } from "@/lib/materialCalculator";
 import { ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
+import PrintButton from "./PrintButton";
 
 function groupByDivision(items: MaterialLineItem[]) {
   const map = new Map<string, { division: number; name: string; items: MaterialLineItem[] }>();
@@ -19,12 +20,13 @@ function groupByDivision(items: MaterialLineItem[]) {
   return Array.from(map.values()).sort((a, b) => a.division - b.division);
 }
 
-export default async function MaterialListPage({ params }: { params: { id: string } }) {
+export default async function MaterialListPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
   const project = await db.project.findFirst({
-    where: { id: params.id, userId: session.user.id },
+    where: { id, userId: session.user.id },
   });
 
   if (!project) notFound();
@@ -46,17 +48,10 @@ export default async function MaterialListPage({ params }: { params: { id: strin
             Build<span className="text-amber-600">well</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href={`/projects/${params.id}`}>
+            <Link href={`/projects/${id}`}>
               <Button variant="ghost" size="sm">← Project</Button>
             </Link>
-            {purchased && (
-              <button
-                onClick={() => window.print()}
-                className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors"
-              >
-                Print / Export PDF
-              </button>
-            )}
+            {purchased && <PrintButton />}
           </div>
         </div>
       </nav>
@@ -88,7 +83,7 @@ export default async function MaterialListPage({ params }: { params: { id: strin
                 <p className="text-sm font-bold text-amber-800">DRAFT PREVIEW — OWNED BY BUILD-WELL LLC</p>
                 <p className="text-xs text-amber-600">Purchase to unlock the full clean document, all quantities, and export.</p>
               </div>
-              <Link href={`/projects/${params.id}`}>
+              <Link href={`/projects/${id}`}>
                 <button className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
                   Purchase — $250
                 </button>
@@ -167,7 +162,7 @@ export default async function MaterialListPage({ params }: { params: { id: strin
                 <div className="bg-stone-50 border-t border-stone-200 px-4 py-3 text-center">
                   <p className="text-xs text-stone-500">
                     {div.items.length - 3} more items hidden —{" "}
-                    <Link href={`/projects/${params.id}`} className="text-amber-600 font-semibold hover:underline">
+                    <Link href={`/projects/${id}`} className="text-amber-600 font-semibold hover:underline">
                       Purchase to unlock
                     </Link>
                   </p>

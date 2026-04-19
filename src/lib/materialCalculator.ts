@@ -493,6 +493,14 @@ function flooringSpec(answers: ProjectAnswers): string {
   return "LVP (luxury vinyl plank), 4 mil wear layer, click-lock";
 }
 
+function windowSpec(climateZone: string): string {
+  const cold = ["cold", "very_cold", "subarctic"].includes(climateZone);
+  const hot = ["hot_humid", "hot_dry"].includes(climateZone);
+  if (cold) return "Triple-pane, Low-E, U-0.20 or better, SHGC 0.35+";
+  if (hot) return "Double-pane, Low-E, U-0.30, SHGC 0.25 or lower";
+  return "Double-pane, Low-E, U-0.27, SHGC 0.30 (ENERGY STAR)";
+}
+
 function windowEstimate(sqft: number, bedrooms: number, stories: number, structureType: string): number {
   if (structureType === "SHED") return 2;
   if (structureType === "GARAGE") return 2;
