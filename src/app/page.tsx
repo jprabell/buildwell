@@ -25,7 +25,7 @@ export default function LandingPage() {
             </span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600">
-            <Link href="#structures" className="hover:text-amber-600 transition-colors">Structures</Link>
+            <Link href="/structures" className="hover:text-amber-600 transition-colors">Structures</Link>
             <Link href="#documents" className="hover:text-amber-600 transition-colors">Documents</Link>
             <Link href="#how-it-works" className="hover:text-amber-600 transition-colors">How It Works</Link>
             <Link href="/faq" className="hover:text-amber-600 transition-colors">FAQ</Link>
@@ -66,12 +66,12 @@ export default function LandingPage() {
             🏗️ From sheds to custom homes — every structure type supported
           </div>
           <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight fade-up">
-            Design Your Build.<br />
-            <span className="shimmer-text">Get Every Document.</span>
+            <span className="shimmer-text">Blueprints, specs, and bid docs</span><br />
+            for your build — in an afternoon.
           </h1>
           <p className="text-xl text-stone-300 mb-10 max-w-2xl mx-auto leading-relaxed fade-up">
-            Answer guided questions and receive professional blueprints, material lists,
-            spec sheets, and contractor bid documents — at a fraction of traditional costs.
+            Answer a few guided questions and get professional construction documents
+            ready for permits, contractors, and suppliers — at a fraction of what an architect charges.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center fade-up">
             <Link href="/register">

@@ -223,7 +223,16 @@ export default function StructureGrid() {
                   Start Building a {structure.label} →
                 </button>
               </Link>
-              <p className="text-center text-xs text-stone-400 mt-3">Free to start. No credit card required.</p>
+              <div className="flex items-center justify-between mt-3">
+                <p className="text-xs text-stone-400">Free to start. No credit card required.</p>
+                <Link
+                  href={`/structures/${structure.value.toLowerCase().replace(/_/g, "-")}`}
+                  onClick={() => setSelected(null)}
+                  className="text-xs text-amber-600 hover:text-amber-700 font-semibold underline underline-offset-2"
+                >
+                  Full details →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
