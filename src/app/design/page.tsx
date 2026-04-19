@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { STRUCTURE_OPTIONS, STRUCTURE_CATEGORIES } from "@/lib/structures";
 import { getStepsForStructure } from "@/lib/questions";
@@ -19,6 +19,32 @@ export default function DesignPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<ProjectAnswers>({});
   const [saving, setSaving] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+
+  // Load existing project when ?edit=ID is present
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("edit");
+    if (!id) return;
+
+    setEditId(id);
+    fetch(`/api/projects/${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.structureType) {
+          setSelectedType(data.structureType as StructureType);
+          // Strip internal _purchases key before restoring answers
+          const { _purchases, ...restAnswers } = (data.answers ?? {}) as Record<string, unknown>;
+          void _purchases;
+          setAnswers(restAnswers as ProjectAnswers);
+          setStage("questions");
+          setCurrentStep(0);
+        }
+      })
+      .catch(() => {
+        // If fetch fails, fall through to normal new-project flow
+      });
+  }, []);
 
   const steps = selectedType ? getStepsForStructure(selectedType) : [];
   const step = steps[currentStep];
@@ -40,23 +66,44 @@ export default function DesignPage() {
     setSaving(true);
     const projectName = (answers.projectName as string) || "My Project";
 
-    const res = await fetch("/api/projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: projectName,
-        structureType: selectedType,
-        answers,
-      }),
-    });
+    if (editId) {
+      // Update existing project
+      const res = await fetch(`/api/projects/${editId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: projectName,
+          structureType: selectedType,
+          answers,
+        }),
+      });
 
-    if (res.ok) {
-      const data = await res.json();
-      router.push(`/projects/${data.id}`);
+      if (res.ok) {
+        router.push(`/projects/${editId}`);
+      } else {
+        setSaving(false);
+        alert("Failed to update project. Please try again.");
+      }
     } else {
-      setSaving(false);
-      alert("Failed to save project. Please sign in and try again.");
-      router.push("/login");
+      // Create new project
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: projectName,
+          structureType: selectedType,
+          answers,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        router.push(`/projects/${data.id}`);
+      } else {
+        setSaving(false);
+        alert("Failed to save project. Please sign in and try again.");
+        router.push("/login");
+      }
     }
   }
 
@@ -154,13 +201,29 @@ export default function DesignPage() {
           <a href="/" className="text-xl font-black text-slate-900">
             Build<span className="text-amber-600">well</span>
           </a>
-          <button
-            onClick={() => setStage("select-type")}
-            className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            ← Change structure type
-          </button>
+          {!editId && (
+            <button
+              onClick={() => setStage("select-type")}
+              className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              ← Change structure type
+            </button>
+          )}
+          {editId && (
+            <a
+              href={`/projects/${editId}`}
+              className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              ← Back to project
+            </a>
+          )}
         </div>
+
+        {editId && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 font-medium">
+            Editing answers — your previous selections are pre-filled. Save when done.
+          </div>
+        )}
 
         {/* Progress */}
         <div className="mb-8">
@@ -338,19 +401,20 @@ export default function DesignPage() {
             <Button
               variant="outline"
               onClick={() => {
-                if (currentStep === 0) {
+                if (currentStep === 0 && !editId) {
                   setStage("select-type");
-                } else {
+                } else if (currentStep > 0) {
                   setCurrentStep((s) => s - 1);
                 }
               }}
+              disabled={currentStep === 0 && !!editId}
             >
               Back
             </Button>
 
             {isLastStep ? (
               <Button onClick={handleFinish} disabled={saving}>
-                {saving ? "Saving..." : "Finish & Save Project"}
+                {saving ? "Saving..." : editId ? "Save Changes" : "Finish & Save Project"}
               </Button>
             ) : (
               <Button onClick={() => setCurrentStep((s) => s + 1)}>
