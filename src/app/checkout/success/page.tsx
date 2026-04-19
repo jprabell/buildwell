@@ -8,9 +8,11 @@ import Link from "next/link";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const PACKAGE_LABELS: Record<string, string> = {
-  blueprint_set: "Full Blueprint Set",
+  blueprint_set: "Construction Planning Report",
   material_list: "Material List + Spec Sheet",
-  quote_package: "Quote Package + Bid Documents",
+  quote_package: "Contractor Bid Package",
+  spec_tier: "Good / Better / Best Spec Report",
+  vendor_list: "Preferred Vendor List",
 };
 
 export default async function CheckoutSuccessPage({

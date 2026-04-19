@@ -1,0 +1,31 @@
+<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky -->
+  <rect width="200" height="150" fill="#f5f5f4"/>
+  <!-- Soil below grade -->
+  <rect x="0" y="62" width="200" height="88" fill="#a07850"/>
+  <!-- Grade line -->
+  <line x1="0" y1="62" x2="200" y2="62" stroke="#d97706" stroke-width="2" stroke-dasharray="8,4"/>
+  <!-- Pier 1 shaft -->
+  <rect x="37" y="28" width="10" height="105" fill="#9ca3af" stroke="#6b7280" stroke-width="1.5"/>
+  <!-- Pier 1 helix blades -->
+  <ellipse cx="42" cy="90" rx="16" ry="4" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <ellipse cx="42" cy="110" rx="16" ry="4" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <!-- Pier 1 bracket cap -->
+  <rect x="29" y="22" width="26" height="9" fill="#6b7280" stroke="#4b5563" stroke-width="1.5"/>
+  <!-- Pier 2 shaft -->
+  <rect x="95" y="28" width="10" height="105" fill="#9ca3af" stroke="#6b7280" stroke-width="1.5"/>
+  <!-- Pier 2 helix blades -->
+  <ellipse cx="100" cy="86" rx="16" ry="4" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <ellipse cx="100" cy="106" rx="16" ry="4" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <!-- Pier 2 bracket cap -->
+  <rect x="87" y="22" width="26" height="9" fill="#6b7280" stroke="#4b5563" stroke-width="1.5"/>
+  <!-- Pier 3 shaft -->
+  <rect x="153" y="28" width="10" height="105" fill="#9ca3af" stroke="#6b7280" stroke-width="1.5"/>
+  <!-- Pier 3 helix blades -->
+  <ellipse cx="158" cy="92" rx="16" ry="4" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <ellipse cx="158" cy="112" rx="16" ry="4" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <!-- Pier 3 bracket cap -->
+  <rect x="145" y="22" width="26" height="9" fill="#6b7280" stroke="#4b5563" stroke-width="1.5"/>
+  <!-- Grade beam / structure above -->
+  <rect x="18" y="10" width="164" height="14" fill="#d6d3d1" stroke="#78716c" stroke-width="2"/>
+</svg>

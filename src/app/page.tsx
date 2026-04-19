@@ -1,6 +1,17 @@
 import Link from "next/link";
-import { STRUCTURE_OPTIONS, STRUCTURE_CATEGORIES } from "@/lib/structures";
 import Button from "@/components/ui/Button";
+import StructureGrid from "@/components/landing/StructureGrid";
+
+const TRUST_ITEMS = [
+  "Professional-grade documents",
+  "16 structure types supported",
+  "DIY builders & contractors",
+  "Save thousands vs. hiring architects",
+  "Instant delivery after purchase",
+  "Free to start — no credit card",
+  "Blueprints, specs & bid docs",
+  "From shed to custom home",
+];
 
 export default function LandingPage() {
   return (
@@ -17,6 +28,7 @@ export default function LandingPage() {
             <Link href="#structures" className="hover:text-amber-600 transition-colors">Structures</Link>
             <Link href="#documents" className="hover:text-amber-600 transition-colors">Documents</Link>
             <Link href="#how-it-works" className="hover:text-amber-600 transition-colors">How It Works</Link>
+            <Link href="/faq" className="hover:text-amber-600 transition-colors">FAQ</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -30,265 +42,259 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-36 px-6 overflow-hidden">
+      <section className="relative pt-32 pb-40 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1920&q=80')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/60 via-stone-900/55 to-stone-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/65 via-stone-900/60 to-stone-950/80" />
+
+        {/* Floating amber orb */}
+        <div
+          className="float-glow absolute w-96 h-96 rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(circle, rgba(217,119,6,0.35) 0%, rgba(217,119,6,0.1) 50%, transparent 70%)",
+            left: "50%",
+            top: "30%",
+            transform: "translateX(-50%)",
+            filter: "blur(2px)",
+          }}
+        />
+
         <div className="relative max-w-5xl mx-auto text-center text-white">
-          <div className="inline-flex items-center gap-2 bg-amber-600/20 border border-amber-500/40 rounded-full px-4 py-1.5 text-amber-300 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 bg-amber-600/20 border border-amber-500/40 rounded-full px-4 py-1.5 text-amber-300 text-sm font-medium mb-8 fade-up">
             🏗️ From sheds to custom homes — every structure type supported
           </div>
-          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight fade-up">
             Design Your Build.<br />
-            <span className="text-amber-400">Get Every Document.</span>
+            <span className="shimmer-text">Get Every Document.</span>
           </h1>
-          <p className="text-xl text-stone-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-stone-300 mb-10 max-w-2xl mx-auto leading-relaxed fade-up">
             Answer guided questions and receive professional blueprints, material lists,
             spec sheets, and contractor bid documents — at a fraction of traditional costs.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center fade-up">
             <Link href="/register">
-              <Button size="lg">Start Your Design Free</Button>
+              <button className="amber-pulse bg-amber-600 hover:bg-amber-500 text-white font-black text-lg px-10 py-4 rounded-2xl shadow-xl transition-all duration-200">
+                Start Your Design Free →
+              </button>
             </Link>
             <Link href="#how-it-works">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+              <button className="border border-white/30 text-white hover:bg-white/10 font-bold text-lg px-10 py-4 rounded-2xl transition-all duration-200">
                 See How It Works
-              </Button>
+              </button>
             </Link>
           </div>
-          <p className="mt-6 text-stone-400 text-sm">No credit card required to start. Save and return anytime.</p>
+          <p className="mt-6 text-stone-400 text-sm fade-up">No credit card required to start. Save and return anytime.</p>
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <section className="bg-amber-700 py-5 px-6">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-center gap-6 sm:gap-16 text-white text-sm font-medium text-center">
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-amber-300">✓</span> Professional-grade documents
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-amber-300">✓</span> DIY builders &amp; contractors
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-amber-300">✓</span> Save thousands vs. hiring architects
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-amber-300">✓</span> 16 structure types supported
-          </div>
+      {/* Scrolling Trust Bar */}
+      <div className="bg-amber-700 py-4 overflow-hidden">
+        <div className="ticker-inner flex gap-0 whitespace-nowrap text-white text-sm font-semibold">
+          {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
+            <span key={i} className="flex items-center gap-2 px-8">
+              <span className="text-amber-300 text-lg">✦</span>
+              {item}
+            </span>
+          ))}
         </div>
-      </section>
+      </div>
 
       {/* Structure Types */}
       <section id="structures" className="py-24 px-6 bg-amber-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-4xl font-black text-stone-900 mb-4">Every Structure Type</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-3">16 Structure Types</p>
+            <h2 className="text-4xl md:text-5xl font-black text-stone-900 mb-4">
+              Whatever You&rsquo;re Building,<br />
+              <span className="text-amber-600">We&rsquo;ve Got the Documents.</span>
+            </h2>
             <p className="text-lg text-stone-500 max-w-xl mx-auto">
-              From a simple storage shed to a full custom home — Buildwell supports them all.
+              Click any structure to explore it — then start your project free.
             </p>
           </div>
-          {STRUCTURE_CATEGORIES.map((category) => {
-            const structures = STRUCTURE_OPTIONS.filter((s) => s.category === category);
-            return (
-              <div key={category} className="mb-14">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-amber-700 mb-5 border-b border-stone-200 pb-2">
-                  {category}
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {structures.map((s) => (
-                    <Link href="/register" key={s.value}>
-                      <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 hover:border-amber-400 hover:shadow-lg transition-all cursor-pointer group">
-                        <div className="relative h-36 overflow-hidden bg-stone-200">
-                          {s.image ? (
-                            <img
-                              src={s.image}
-                              alt={s.label}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-4xl">
-                              {s.icon}
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent" />
-                        </div>
-                        <div className="p-3">
-                          <div className="font-bold text-stone-900 text-sm group-hover:text-amber-700 transition-colors">
-                            {s.label}
-                          </div>
-                          <div className="text-xs text-stone-400 mt-0.5 leading-tight mb-2">{s.description}</div>
-                          <div className="flex items-center gap-1">
-                            <span className="font-bold text-xs">
-                              <span className="text-amber-500">{"$".repeat(s.costLevel)}</span>
-                              <span className="text-stone-200">{"$".repeat(4 - s.costLevel)}</span>
-                            </span>
-                            <span className="text-xs text-stone-400">{s.costNote}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+          <StructureGrid />
         </div>
       </section>
 
       {/* Document Packages */}
-      <section id="documents" className="py-24 px-6 bg-stone-900 text-white">
-        <div className="max-w-6xl mx-auto">
+      <section id="documents" className="py-24 px-6 bg-stone-950 text-white relative overflow-hidden">
+        {/* Subtle amber gradient glow top-left */}
+        <div
+          className="absolute top-0 left-0 w-[600px] h-[400px] pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at top left, rgba(217,119,6,0.15) 0%, transparent 70%)" }}
+        />
+        <div className="relative max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-4xl font-black mb-4">Professional Document Packages</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-500 mb-3">Professional Documentation</p>
+            <h2 className="text-4xl md:text-5xl font-black mb-4">
+              Every Document Your<br />
+              <span className="text-amber-400">Build Will Ever Need</span>
+            </h2>
             <p className="text-lg text-stone-400 max-w-2xl mx-auto">
-              A fraction of what you'd pay a traditional architect or contractor — with instant delivery.
+              A fraction of what you&rsquo;d pay a traditional architect or contractor — with instant delivery.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Blueprint Set */}
-            <div className="bg-stone-800 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/60 transition-colors">
-              <div className="relative h-48 bg-stone-700 overflow-hidden">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Construction Planning Report */}
+            <div className="group bg-stone-900 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/80 transition-all duration-300 hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] hover:-translate-y-1">
+              <div className="relative h-48 bg-stone-800 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80"
-                  alt="Architectural blueprints"
-                  className="w-full h-full object-cover opacity-60"
+                  alt="Construction planning documents"
+                  className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-5xl">📐</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent" />
+                <div className="absolute bottom-4 left-5"><span className="text-4xl">📐</span></div>
+                <div className="absolute top-4 right-4">
+                  <span className="bg-amber-600 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wide">Most Complete</span>
                 </div>
               </div>
               <div className="p-6">
-                <div className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-2">Most Complete</div>
-                <h3 className="text-xl font-black mb-1">Full Blueprint Set</h3>
-                <div className="text-3xl font-black text-amber-400 mb-4">$2,000</div>
+                <h3 className="text-xl font-black mb-1">Construction Planning Report</h3>
+                <div className="text-3xl font-black text-amber-400 mb-4">$250</div>
                 <ul className="space-y-2 text-sm text-stone-300 mb-6">
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Floor plan layout</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Exterior elevations</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Framing plan</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Roofing &amp; truss plan</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Plumbing, Electrical &amp; HVAC</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Exterior detail sheets</li>
+                  {["Room schedule with dimensions", "Foundation & framing summary", "Roof & structural notes", "Systems overview (plumbing, electrical, HVAC)", "Material selections & specs", "Code compliance checklist"].map((item) => (
+                    <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
+                  ))}
                 </ul>
-                <p className="text-xs text-stone-500 italic mb-4">First page preview available free. Full set unlocked after purchase.</p>
                 <Link href="/register">
-                  <button className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition-colors">
-                    Start Your Design
-                  </button>
+                  <button className="w-full amber-pulse bg-amber-600 hover:bg-amber-500 text-white font-black py-3 rounded-xl transition-all duration-200">Start Your Design</button>
                 </Link>
               </div>
             </div>
 
-            {/* Material List + Spec Sheet */}
-            <div className="bg-stone-800 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/60 transition-colors">
-              <div className="relative h-48 bg-stone-700 overflow-hidden">
+            {/* Material & Specification List */}
+            <div className="group bg-stone-900 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/80 transition-all duration-300 hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] hover:-translate-y-1">
+              <div className="relative h-48 bg-stone-800 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1426927308491-6380b6a9936f?auto=format&fit=crop&w=600&q=80"
-                  alt="Building materials lumber yard"
-                  className="w-full h-full object-cover opacity-60"
+                  alt="Building materials"
+                  className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-5xl">📋</span>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent" />
+                <div className="absolute bottom-4 left-5"><span className="text-4xl">📋</span></div>
               </div>
               <div className="p-6">
-                <div className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-2">Great Value</div>
-                <h3 className="text-xl font-black mb-1">Material List + Spec Sheet</h3>
-                <div className="text-3xl font-black text-amber-400 mb-4">$250</div>
+                <h3 className="text-xl font-black mb-1">Material & Specification List</h3>
+                <div className="text-3xl font-black text-amber-400 mb-4">$100</div>
                 <ul className="space-y-2 text-sm text-stone-300 mb-6">
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Full itemized material list</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Quantities &amp; specifications</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Per-trade spec sheets</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Framing, roofing, insulation</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Windows, doors, finishes</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Ready for supplier ordering</li>
+                  {["Full itemized material list", "Quantities & unit specifications", "Per-trade spec sheets", "Framing, roofing & insulation", "Windows, doors & finishes", "Ready for supplier ordering"].map((item) => (
+                    <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
+                  ))}
                 </ul>
-                <p className="text-xs text-stone-500 italic mb-4">First page preview available free. Full document unlocked after purchase.</p>
                 <Link href="/register">
-                  <button className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition-colors">
-                    Start Your Design
-                  </button>
+                  <button className="w-full bg-stone-700 hover:bg-stone-600 text-white font-black py-3 rounded-xl transition-all duration-200">Start Your Design</button>
                 </Link>
               </div>
             </div>
 
-            {/* Quote Package */}
-            <div className="bg-stone-800 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/60 transition-colors">
-              <div className="relative h-48 bg-stone-700 overflow-hidden">
+            {/* Contractor Bid Package */}
+            <div className="group bg-stone-900 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/80 transition-all duration-300 hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] hover:-translate-y-1">
+              <div className="relative h-48 bg-stone-800 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80"
-                  alt="Contractor reviewing bid documents"
-                  className="w-full h-full object-cover opacity-60"
+                  alt="Contractor bid documents"
+                  className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-5xl">💼</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-transparent" />
+                <div className="absolute bottom-4 left-5"><span className="text-4xl">💼</span></div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-black mb-1">Contractor Bid Package</h3>
+                <div className="text-3xl font-black text-amber-400 mb-4">$250</div>
+                <ul className="space-y-2 text-sm text-stone-300 mb-6">
+                  {["Scope of work per trade", "Formatted bid request forms", "Line-item cost breakdowns", "Framing, electrical & plumbing", "HVAC & roofing bid sheets", "Ready to send to contractors"].map((item) => (
+                    <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
+                  ))}
+                </ul>
+                <Link href="/register">
+                  <button className="w-full bg-stone-700 hover:bg-stone-600 text-white font-black py-3 rounded-xl transition-all duration-200">Start Your Design</button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Good / Better / Best Spec Report */}
+            <div className="group bg-stone-900 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/80 transition-all duration-300 hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] hover:-translate-y-1">
+              <div className="relative h-48 bg-stone-800 overflow-hidden flex items-center justify-center">
+                <div className="text-center">
+                  <div className="flex items-end justify-center gap-2 mb-2">
+                    <div className="w-8 h-12 bg-stone-600 rounded-t-lg opacity-70" />
+                    <div className="w-8 h-16 bg-amber-600 rounded-t-lg" />
+                    <div className="w-8 h-20 bg-amber-400 rounded-t-lg" />
+                  </div>
+                  <p className="text-xs text-stone-400 font-semibold tracking-widest uppercase">Good · Better · Best</p>
                 </div>
               </div>
               <div className="p-6">
-                <div className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-2">Contractor Ready</div>
-                <h3 className="text-xl font-black mb-1">Quote Package + Bid Docs</h3>
-                <div className="text-3xl font-black text-amber-400 mb-4">$250</div>
+                <h3 className="text-xl font-black mb-1">Good / Better / Best Spec Report</h3>
+                <div className="text-3xl font-black text-amber-400 mb-4">$75</div>
                 <ul className="space-y-2 text-sm text-stone-300 mb-6">
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Formatted quote documents</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Vendor pricing included</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Bid docs by trade</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Framing, electrical, plumbing</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> HVAC &amp; roofing bids</li>
-                  <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">✓</span> Ready to send to contractors</li>
+                  {["3-tier verified material options", "Brand examples per category", "Installed cost ranges per tier", "Warranty comparison by product", "Framing, insulation & windows", "HVAC, flooring, cabinets & more"].map((item) => (
+                    <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
+                  ))}
                 </ul>
-                <p className="text-xs text-stone-500 italic mb-4">First page preview available free. Full package unlocked after purchase.</p>
                 <Link href="/register">
-                  <button className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition-colors">
-                    Start Your Design
-                  </button>
+                  <button className="w-full bg-stone-700 hover:bg-stone-600 text-white font-black py-3 rounded-xl transition-all duration-200">Start Your Design</button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Preferred Vendor List */}
+            <div className="group bg-stone-900 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/80 transition-all duration-300 hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] hover:-translate-y-1">
+              <div className="relative h-48 bg-stone-800 overflow-hidden flex items-center justify-center">
+                <div className="text-center px-6">
+                  <div className="text-5xl mb-3">📞</div>
+                  <p className="text-xs text-stone-400 font-semibold tracking-widest uppercase">Local · Rated · Ready</p>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-black mb-1">Preferred Vendor List</h3>
+                <div className="text-3xl font-black text-amber-400 mb-4">$40</div>
+                <ul className="space-y-2 text-sm text-stone-300 mb-6">
+                  {["3 local contractors per trade", "Phone & address per listing", "Yelp rating & review count", "All trades in build sequence", "Notes section per trade", "Print-ready procurement doc"].map((item) => (
+                    <li key={item} className="flex items-start gap-2"><span className="text-amber-500 mt-0.5 shrink-0">✓</span> {item}</li>
+                  ))}
+                </ul>
+                <Link href="/register">
+                  <button className="w-full bg-stone-700 hover:bg-stone-600 text-white font-black py-3 rounded-xl transition-all duration-200">Start Your Design</button>
                 </Link>
               </div>
             </div>
           </div>
 
-          <p className="text-center text-stone-500 text-sm mt-10">
-            Compare: A full architect-drawn blueprint set typically costs <span className="text-stone-300 font-semibold">$5,000–$15,000</span>. Buildwell delivers professional documentation at a fraction of the cost.
-          </p>
+          <div className="mt-10 text-center bg-stone-900/50 border border-stone-800 rounded-2xl p-6 max-w-2xl mx-auto">
+            <p className="text-stone-400 text-sm">
+              Get everything — all 5 documents — for{" "}
+              <span className="text-amber-400 font-bold">$715 total</span>.
+              A traditional architect charges <span className="text-stone-300 font-semibold">$5,000–$15,000</span> for comparable documentation.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* How It Works */}
       <section id="how-it-works" className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl font-black text-stone-900 mb-4">How Buildwell Works</h2>
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-3">Simple Process</p>
+            <h2 className="text-4xl md:text-5xl font-black text-stone-900 mb-4">How Buildwell Works</h2>
             <p className="text-lg text-stone-500">Four steps from idea to complete document package</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-4 gap-8 relative">
+            {/* Connector line (desktop only) */}
+            <div className="hidden md:block absolute top-8 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 z-0" />
             {[
-              {
-                step: "01",
-                icon: "🏗️",
-                title: "Choose Your Structure",
-                description: "Select from 16 structure types — homes, containers, barns, cabins, sheds, and more.",
-              },
-              {
-                step: "02",
-                icon: "💬",
-                title: "Answer Guided Questions",
-                description: "Size, layout, foundation, utilities, sustainability goals, and budget — all tailored to your build.",
-              },
-              {
-                step: "03",
-                icon: "📊",
-                title: "Review Your Summary",
-                description: "See a complete project overview with specifications, material categories, and system selections.",
-              },
-              {
-                step: "04",
-                icon: "📁",
-                title: "Unlock Your Documents",
-                description: "Blueprints, material lists, spec sheets, and bid documents — ready for your contractor.",
-              },
+              { step: "01", icon: "🏗️", title: "Choose Your Structure", description: "Select from 16 structure types — homes, containers, barns, cabins, sheds, and more." },
+              { step: "02", icon: "💬", title: "Answer Guided Questions", description: "Size, layout, foundation, utilities, sustainability goals — all tailored to your build." },
+              { step: "03", icon: "📊", title: "Review Your Summary", description: "See a complete project overview with specifications, material categories, and system selections." },
+              { step: "04", icon: "📁", title: "Unlock Your Documents", description: "Blueprints, material lists, spec sheets, and bid documents — ready for your contractor." },
             ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="text-5xl font-black text-amber-200 mb-1">{item.step}</div>
+              <div key={item.step} className="text-center relative z-10">
+                <div className="w-16 h-16 rounded-full bg-amber-600 text-white font-black text-lg flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-600/30">
+                  {item.step}
+                </div>
                 <div className="text-3xl mb-3">{item.icon}</div>
                 <h3 className="text-lg font-bold text-stone-900 mb-2">{item.title}</h3>
                 <p className="text-stone-500 text-sm leading-relaxed">{item.description}</p>
@@ -302,33 +308,39 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-amber-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-3">Who It&rsquo;s For</p>
             <h2 className="text-4xl font-black text-stone-900 mb-4">Built for Everyone</h2>
-            <p className="text-lg text-stone-500">Whether you're swinging a hammer yourself or managing a crew</p>
+            <p className="text-lg text-stone-500">Whether you&rsquo;re swinging a hammer yourself or managing a crew</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=600&q=80",
+                icon: "🔨",
                 title: "DIY Builders",
                 description: "Get the exact documents you need to pull permits, order materials, and manage your own build with confidence.",
               },
               {
                 image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
+                icon: "📋",
                 title: "Contractors",
                 description: "Streamline client projects with professional bid packages and material lists ready in minutes, not weeks.",
               },
               {
                 image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80",
+                icon: "🏢",
                 title: "Developers",
                 description: "Quickly scope multiple projects with accurate material estimates and professional documentation packages.",
               },
             ].map((item) => (
-              <div key={item.title} className="rounded-2xl overflow-hidden border border-stone-200 hover:shadow-lg transition-shadow">
-                <div className="h-48 overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+              <div key={item.title} className="group rounded-2xl overflow-hidden border border-stone-200 hover:border-amber-400 hover:shadow-[0_0_28px_rgba(217,119,6,0.18)] transition-all duration-300 bg-white">
+                <div className="h-52 overflow-hidden relative">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent" />
+                  <div className="absolute bottom-4 left-5 text-3xl">{item.icon}</div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-stone-900 mb-2">{item.title}</h3>
+                  <h3 className="text-xl font-bold text-stone-900 mb-2 group-hover:text-amber-700 transition-colors">{item.title}</h3>
                   <p className="text-stone-500 text-sm leading-relaxed">{item.description}</p>
                 </div>
               </div>
@@ -337,23 +349,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative py-28 px-6 overflow-hidden">
+      {/* Final CTA */}
+      <section className="relative py-32 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80')" }}
         />
-        <div className="absolute inset-0 bg-amber-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/85 via-stone-900/80 to-stone-950/90" />
         <div className="relative max-w-3xl mx-auto text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-black mb-4">Ready to Start Building?</h2>
-          <p className="text-amber-200 text-lg mb-10 max-w-xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-amber-600/20 border border-amber-500/40 rounded-full px-4 py-1.5 text-amber-300 text-sm font-medium mb-8">
+            🏆 Professional documents. Fraction of the cost.
+          </div>
+          <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
+            Ready to Start<br />
+            <span className="text-amber-400">Building?</span>
+          </h2>
+          <p className="text-amber-200/80 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
             Create your free account, answer a few questions, and preview your documents — no credit card needed.
           </p>
           <Link href="/register">
-            <button className="bg-white text-amber-900 hover:bg-amber-50 font-black text-lg px-10 py-4 rounded-2xl shadow-xl transition-colors">
+            <button className="amber-pulse bg-amber-600 hover:bg-amber-500 text-white font-black text-xl px-12 py-5 rounded-2xl shadow-2xl transition-all duration-200">
               Create Free Account →
             </button>
           </Link>
+          <p className="mt-5 text-stone-400 text-sm">Free to start. No commitment. Save and return anytime.</p>
         </div>
       </section>
 

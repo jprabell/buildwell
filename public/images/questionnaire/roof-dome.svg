@@ -1,0 +1,19 @@
+<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="180" fill="#e0f2fe"/>
+  <rect y="140" width="300" height="40" fill="#d4c4a8"/>
+  <rect y="137" width="300" height="6" fill="#86efac"/>
+  <rect x="60" y="100" width="180" height="40" fill="#f5f5f4" stroke="#a8a29e" stroke-width="1.5"/>
+  <ellipse cx="150" cy="100" rx="110" ry="72" fill="#d97706" clip-path="url(#topHalf)"/>
+  <defs>
+    <clipPath id="topHalf">
+      <rect x="0" y="0" width="300" height="100"/>
+    </clipPath>
+  </defs>
+  <path d="M40,100 A110,72 0 0,1 260,100" fill="#d97706" stroke="#78350f" stroke-width="2"/>
+  <path d="M68,100 A82,52 0 0,1 232,100" fill="none" stroke="#b45309" stroke-width="1.5" opacity="0.5"/>
+  <path d="M96,100 A54,34 0 0,1 204,100" fill="none" stroke="#b45309" stroke-width="1" opacity="0.4"/>
+  <line x1="40" y1="100" x2="260" y2="100" stroke="#78350f" stroke-width="2"/>
+  <rect x="120" y="108" width="40" height="30" fill="#bae6fd" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="140" y1="108" x2="140" y2="138" stroke="#94a3b8" stroke-width="1"/>
+  <text x="150" y="170" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#44403c">DOME ROOF</text>
+</svg>

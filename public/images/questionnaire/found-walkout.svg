@@ -1,0 +1,29 @@
+<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky -->
+  <rect width="200" height="150" fill="#f5f5f4"/>
+  <!-- Soil: high side (left) -->
+  <polygon points="0,38 90,80 90,150 0,150" fill="#a07850"/>
+  <!-- Soil: low side (right) and bottom -->
+  <rect x="90" y="118" width="110" height="32" fill="#a07850"/>
+  <!-- Sloped grade line -->
+  <line x1="0" y1="38" x2="90" y2="80" stroke="#d97706" stroke-width="2.5"/>
+  <!-- Grade continues flat on right -->
+  <line x1="90" y1="80" x2="200" y2="80" stroke="#d97706" stroke-width="2" stroke-dasharray="8,4"/>
+  <!-- Basement interior (exposed right side) -->
+  <rect x="82" y="20" width="100" height="98" fill="#e8ecf0"/>
+  <!-- Left/back concrete wall -->
+  <rect x="72" y="20" width="18" height="98" fill="#d6d3d1" stroke="#78716c" stroke-width="2"/>
+  <!-- Right concrete wall -->
+  <rect x="164" y="20" width="18" height="60" fill="#d6d3d1" stroke="#78716c" stroke-width="2"/>
+  <!-- Soil burying right wall above grade -->
+  <rect x="164" y="20" width="36" height="60" fill="#a07850"/>
+  <!-- Walkout door opening (exposed wall) -->
+  <rect x="108" y="58" width="26" height="22" fill="#bfdbfe" stroke="#6b7280" stroke-width="1.5"/>
+  <circle cx="132" cy="69" r="2" fill="#6b7280"/>
+  <!-- Walkout grade-level step/pad -->
+  <rect x="90" y="78" width="80" height="6" fill="#c4b5a0" stroke="#78716c" stroke-width="1"/>
+  <!-- Floor level at top of basement -->
+  <rect x="72" y="12" width="110" height="10" fill="#d4b896" stroke="#78716c" stroke-width="1.5"/>
+  <!-- Basement floor slab -->
+  <rect x="82" y="114" width="82" height="6" fill="#d6d3d1" stroke="#78716c" stroke-width="1"/>
+</svg>

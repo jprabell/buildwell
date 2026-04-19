@@ -12,27 +12,29 @@ const PACKAGES = [
   {
     id: "blueprint_set",
     icon: "📐",
-    title: "Full Blueprint Set",
-    price: "$2,000",
+    title: "Construction Planning Report",
+    price: "$250",
+    badge: "Most Complete",
     includes: [
-      "Floor plan layout",
-      "Exterior elevations",
-      "Framing plan",
-      "Roofing & truss plan",
-      "Plumbing, Electrical & HVAC",
-      "Exterior detail sheets",
+      "Room schedule with dimensions",
+      "Foundation & framing summary",
+      "Roof & structural notes",
+      "Systems overview (plumbing, electrical, HVAC)",
+      "Material selections & specs",
+      "Code compliance checklist",
     ],
   },
   {
     id: "material_list",
     icon: "📋",
-    title: "Material List + Spec Sheet",
-    price: "$250",
+    title: "Material & Specification List",
+    price: "$100",
+    badge: null,
     includes: [
       "Full itemized material list",
-      "Quantities & specifications",
+      "Quantities & unit specifications",
       "Per-trade spec sheets",
-      "Framing, roofing, insulation",
+      "Framing, roofing & insulation",
       "Windows, doors & finishes",
       "Ready for supplier ordering",
     ],
@@ -40,39 +42,57 @@ const PACKAGES = [
   {
     id: "quote_package",
     icon: "💼",
-    title: "Quote Package + Bid Docs",
+    title: "Contractor Bid Package",
     price: "$250",
+    badge: null,
     includes: [
-      "Formatted quote documents",
-      "Vendor pricing included",
-      "Bid documents by trade",
-      "Framing, electrical, plumbing",
-      "HVAC & roofing bids",
+      "Scope of work per trade",
+      "Formatted bid request forms",
+      "Line-item cost breakdowns",
+      "Framing, electrical & plumbing",
+      "HVAC & roofing bid sheets",
       "Ready to send to contractors",
     ],
   },
   {
     id: "spec_tier",
     icon: "⭐",
-    title: "Good / Better / Best Spec Tier",
-    price: "$150",
+    title: "Good / Better / Best Spec Report",
+    price: "$75",
+    badge: null,
     includes: [
-      "3-tier verified material specs",
+      "3-tier verified material options",
       "Brand examples per category",
-      "Installed cost ranges",
-      "Warranty info by product",
-      "Framing, insulation, windows",
+      "Installed cost ranges per tier",
+      "Warranty comparison by product",
+      "Framing, insulation & windows",
       "HVAC, flooring, cabinets & more",
+    ],
+  },
+  {
+    id: "vendor_list",
+    icon: "📞",
+    title: "Preferred Vendor List",
+    price: "$40",
+    badge: null,
+    includes: [
+      "3 local contractors per trade",
+      "Phone & address per listing",
+      "Google rating & review count",
+      "All trades in build sequence",
+      "Notes section per trade",
+      "Print-ready procurement doc",
     ],
   },
 ];
 
-export default async function ProjectPage({ params }: { params: { id: string } }) {
+export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
   const project = await db.project.findFirst({
-    where: { id: params.id, userId: session.user.id },
+    where: { id, userId: session.user.id },
   });
 
   if (!project) notFound();
@@ -195,32 +215,20 @@ export default async function ProjectPage({ params }: { params: { id: string } }
 
                 {purchased ? (
                   <div className="space-y-2">
-                    {pkg.id === "blueprint_set" ? (
-                      <a href={`/api/projects/${project.id}/floor-plan`} download>
-                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
-                          Download Blueprint Set (.dxf)
-                        </button>
-                      </a>
-                    ) : (
-                      <Link href={`/projects/${project.id}/${
-                        pkg.id === "material_list" ? "material-list"
-                        : pkg.id === "spec_tier" ? "spec-tier"
-                        : `preview/${pkg.id}`
-                      }`}>
-                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
-                          {pkg.id === "material_list" ? "View Material List"
-                           : pkg.id === "spec_tier" ? "View Spec Tier Report"
-                           : "Download Full Document"}
-                        </button>
-                      </Link>
-                    )}
-                    {pkg.id !== "blueprint_set" && pkg.id !== "spec_tier" && (
-                      <Link href={`/projects/${project.id}/preview/${pkg.id}`}>
-                        <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
-                          View Preview
-                        </button>
-                      </Link>
-                    )}
+                    <Link href={`/projects/${project.id}/${
+                      pkg.id === "material_list" ? "material-list"
+                      : pkg.id === "spec_tier" ? "spec-tier"
+                      : pkg.id === "vendor_list" ? "contractors"
+                      : `preview/${pkg.id}`
+                    }`}>
+                      <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
+                        {pkg.id === "blueprint_set" ? "View Planning Report"
+                         : pkg.id === "material_list" ? "View Material List"
+                         : pkg.id === "spec_tier" ? "View Spec Report"
+                         : pkg.id === "vendor_list" ? "View Vendor List"
+                         : "View Document"}
+                      </button>
+                    </Link>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -232,10 +240,11 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                     <Link href={`/projects/${project.id}/${
                       pkg.id === "material_list" ? "material-list"
                       : pkg.id === "spec_tier" ? "spec-tier"
+                      : pkg.id === "vendor_list" ? "contractors"
                       : `preview/${pkg.id}`
                     }`}>
                       <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
-                        Preview Free (watermarked)
+                        {pkg.id === "vendor_list" ? "Preview Vendor List" : "Preview Free (watermarked)"}
                       </button>
                     </Link>
                   </div>
@@ -250,24 +259,6 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           Free previews include a "DRAFT DOCUMENT — OWNED BY BUILD-WELL LLC" watermark. Purchased documents are clean and ready to use.
         </p>
 
-        {/* Contractor Directory CTA */}
-        <div className="mt-10 bg-white border border-stone-200 rounded-2xl p-6 flex items-center justify-between gap-6">
-          <div>
-            <h3 className="font-black text-stone-900 mb-1">🔨 Preferred Vendor List</h3>
-            <p className="text-sm text-stone-500">
-              See all the trades you need, in build sequence, with one-click contractor searches
-              {answers.zipCode ? ` near ${answers.zipCode}` : " near your build site"}.
-              {!answers.zipCode && (
-                <span className="text-amber-600"> Add your ZIP code for location-specific results.</span>
-              )}
-            </p>
-          </div>
-          <Link href={`/projects/${project.id}/contractors`} className="shrink-0">
-            <button className="bg-stone-900 hover:bg-stone-700 text-white font-bold px-5 py-3 rounded-xl transition-colors text-sm whitespace-nowrap">
-              Find Contractors →
-            </button>
-          </Link>
-        </div>
       </div>
     </div>
   );

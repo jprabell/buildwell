@@ -1,0 +1,41 @@
+<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="180" fill="#e0f2fe"/>
+  <rect y="140" width="300" height="40" fill="#d4c4a8"/>
+  <rect y="137" width="300" height="6" fill="#86efac"/>
+  <!-- House right half -->
+  <rect x="140" y="58" width="138" height="82" fill="#f5f5f4" stroke="#a8a29e" stroke-width="1.5"/>
+  <polygon points="132,58 209,28 286,58" fill="#d97706" stroke="#78350f" stroke-width="1.5"/>
+  <!-- Wall line -->
+  <line x1="140" y1="58" x2="140" y2="140" stroke="#a8a29e" stroke-width="2.5"/>
+  <!-- Flue pipe through roof -->
+  <rect x="198" y="18" width="14" height="42" fill="#4b5563" stroke="#374151" stroke-width="1.5"/>
+  <!-- Smoke from flue -->
+  <path d="M200,18 Q193,10 198,3" stroke="#9ca3af" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <path d="M205,16 Q205,8 212,4" stroke="#9ca3af" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <!-- Propane tank (outside, left) -->
+  <ellipse cx="60" cy="115" rx="50" ry="24" fill="#6b7280" stroke="#374151" stroke-width="2"/>
+  <ellipse cx="18" cy="115" rx="13" ry="24" fill="#4b5563" stroke="#374151" stroke-width="1.5"/>
+  <ellipse cx="102" cy="115" rx="13" ry="24" fill="#4b5563" stroke="#374151" stroke-width="1.5"/>
+  <text x="60" y="112" text-anchor="middle" font-family="sans-serif" font-size="9" fill="white" font-weight="bold">PROPANE</text>
+  <text x="60" y="122" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#d1d5db">TANK</text>
+  <!-- Pressure regulator -->
+  <rect x="106" y="107" width="14" height="14" fill="#374151" stroke="#1e293b" stroke-width="1" rx="2"/>
+  <circle cx="113" cy="114" r="4" fill="#6b7280"/>
+  <!-- Gas line from tank to house -->
+  <line x1="120" y1="114" x2="140" y2="114" stroke="#f59e0b" stroke-width="3"/>
+  <!-- Line through wall -->
+  <line x1="140" y1="114" x2="158" y2="114" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Furnace inside -->
+  <rect x="158" y="78" width="58" height="62" fill="#374151" stroke="#1e293b" stroke-width="2" rx="3"/>
+  <!-- Furnace label -->
+  <text x="187" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" fill="white" font-weight="bold">FURNACE</text>
+  <!-- Flames in furnace -->
+  <path d="M165,132 Q168,120 172,124 Q175,114 181,120 Q184,112 190,117 Q193,124 197,120 Q200,128 202,132 Z" fill="#f97316" opacity="0.9"/>
+  <path d="M168,132 Q171,124 175,128 Q178,120 184,124 Q186,130 189,126 Q192,132 168,132 Z" fill="#fbbf24" opacity="0.85"/>
+  <!-- Ductwork going up -->
+  <rect x="176" y="58" width="22" height="22" fill="#9ca3af" stroke="#6b7280" stroke-width="1.5"/>
+  <!-- Tank to house label -->
+  <text x="60" y="152" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#44403c">outdoor tank</text>
+  <text x="209" y="68" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#374151">supply duct</text>
+  <text x="150" y="170" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#44403c">PROPANE FURNACE</text>
+</svg>

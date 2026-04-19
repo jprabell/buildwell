@@ -85,7 +85,7 @@ export default async function MaterialListPage({ params }: { params: Promise<{ i
               </div>
               <Link href={`/projects/${id}`}>
                 <button className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
-                  Purchase — $250
+                  Purchase — $100
                 </button>
               </Link>
             </div>

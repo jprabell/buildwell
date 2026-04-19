@@ -8,7 +8,6 @@ import { StructureType, ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
-import CostBadge from "@/components/ui/CostBadge";
 import { cn } from "@/lib/utils";
 
 type Stage = "select-type" | "questions" | "saving";
@@ -81,10 +80,12 @@ export default function DesignPage() {
             const structures = STRUCTURE_OPTIONS.filter((s) => s.category === category);
             return (
               <div key={category} className="mb-10">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-4 flex items-center gap-3">
+                  <span className="flex-1 h-px bg-gradient-to-r from-amber-200 to-transparent" />
                   {category}
+                  <span className="flex-1 h-px bg-gradient-to-l from-amber-200 to-transparent" />
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {structures.map((s) => (
                     <button
                       key={s.value}
@@ -94,25 +95,38 @@ export default function DesignPage() {
                         setCurrentStep(0);
                       }}
                       className={cn(
-                        "bg-white rounded-xl p-4 border-2 text-left hover:border-amber-400 hover:shadow-md transition-all group",
+                        "text-left group relative bg-white rounded-2xl overflow-hidden border-2 transition-all duration-300 hover:shadow-[0_0_28px_rgba(217,119,6,0.25)] hover:-translate-y-1 cursor-pointer",
                         selectedType === s.value
-                          ? "border-amber-500 shadow-md"
-                          : "border-slate-200"
+                          ? "border-amber-500 shadow-[0_0_20px_rgba(217,119,6,0.3)]"
+                          : "border-stone-200 hover:border-amber-400"
                       )}
                     >
-                      <div className="text-3xl mb-2">{s.icon}</div>
-                      <div className="font-semibold text-slate-900 text-sm group-hover:text-amber-700">
-                        {s.label}
+                      {/* Image */}
+                      <div className="relative h-32 overflow-hidden bg-stone-200">
+                        {s.image ? (
+                          <img
+                            src={s.image}
+                            alt={s.label}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-4xl bg-stone-100">
+                            {s.icon}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-stone-900/10 to-transparent" />
+                        {selectedType === s.value && (
+                          <div className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                            ✓ Selected
+                          </div>
+                        )}
                       </div>
-                      <div className="text-xs text-slate-400 mt-1 leading-tight mb-2">
-                        {s.description}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="font-bold text-sm">
-                          <span className="text-amber-500">{"$".repeat(s.costLevel)}</span>
-                          <span className="text-slate-200">{"$".repeat(4 - s.costLevel)}</span>
-                        </span>
-                        <span className="text-xs text-slate-400">{s.costNote}</span>
+                      {/* Label */}
+                      <div className="p-3">
+                        <div className="font-bold text-stone-900 text-sm group-hover:text-amber-700 transition-colors leading-tight">
+                          {s.label}
+                        </div>
+                        <div className="text-xs text-stone-400 mt-0.5 leading-tight">{s.description}</div>
                       </div>
                     </button>
                   ))}

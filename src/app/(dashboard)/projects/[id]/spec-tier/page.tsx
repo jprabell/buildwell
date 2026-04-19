@@ -83,7 +83,7 @@ export default async function SpecTierPage({ params }: { params: Promise<{ id: s
               </div>
               <Link href={`/projects/${id}`}>
                 <button className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
-                  Purchase — $150
+                  Purchase — $75
                 </button>
               </Link>
             </div>

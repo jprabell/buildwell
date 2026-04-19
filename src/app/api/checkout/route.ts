@@ -7,19 +7,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const DOCUMENT_PACKAGES = {
   blueprint_set: {
-    name: "Full Blueprint Set",
-    description: "Floor plan, elevations, framing, roofing, plumbing, electrical & HVAC",
-    price: 200000, // $2,000 in cents
+    name: "Construction Planning Report",
+    description: "Room schedule, structural summary, systems overview, material selections & code compliance checklist",
+    price: 25000, // $250 in cents
   },
   material_list: {
     name: "Material List + Spec Sheet",
     description: "Itemized material list with quantities and per-trade spec sheets",
-    price: 25000, // $250 in cents
+    price: 10000, // $100 in cents
   },
   quote_package: {
-    name: "Quote Package + Bid Documents",
-    description: "Formatted quote docs with vendor pricing and trade bid documents",
+    name: "Contractor Bid Package",
+    description: "Scope of work per trade, formatted bid request forms, and line-item cost breakdowns",
     price: 25000, // $250 in cents
+  },
+  spec_tier: {
+    name: "Good / Better / Best Spec Report",
+    description: "3-tier material options with brand examples, installed cost ranges, and warranty comparison",
+    price: 7500, // $75 in cents
+  },
+  vendor_list: {
+    name: "Preferred Vendor List",
+    description: "3 local contractors per trade with phone, address, and rating — print-ready spreadsheet",
+    price: 4000, // $40 in cents
   },
 };
 

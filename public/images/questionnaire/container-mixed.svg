@@ -1,0 +1,33 @@
+<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="180" fill="#f1f5f9"/>
+  <text x="150" y="20" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#94a3b8">PLAN VIEW — CUSTOM LAYOUT</text>
+  <!-- Container 1 (horizontal, upper-left area) -->
+  <rect x="18" y="48" width="145" height="27" fill="#64748b" stroke="#1e293b" stroke-width="2" rx="1"/>
+  <line x1="38" y1="48" x2="38" y2="75" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="65" y1="48" x2="65" y2="75" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="92" y1="48" x2="92" y2="75" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="119" y1="48" x2="119" y2="75" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <text x="91" y="66" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#e2e8f0">C1</text>
+  <!-- Container 2 (horizontal, lower-left, offset) -->
+  <rect x="18" y="95" width="105" height="27" fill="#475569" stroke="#1e293b" stroke-width="2" rx="1"/>
+  <line x1="38" y1="95" x2="38" y2="122" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="65" y1="95" x2="65" y2="122" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="90" y1="95" x2="90" y2="122" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <text x="63" y="113" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#e2e8f0">C2</text>
+  <!-- Container 3 (vertical, right side) -->
+  <rect x="192" y="38" width="27" height="105" fill="#334155" stroke="#1e293b" stroke-width="2" rx="1"/>
+  <line x1="192" y1="58" x2="219" y2="58" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="192" y1="80" x2="219" y2="80" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="192" y1="102" x2="219" y2="102" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <line x1="192" y1="124" x2="219" y2="124" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <text x="205" y="93" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#e2e8f0" transform="rotate(-90,205,93)">C3</text>
+  <!-- Container 4 (small horizontal, upper-right) -->
+  <rect x="232" y="38" width="58" height="27" fill="#64748b" stroke="#1e293b" stroke-width="2" rx="1"/>
+  <line x1="252" y1="38" x2="252" y2="65" stroke="#94a3b8" stroke-width="1.5" opacity="0.5"/>
+  <text x="261" y="56" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#e2e8f0">C4</text>
+  <!-- Connection dashes -->
+  <line x1="163" y1="61" x2="192" y2="61" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <line x1="123" y1="108" x2="192" y2="108" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="150" y="148" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748b">multiple containers, custom arrangement</text>
+  <text x="150" y="170" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#44403c">MIXED / CUSTOM</text>
+</svg>
