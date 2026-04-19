@@ -3,13 +3,13 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { getSpecTierRows, getSpecTierCostSummaries } from "@/lib/specTiers";
+import { getSpecTierRows, getSpecTierCostSummaries, SpecTierRow } from "@/lib/specTiers";
 import { ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
 import PrintButton from "../material-list/PrintButton";
 
-function groupByCategory(rows: typeof SPEC_TIER_ROWS) {
-  const map = new Map<string, typeof SPEC_TIER_ROWS>();
+function groupByCategory(rows: SpecTierRow[]) {
+  const map = new Map<string, SpecTierRow[]>();
   for (const row of rows) {
     if (!map.has(row.category)) map.set(row.category, []);
     map.get(row.category)!.push(row);
