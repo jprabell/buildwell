@@ -249,6 +249,25 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         <p className="text-center text-stone-400 text-xs mt-6">
           Free previews include a "DRAFT DOCUMENT — OWNED BY BUILD-WELL LLC" watermark. Purchased documents are clean and ready to use.
         </p>
+
+        {/* Contractor Directory CTA */}
+        <div className="mt-10 bg-white border border-stone-200 rounded-2xl p-6 flex items-center justify-between gap-6">
+          <div>
+            <h3 className="font-black text-stone-900 mb-1">🔨 Preferred Vendor List</h3>
+            <p className="text-sm text-stone-500">
+              See all the trades you need, in build sequence, with one-click contractor searches
+              {answers.zipCode ? ` near ${answers.zipCode}` : " near your build site"}.
+              {!answers.zipCode && (
+                <span className="text-amber-600"> Add your ZIP code for location-specific results.</span>
+              )}
+            </p>
+          </div>
+          <Link href={`/projects/${project.id}/contractors`} className="shrink-0">
+            <button className="bg-stone-900 hover:bg-stone-700 text-white font-bold px-5 py-3 rounded-xl transition-colors text-sm whitespace-nowrap">
+              Find Contractors →
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -73,6 +73,13 @@ const UNIVERSAL_STEPS: QuestionStep[] = [
         ],
       },
       {
+        id: "zipCode",
+        label: "Build Location ZIP Code (optional — needed to generate your preferred vendor list)",
+        type: "text",
+        placeholder: "e.g. 78701",
+        required: false,
+      },
+      {
         id: "climateZone",
         label: "Climate Zone",
         type: "select",
