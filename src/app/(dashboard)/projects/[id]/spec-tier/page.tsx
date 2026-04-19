@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { SPEC_TIER_ROWS, TIER_COST_SUMMARIES } from "@/lib/specTiers";
+import { getSpecTierRows, getSpecTierCostSummaries } from "@/lib/specTiers";
 import { ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
 import PrintButton from "../material-list/PrintButton";
@@ -32,8 +32,10 @@ export default async function SpecTierPage({ params }: { params: Promise<{ id: s
   const purchases = (answers._purchases as string[] | undefined) ?? [];
   const purchased = purchases.includes("spec_tier");
 
-  const categories = groupByCategory(SPEC_TIER_ROWS);
-  const totalRows = SPEC_TIER_ROWS.length;
+  const specRows = getSpecTierRows(project.structureType);
+  const specCostSummaries = getSpecTierCostSummaries(project.structureType);
+  const categories = groupByCategory(specRows);
+  const totalRows = specRows.length;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -92,7 +94,7 @@ export default async function SpecTierPage({ params }: { params: Promise<{ id: s
 
         {/* Tier cost summary cards */}
         <div className="grid md:grid-cols-3 gap-4 mb-10">
-          {TIER_COST_SUMMARIES.map((tier) => (
+          {specCostSummaries.map((tier) => (
             <div key={tier.label} className={`rounded-2xl border p-5 ${tier.bgClass}`}>
               <p className={`text-xs font-black uppercase tracking-widest mb-1 ${tier.colorClass}`}>
                 {tier.label}

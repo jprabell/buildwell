@@ -516,3 +516,386 @@ export const SPEC_TIER_ROWS: SpecTierRow[] = [
     },
   },
 ];
+
+// ─── Barndominium / Metal Building Tiers ──────────────────────────────────────
+
+export const BARNDOMINIUM_COST_SUMMARIES: TierCostSummary[] = [
+  {
+    label: "Good",
+    perSqftRange: "$65–$95",
+    totalRangeNote: "per sq ft finished (all-in)",
+    description: "Pre-engineered or post-frame shell with basic finish-out. R-panel roof and walls, batt insulation, standard slab, builder-grade interior.",
+    colorClass: "text-slate-700",
+    bgClass: "bg-slate-50 border-slate-200",
+  },
+  {
+    label: "Better",
+    perSqftRange: "$100–$145",
+    totalRangeNote: "per sq ft finished (all-in)",
+    description: "Upgraded shell, spray foam insulation, polished or stained slab, standing seam roof option, quality HVAC for open spans, upgraded interior finishes.",
+    colorClass: "text-amber-700",
+    bgClass: "bg-amber-50 border-amber-200",
+  },
+  {
+    label: "Best",
+    perSqftRange: "$155–$220+",
+    totalRangeNote: "per sq ft finished (all-in)",
+    description: "Premium custom steel frame or post-frame with full spray foam, radiant heated slab, standing seam, high-end interior finishes — custom cabinetry, hardwood, stone.",
+    colorClass: "text-emerald-700",
+    bgClass: "bg-emerald-50 border-emerald-200",
+  },
+];
+
+export const BARNDOMINIUM_SPEC_TIER_ROWS: SpecTierRow[] = [
+  // ─── BUILDING SYSTEM ───────────────────────────────────────────────────────
+  {
+    category: "Building System",
+    subcategory: "Structural Frame",
+    good: {
+      spec: "Post-frame (pole barn) construction, 6×6 or 6×8 treated posts @ 8' OC, pre-built wood trusses",
+      brandExamples: "Standard treated timber, local truss manufacturer",
+      costRange: "$12–$18/sqft of building footprint",
+      warranty: "N/A (structural warranty per engineer)",
+      notes: "Most affordable frame system. Very common for barndo builds. Posts bear directly on concrete. Wide bay spacing reduces column count.",
+    },
+    better: {
+      spec: "Pre-engineered steel building kit, 26-gauge Galvalume primary/secondary framing, IBC-compliant",
+      brandExamples: "Mueller Buildings, General Steel, Nucor Building Systems, Ameribuilt",
+      costRange: "$18–$26/sqft of building footprint",
+      warranty: "25-year structural, 40-year Galvalume on framing",
+      notes: "Faster erection with engineered drawings included. Clear-span up to 200'. Pre-drilled for fast bolt-up. Better for large footprints.",
+    },
+    best: {
+      spec: "Custom red-iron rigid frame steel, engineer-stamped, 3\" girts and purlins, fully welded connections",
+      brandExamples: "VP Buildings, Robertson-Ceco, BlueScope Buildings, local structural steel fab",
+      costRange: "$28–$42/sqft of building footprint",
+      warranty: "Lifetime structural (with maintenance), 50-year Galvalume",
+      notes: "Maximum design flexibility — custom bay spacing, lean-tos, monitors, cupolas. Required for complex multi-use layouts.",
+    },
+  },
+  {
+    category: "Building System",
+    subcategory: "Foundation / Slab",
+    good: {
+      spec: "4\" unreinforced slab-on-grade, #4 rebar at perimeter, wire mesh center, standard broom finish",
+      brandExamples: "Local concrete contractor, standard mix 3,000 PSI",
+      costRange: "$5.50–$8.00/sqft installed",
+      warranty: "N/A",
+      notes: "Meets code for most light-use areas. No vapor barrier provisions for moisture in living areas. Adequate for shop/storage portion.",
+    },
+    better: {
+      spec: "5\" reinforced slab, #4 rebar @ 18\" OC both ways, 6-mil poly vapor barrier, control joints, smooth trowel finish",
+      brandExamples: "Local contractor, 4,000 PSI mix with fiber additive",
+      costRange: "$8.00–$12.00/sqft installed",
+      warranty: "N/A",
+      notes: "Suitable for living space and shop. Smooth trowel finish is required for polishing or staining later. Vapor barrier protects flooring.",
+    },
+    best: {
+      spec: "6\" post-tension or fiber-reinforced slab with radiant heat tubing, 6-mil vapor barrier, polished or stained finish",
+      brandExamples: "Polished Concrete Solutions, Concrete Craft, Westcoat, Dur-A-Flex stains",
+      costRange: "$16.00–$26.00/sqft installed (with radiant)",
+      warranty: "Polished finish: lifetime structural; radiant tubing: 25-year PEX",
+      notes: "Radiant adds $6–9/sqft but eliminates ductwork in slab zones. Polished concrete is essentially maintenance-free flooring.",
+    },
+  },
+  // ─── ROOFING & WALLS ────────────────────────────────────────────────────────
+  {
+    category: "Roof & Exterior Walls",
+    subcategory: "Roof Panel System",
+    good: {
+      spec: "26-gauge PBR (Purlin Bearing Rib) panel, exposed fasteners, Galvalume+ or painted, 36\" coverage",
+      brandExamples: "NCI Building Systems, Sheffield Metals PBR, Metal Sales PBR",
+      costRange: "$3.00–$4.50/sqft of roof area installed",
+      warranty: "25-year paint, 40-year Galvalume substrate",
+      notes: "Most common and most affordable metal roof panel. 12/12 pitch or less. Fastener washers must be inspected/replaced at 15–20 years.",
+    },
+    better: {
+      spec: "24-gauge structural standing seam, 1.5\" mechanical seam, Kynar 500 painted finish, hidden fasteners",
+      brandExamples: "Metal Sales Tuff-Rib SSM, MBCI Loc-Seam, Sheffield Metals SSR",
+      costRange: "$7.00–$10.00/sqft of roof area installed",
+      warranty: "35-year Kynar paint, 40-year Galvalume",
+      notes: "No exposed fasteners = no leak points. Thermal movement accommodated by seam. Compatible with standing seam clips for solar.",
+    },
+    best: {
+      spec: "24-gauge architectural standing seam, 2\" snap-lock or structural seam, Kynar 500, concealed insulation clip system",
+      brandExamples: "ATAS International, Drexel Metals AIA Series, Metal Roof Outlet Signature",
+      costRange: "$11.00–$16.00/sqft of roof area installed",
+      warranty: "50-year Kynar paint warranty, lifetime structural",
+      notes: "Premium residential aesthetics on metal structure. Smooth low-profile seam. Best option if mixing architecture styles. Solar-mount ready.",
+    },
+  },
+  {
+    category: "Roof & Exterior Walls",
+    subcategory: "Wall Panel / Cladding",
+    good: {
+      spec: "26-gauge AG panel or R-panel metal siding, exposed fasteners, standard color palette",
+      brandExamples: "NCI, Metal Sales, ABC Supply AG panel",
+      costRange: "$2.50–$4.00/sqft installed",
+      warranty: "25-year paint limited",
+      notes: "Purely functional agricultural look. Low maintenance. Color selection limited but durable.",
+    },
+    better: {
+      spec: "24-gauge PBR or concealed-fastener wall panel + board-and-batten trim accents or partial stone veneer",
+      brandExamples: "MBCI, Sheffield Metals, Ply Gem Stone (Versetta), Boral Cultured Stone",
+      costRange: "$5.50–$9.00/sqft installed",
+      warranty: "30-year paint, lifetime stone veneer",
+      notes: "Mixing metal panel with stone wainscot is the signature barndo look. Stone veneer adds $14–22/sqft for accented areas only.",
+    },
+    best: {
+      spec: "Concealed-fastener flush wall panel or 5V crimp + full stone veneer base 4', board-on-board cedar or LP SmartSide accent gables",
+      brandExamples: "LP SmartSide, Boral, Eldorado Stone, local cut stone",
+      costRange: "$10.00–$18.00/sqft blended installed",
+      warranty: "50-year LP SmartSide, lifetime natural stone",
+      notes: "Custom architectural appearance. Mix of materials requires proper flashing at all transitions. Highest curb appeal.",
+    },
+  },
+  // ─── INSULATION ─────────────────────────────────────────────────────────────
+  {
+    category: "Insulation",
+    subcategory: "Wall & Ceiling Insulation",
+    good: {
+      spec: "Vinyl-faced fiberglass batt, 3.5\" R-13 wall / 6\" R-19 ceiling, friction-fit between girts/purlins",
+      brandExamples: "Owens Corning EcoTouch VR, Johns Manville MICRO-LOCK",
+      costRange: "$0.70–$1.10/sqft installed",
+      warranty: "Lifetime limited",
+      notes: "Standard for agricultural/shop buildings. Thermal bridging through metal frame is significant — R-value in practice is 30–50% lower than rated.",
+    },
+    better: {
+      spec: "2\" closed-cell spray foam on metal panels (R-13) + R-13 fiberglass batt in stud cavity, continuous thermal break",
+      brandExamples: "Demilec Heatlok, Icynene ProSeal Eco, NCFI MetalTite",
+      costRange: "$2.50–$3.80/sqft installed",
+      warranty: "Lifetime",
+      notes: "ccSPF on metal panel eliminates condensation risk and thermal bridging. Hybrid approach balances cost and performance. Required for living space.",
+    },
+    best: {
+      spec: "Full closed-cell spray foam throughout: 3\" wall cavity (R-19) + 4\" roof deck (R-25), vapor barrier built in",
+      brandExamples: "NCFI ConSeal, Lapolla FoamLok 2000, Icynene ProSeal",
+      costRange: "$4.50–$6.50/sqft installed",
+      warranty: "Lifetime",
+      notes: "Best thermal and air performance possible on metal building. Also structurally stiffens the frame. No additional vapor barrier required.",
+    },
+  },
+  // ─── HVAC ────────────────────────────────────────────────────────────────────
+  {
+    category: "HVAC",
+    subcategory: "Living Space Heating & Cooling",
+    good: {
+      spec: "Propane or natural gas forced-air furnace (80% AFUE) + 14 SEER2 central AC, standard duct in living area",
+      brandExamples: "Goodman GMVC8, Carrier Performance 14, Rheem Classic",
+      costRange: "$9–$13/sqft of living area installed",
+      warranty: "10-year parts",
+      notes: "Familiar system for most contractors. Ducts can run in conditioned space above ceiling. Works well if living area is well-insulated and separated from shop.",
+    },
+    better: {
+      spec: "Multi-zone ductless mini-split system, 18–20 SEER2, heat pump with electric resistance backup",
+      brandExamples: "Mitsubishi M-Series, Daikin Quaternity, LG Art Cool Premier",
+      costRange: "$14–$22/sqft of living area installed",
+      warranty: "12-year compressor, 7-year parts",
+      notes: "Ideal for barndo — each zone (bedrooms, open living, shop office) controlled independently. No ductwork in high-ceiling areas. Very efficient.",
+    },
+    best: {
+      spec: "Variable-speed cold-climate heat pump (whole system) + radiant floor in living areas + ERV ventilation",
+      brandExamples: "Mitsubishi Hyper Heat + Warmup radiant, Bosch IDS, Uponor radiant panels",
+      costRange: "$24–$38/sqft of living area installed",
+      warranty: "12-year heat pump, 25-year radiant tubing",
+      notes: "Radiant + mini-split combo is the premium barndo setup. Silent, even heat, no drafts. ERV required for tight spray-foam envelope. 30% IRA tax credit eligible.",
+    },
+  },
+  {
+    category: "HVAC",
+    subcategory: "Shop / Bay Heating",
+    good: {
+      spec: "Propane or natural gas unit heater (radiant tube or force-air), 75,000–150,000 BTU per bay",
+      brandExamples: "Reznor UDAP, Modine Hot Dawg, Sterling F-Series unit heater",
+      costRange: "$1,200–$2,200 per unit installed",
+      warranty: "5-year heat exchanger",
+      notes: "Most common shop heat solution. Fast heat-up, no freeze concerns. Size based on bay volume and door opening frequency.",
+    },
+    better: {
+      spec: "Infrared radiant tube heater (gas), low-intensity, ceiling mounted, zone controlled",
+      brandExamples: "Roberts Gordon Vantage, Schwank EVO, Infratech Commercial",
+      costRange: "$2,500–$4,000 per unit installed",
+      warranty: "10-year emitter",
+      notes: "Heats objects and floor rather than air — comfortable even with high ceilings. Less affected by air drafts from bay doors. 20–30% more efficient than unit heaters.",
+    },
+    best: {
+      spec: "In-slab radiant hydronic heat throughout shop floor, propane or heat pump boiler",
+      brandExamples: "Uponor, Warmboard, Viega, Weil-McLain boiler, Mitsubishi hydrokit",
+      costRange: "$8–$14/sqft of shop floor installed (system)",
+      warranty: "25-year PEX tubing",
+      notes: "Warmest and most even heat for shop floor work. Eliminates cold concrete in winter. Must be designed into slab — cannot be added later.",
+    },
+  },
+  // ─── INTERIOR FINISHES ──────────────────────────────────────────────────────
+  {
+    category: "Interior Finishes",
+    subcategory: "Partition Walls & Ceiling",
+    good: {
+      spec: "2×4 wood stud partition walls @ 16\" OC, 1/2\" drywall, knock-down or orange-peel texture, flat paint",
+      brandExamples: "USG Sheetrock, National Gypsum Gold Bond",
+      costRange: "$4.50–$6.50/sqft of wall area installed",
+      warranty: "N/A",
+      notes: "Standard residential finish. Economical for separating living quarters. Metal building may require separate stud wall inside the shell.",
+    },
+    better: {
+      spec: "2×6 partition walls, 5/8\" Type X drywall (fire-rated), smooth finish, semi-gloss or satin paint",
+      brandExamples: "USG Sheetrock Plus, National Gypsum, PPG Speedhide",
+      costRange: "$7.00–$10.00/sqft of wall area installed",
+      warranty: "N/A",
+      notes: "5/8\" drywall provides better sound isolation and fire separation between shop and living space. Smoother finish shows fewer imperfections.",
+    },
+    best: {
+      spec: "Board-and-batten shiplap (1×6 or 1×8 pine/cedar), tongue & groove ceiling planks, exposed beam accents",
+      brandExamples: "Woodtone RealPanel, Stikwood, local shiplap mill, Rustica Hardware",
+      costRange: "$11.00–$20.00/sqft of wall/ceiling area installed",
+      warranty: "N/A (natural material)",
+      notes: "Defines the barndominium aesthetic — warm, rustic, industrial. Often painted white for modern farmhouse look. Exposed barn beams add $25–45 LF.",
+    },
+  },
+  {
+    category: "Interior Finishes",
+    subcategory: "Flooring (Living Area)",
+    good: {
+      spec: "6mm LVP luxury vinyl plank, floating install, AC3 wear layer",
+      brandExamples: "LifeProof, Shaw Floorté, COREtec One",
+      costRange: "$3.50–$5.50/sqft installed",
+      warranty: "Limited lifetime residential",
+      notes: "100% waterproof, scratch resistant, works over slab. Cannot be refinished. Good match for casual barndo use.",
+    },
+    better: {
+      spec: "Polished or stained concrete slab with area rugs, diamond-grind 400/800/1500 grit, penetrating sealer",
+      brandExamples: "Prosoco, Ameripolish, L&M Chemical, Elite Crete Systems",
+      costRange: "$4.00–$8.00/sqft polished and sealed",
+      warranty: "Sealer recoat every 3–5 years",
+      notes: "Signature barndo floor — zero transition between slab and living space. Must specify smooth trowel finish when pouring. Warm with radiant heat.",
+    },
+    best: {
+      spec: "3/4\" solid white oak or hickory hardwood over slab (with subfloor), site-finished with hard-wax oil",
+      brandExamples: "Mirage, Somerset, Carlisle Wide Plank, character-grade hickory",
+      costRange: "$14.00–$24.00/sqft installed",
+      warranty: "25-year finish (factory) or custom",
+      notes: "Premium warmth and texture. Must use proper vapor barrier and subfloor over slab. Pairs well with shiplap and exposed beam aesthetic.",
+    },
+  },
+  // ─── OVERHEAD DOORS ─────────────────────────────────────────────────────────
+  {
+    category: "Doors & Access",
+    subcategory: "Overhead / Garage Doors",
+    good: {
+      spec: "Non-insulated 24-gauge steel sectional door, chain-drive opener, 1/2 HP motor",
+      brandExamples: "Clopay Coiling Steel, Wayne Dalton 8000, Chamberlain chain drive",
+      costRange: "$900–$1,600 per door installed (10×10)",
+      warranty: "Limited lifetime door, 1-year opener",
+      notes: "Functional for shop access. No insulation — heat loss significant in cold climates. Loud chain drive typical.",
+    },
+    better: {
+      spec: "2\" insulated steel sectional, R-12 polystyrene core, belt-drive opener with battery backup",
+      brandExamples: "Clopay Gallery, Wayne Dalton 9000, LiftMaster 87504",
+      costRange: "$1,800–$3,200 per door installed (10×10)",
+      warranty: "Limited lifetime door and opener",
+      notes: "R-12 insulated door reduces shop heat loss and noise. Belt drive is quiet — important if living space is adjacent. Battery backup for power outages.",
+    },
+    best: {
+      spec: "3\" insulated steel or wood-composite sectional, R-18 urethane core, smart jackshaft opener, Wi-Fi enabled",
+      brandExamples: "Clopay Canyon Ridge (faux wood), Amarr Classica, LiftMaster 8500W jackshaft",
+      costRange: "$3,500–$7,000 per door installed (10×10 with opener)",
+      warranty: "Limited lifetime",
+      notes: "Jackshaft mounts to side of door — frees ceiling for lighting and lifts. Smart control allows phone access. Faux-wood carriage style matches barndo aesthetic perfectly.",
+    },
+  },
+  {
+    category: "Doors & Access",
+    subcategory: "Sliding Barn Doors (Interior)",
+    good: {
+      spec: "Pine or MDF flat panel sliding barn door, single-track bypass hardware, standard pull",
+      brandExamples: "SMARTSTANDARD, ARTisan Hardware, Home Depot interior barn door kits",
+      costRange: "$350–$650 per door installed",
+      warranty: "N/A",
+      notes: "Affordable and popular interior accent. Flat panel works with most styles. Hardware quality varies widely — inspect before buying.",
+    },
+    better: {
+      spec: "Knotty alder or poplar X-brace barn door, solid core, heavy-duty 6' flat track, soft-close hardware",
+      brandExamples: "Rustica Hardware, Barn Door Hardware Store, Artisan Hardware",
+      costRange: "$800–$1,600 per door installed",
+      warranty: "Lifetime hardware",
+      notes: "X-brace is the classic barndo look. Solid core reduces sound transmission. Soft-close prevents slamming. Requires proper header backing.",
+    },
+    best: {
+      spec: "Solid reclaimed wood or custom Douglas Fir Z-brace, industrial exposed-rod hardware, powder-coated steel track",
+      brandExamples: "Reclaimed Designworks, Montana Reclaimed Lumber, Urban Woods, custom millwork",
+      costRange: "$2,000–$5,000+ per door installed",
+      warranty: "N/A (custom)",
+      notes: "Statement piece for barndo interior. Reclaimed wood has unique character. Custom sizing available for oversized openings up to 8' wide × 10' tall.",
+    },
+  },
+  // ─── ELECTRICAL ─────────────────────────────────────────────────────────────
+  {
+    category: "Electrical",
+    subcategory: "Electrical Service & Distribution",
+    good: {
+      spec: "200A main service, standard residential panel, AFCI/GFCI per NEC, 120/240V circuits",
+      brandExamples: "Square D QO, Siemens, Leviton",
+      costRange: "$9–$13/sqft rough + finish",
+      warranty: "1-year labor",
+      notes: "Meets residential code. Adequate for living space. Will not support heavy shop equipment (3-phase welders, large compressors).",
+    },
+    better: {
+      spec: "200A main + 100A shop sub-panel, 240V circuits for shop equipment, EV-ready NEMA 14-50 outlet, USB-C receptacles",
+      brandExamples: "Eaton BR, Square D QO sub, Siemens",
+      costRange: "$15–$22/sqft rough + finish",
+      warranty: "1-year labor",
+      notes: "Sub-panel for shop keeps circuits separate from living space. 240V circuits handle most home shop tools. EV adds $400–600.",
+    },
+    best: {
+      spec: "400A service, separate 200A living panel + 200A shop panel, 3-phase option if available, generator transfer switch, structured wiring",
+      brandExamples: "Siemens PL Series, Square D HOMT, Generac Transfer Switch, Lutron RadioRA 3",
+      costRange: "$25–$40/sqft rough + finish",
+      warranty: "1-year labor",
+      notes: "3-phase enables commercial-grade CNC, welders, lifts. Generator transfer protects home and shop. Smart lighting throughout living area.",
+    },
+  },
+  // ─── PLUMBING ────────────────────────────────────────────────────────────────
+  {
+    category: "Plumbing",
+    subcategory: "Supply & DWV",
+    good: {
+      spec: "PEX-B supply, PVC DWV, builder-grade fixtures, utility mop sink in shop area",
+      brandExamples: "SharkBite PEX, Charlotte PVC, Kohler Escale utility sink",
+      costRange: "$9–$12/sqft rough plumbing (living area)",
+      warranty: "10-year PEX limited",
+      notes: "Standard residential rough-in. Utility sink in shop is very common and practical. PEX is freeze-resistant — important in unheated shop areas.",
+    },
+    better: {
+      spec: "PEX-A manifold system with home-run layout, PVC DWV, full-port ball valves, floor drain in shop",
+      brandExamples: "Uponor, Rehau, Viega; Watts floor drain",
+      costRange: "$13–$18/sqft rough plumbing",
+      warranty: "25-year PEX-A limited",
+      notes: "Manifold allows shutoff per fixture without accessing walls. Floor drain in shop is critical for washing vehicles, equipment, or any wet work.",
+    },
+    best: {
+      spec: "PEX-A manifold, cast iron DWV (noise reduction), recirculation pump, outdoor hose bibs on multiple sides, 2 floor drains in shop",
+      brandExamples: "Uponor, Mueller cast iron, Grundfos Comfort circ pump",
+      costRange: "$20–$30/sqft rough plumbing",
+      warranty: "Lifetime copper/CI, 25-year PEX",
+      notes: "Cast iron drain dramatically reduces noise in living area. Recirculation delivers instant hot water. Multiple hose bibs essential for large footprint.",
+    },
+  },
+];
+
+// ─── Helper: get structure-appropriate rows ────────────────────────────────────
+
+const BARNDOMINIUM_TYPES = new Set(["BARNDOMINIUM"]);
+const AGRICULTURAL_TYPES = new Set(["BARN", "POLE_BARN"]);
+
+export function getSpecTierRows(structureType: string): SpecTierRow[] {
+  if (BARNDOMINIUM_TYPES.has(structureType)) return BARNDOMINIUM_SPEC_TIER_ROWS;
+  if (AGRICULTURAL_TYPES.has(structureType)) return BARNDOMINIUM_SPEC_TIER_ROWS; // similar metal-building spec
+  return SPEC_TIER_ROWS;
+}
+
+export function getSpecTierCostSummaries(structureType: string): TierCostSummary[] {
+  if (BARNDOMINIUM_TYPES.has(structureType) || AGRICULTURAL_TYPES.has(structureType)) {
+    return BARNDOMINIUM_COST_SUMMARIES;
+  }
+  return TIER_COST_SUMMARIES;
+}
