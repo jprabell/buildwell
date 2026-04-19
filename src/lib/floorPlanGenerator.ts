@@ -201,6 +201,176 @@ function closetShelves(d: typeof Drawing, x: number, y: number, w: number, h: nu
   d.drawLine(x, y + h - shelfD * 2, x + w, y + h - shelfD * 2);
 }
 
+// ─── Furniture symbols ────────────────────────────────────────────────────────
+
+// Queen / double bed — headboard on +y edge; default 5'×6.7'
+function bedQ(d: typeof Drawing, x: number, y: number, w = 5.0, h = 6.7) {
+  rect(d, x, y, w, h);
+  d.drawLine(x, y + h - 0.7, x + w, y + h - 0.7);               // headboard top rail
+  d.drawLine(x, y + h - 1.05, x + w, y + h - 1.05);             // coverlet fold
+  const pw = (w - 0.9) / 2;
+  rect(d, x + 0.3, y + h - 0.65, pw - 0.08, 0.46);              // pillow L
+  rect(d, x + 0.3 + pw + 0.1, y + h - 0.65, pw - 0.08, 0.46);  // pillow R
+  d.drawLine(x + w / 2, y, x + w / 2, y + h - 1.05);            // center fold
+}
+
+// Twin / single bed — headboard on +y edge; default 3.3'×6.5'
+function bedT(d: typeof Drawing, x: number, y: number, w = 3.3, h = 6.5) {
+  rect(d, x, y, w, h);
+  d.drawLine(x, y + h - 0.65, x + w, y + h - 0.65);
+  d.drawLine(x, y + h - 1.0, x + w, y + h - 1.0);
+  rect(d, x + 0.28, y + h - 0.6, w - 0.56, 0.46);               // pillow
+}
+
+// Sofa — horizontal; w=7–9', h≈3.2'
+function sofaH(d: typeof Drawing, x: number, y: number, w: number, h = 3.2) {
+  rect(d, x, y, w, h);
+  d.drawLine(x + 0.55, y, x + 0.55, y + h);                     // arm L
+  d.drawLine(x + w - 0.55, y, x + w - 0.55, y + h);             // arm R
+  d.drawLine(x + 0.55, y + h * 0.52, x + w - 0.55, y + h * 0.52); // back cushion line
+  const cw = (w - 1.1) / 3;
+  for (let i = 0; i < 3; i++) {
+    rect(d, x + 0.55 + i * cw, y + 0.15, cw - 0.1, h * 0.35);  // seat cushion
+  }
+}
+
+// Coffee table centered at (cx, cy)
+function coffeeTable(d: typeof Drawing, cx: number, cy: number, w = 4.2, h = 2.0) {
+  rect(d, cx - w / 2, cy - h / 2, w, h);
+  d.drawLine(cx - w / 2 + 0.2, cy - h / 2 + 0.2, cx + w / 2 - 0.2, cy + h / 2 - 0.2);
+  d.drawLine(cx + w / 2 - 0.2, cy - h / 2 + 0.2, cx - w / 2 + 0.2, cy + h / 2 - 0.2);
+}
+
+// Dining table with chairs centered at (cx, cy)
+function diningSet(d: typeof Drawing, cx: number, cy: number, tw = 5.0, th = 3.0) {
+  rect(d, cx - tw / 2, cy - th / 2, tw, th);
+  const chW = 1.8, chH = 1.4, cols = Math.max(2, Math.round(tw / 2.5));
+  const sp = tw / cols;
+  for (let i = 0; i < cols; i++) {
+    const chX = cx - tw / 2 + sp * (i + 0.5) - chW / 2;
+    rect(d, chX, cy + th / 2 + 0.22, chW, chH);                 // chairs above
+    rect(d, chX, cy - th / 2 - 0.22 - chH, chW, chH);          // chairs below
+  }
+  // End chairs
+  rect(d, cx - tw / 2 - 0.22 - chH, cy - chW / 2, chH, chW);
+  rect(d, cx + tw / 2 + 0.22, cy - chW / 2, chH, chW);
+}
+
+// Dresser — 3 drawers, along wall
+function dresser(d: typeof Drawing, x: number, y: number, w: number, depth = 1.8) {
+  rect(d, x, y, w, depth);
+  const dw = w / 3;
+  for (let i = 0; i < 3; i++) {
+    rect(d, x + i * dw + 0.12, y + 0.12, dw - 0.24, depth - 0.24);
+  }
+}
+
+// TV / entertainment wall unit
+function tvWall(d: typeof Drawing, x: number, y: number, w: number, depth = 1.2) {
+  rect(d, x, y, w, depth);
+  d.drawLine(x + w * 0.18, y, x + w * 0.18, y + depth);
+  d.drawLine(x + w * 0.82, y, x + w * 0.82, y + depth);
+  rect(d, x + w * 0.22, y + 0.15, w * 0.56, depth * 0.68);     // TV screen
+}
+
+// Desk — simple L-bracket if w > 8, else straight
+function deskH(d: typeof Drawing, x: number, y: number, w: number, depth = 2.4) {
+  rect(d, x, y, w, depth);
+  d.drawLine(x, y + depth - 0.4, x + w, y + depth - 0.4);
+  d.drawLine(x + 0.4, y, x + 0.4, y + depth - 0.4);
+  d.drawLine(x + w - 0.4, y, x + w - 0.4, y + depth - 0.4);
+}
+
+// ─── Elevation material helpers ───────────────────────────────────────────────
+
+// Horizontal lap siding lines
+function lapSiding(d: typeof Drawing, x: number, y: number, w: number, h: number, spacing = 0.75) {
+  d.setActiveLayer("HATCH");
+  for (let sy = spacing; sy < h; sy += spacing) {
+    d.drawLine(x, y + sy, x + w, y + sy);
+  }
+  d.setActiveLayer("EXTERIOR");
+}
+
+// Horizontal roof shingle courses on sloped roof
+// plateY = y-coordinate of eave; rise = total rise; pitch = rise/run
+function shingleLines(d: typeof Drawing, x: number, y: number, W: number, plateY: number, rise: number, pitch: number, overhang: number) {
+  d.setActiveLayer("HATCH");
+  const spacing = 0.85; // ~10" exposure
+  for (let dy = spacing; dy < rise; dy += spacing) {
+    const hw = dy / pitch;
+    const lx1 = Math.max(x - overhang, x + W / 2 - hw);
+    const lx2 = Math.min(x + W + overhang, x + W / 2 + hw);
+    d.drawLine(lx1, plateY + dy, x + W / 2, plateY + dy);
+    d.drawLine(x + W / 2, plateY + dy, lx2, plateY + dy);
+  }
+  d.setActiveLayer("EXTERIOR");
+}
+
+// Standing-seam / metal roof ribs on slope (for barns, A-frame, etc.)
+function metalRoofLines(d: typeof Drawing, x: number, y: number, W: number, plateY: number, rise: number, pitch: number, overhang: number) {
+  d.setActiveLayer("HATCH");
+  const spacing = 1.5; // panel spacing
+  const panelCount = Math.floor((W / 2 + overhang) / spacing);
+  for (let i = 1; i <= panelCount; i++) {
+    const run = i * spacing;
+    // Left slope
+    const lx = x + W / 2 - run;
+    const ly = plateY + run * pitch;
+    d.drawLine(lx, ly, lx, plateY);
+    // Right slope
+    const rx = x + W / 2 + run;
+    d.drawLine(rx, ly, rx, plateY);
+  }
+  d.setActiveLayer("EXTERIOR");
+}
+
+// Concrete block / CMU foundation hatch
+function foundHatch(d: typeof Drawing, x: number, y: number, W: number, h: number) {
+  d.setActiveLayer("HATCH");
+  // Horizontal mortar joints
+  for (let fy = 0.67; fy < h; fy += 0.67) {
+    d.drawLine(x, y + fy, x + W, y + fy);
+  }
+  // Staggered vertical joints (running bond)
+  let offset = 0;
+  for (let fy = 0; fy < h; fy += 0.67, offset = offset === 0 ? 1.0 : 0) {
+    for (let fx = offset + 2.0; fx < W; fx += 2.0) {
+      d.drawLine(x + fx, y + fy, x + fx, y + fy + 0.67);
+    }
+  }
+  d.setActiveLayer("WALLS");
+}
+
+// General notes block — drawn to right of title block
+function generalNotes(d: typeof Drawing, x: number, y: number) {
+  d.setActiveLayer("TITLE");
+  const w = 22, h = 18;
+  rect(d, x, y, w, h);
+  d.drawLine(x, y + h - 2.2, x + w, y + h - 2.2);
+  d.drawText(x + 0.4, y + h - 1.65, 0.55, 0, "GENERAL NOTES");
+  const notes = [
+    "1. ALL DIMENSIONS ARE TO FACE OF FRAMING UNLESS NOTED.",
+    "2. VERIFY ALL DIMENSIONS IN FIELD BEFORE CONSTRUCTION.",
+    "3. DO NOT SCALE DRAWINGS.",
+    "4. CONSTRUCTION TO COMPLY WITH ALL APPLICABLE LOCAL,",
+    "   STATE AND FEDERAL CODES AND ORDINANCES.",
+    "5. CONTRACTOR TO VERIFY EXISTING CONDITIONS BEFORE",
+    "   STARTING WORK AND REPORT DISCREPANCIES TO EOR.",
+    "6. ALL STRUCTURAL MEMBERS TO BE DESIGNED BY A",
+    "   LICENSED STRUCTURAL ENGINEER.",
+    "7. REFER TO STRUCTURAL, MEP, AND CIVIL DRAWINGS",
+    "   FOR ADDITIONAL REQUIREMENTS.",
+    "8. FOUNDATION TYPE TO BE DETERMINED BY SOILS REPORT.",
+    "9. THIS IS A PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION.",
+    "10. CONTACT AHJ FOR PERMIT REQUIREMENTS.",
+  ];
+  d.setActiveLayer("TEXT");
+  notes.forEach((line, i) => {
+    d.drawText(x + 0.4, y + h - 3.0 - i * 1.0, 0.3, 0, line);
+  });
+}
+
 // ─── Title block ──────────────────────────────────────────────────────────────
 
 function titleBlock(d: typeof Drawing, x: number, y: number, projectName: string, structureType: string, sqft: number) {
@@ -246,7 +416,10 @@ function elevFooter(d: typeof Drawing, x: number, y: number, W: number, foundH: 
 function elevFoundation(d: typeof Drawing, x: number, y: number, W: number, foundH: number) {
   d.setActiveLayer("WALLS");
   rect(d, x, y, W, foundH);
-  hatch(d, x + 0.1, y + 0.1, W - 0.2, foundH - 0.2, 1.2);
+  // Poured concrete hatch
+  hatch(d, x + 0.1, y + 0.1, W - 0.2, foundH - 0.2, 0.9);
+  d.setActiveLayer("TEXT");
+  d.drawText(x + 0.5, y + foundH / 2 - 0.2, 0.28, 0, "CONC. FOUND.");
 }
 
 // Gable elevation — residential, barndominium, agricultural, outbuildings, log cabin, passive solar
@@ -261,35 +434,45 @@ function drawGableElevation(d: typeof Drawing, x: number, y: number, W: number, 
   const overhang = isBarn ? 1.0 : 2.0;
 
   elevFoundation(d, x, y, W, foundH);
+  foundHatch(d, x, y, W, foundH);
 
   // Walls
   d.setActiveLayer("EXTERIOR");
   rect(d, x, y + foundH, W, wallHt);
-  // Log cabin horizontal courses
+  // Siding material
   if (structureType === "LOG_CABIN") {
+    // Horizontal log courses
     const logH = 0.65;
     for (let ly = foundH + logH; ly < foundH + wallHt; ly += logH) {
       d.drawLine(x, y + ly, x + W, y + ly);
     }
+  } else if (isBarn) {
+    // Board-and-batten — alternating wide/narrow vertical boards
+    lapSiding(d, x, y + foundH, W, wallHt, 1.5);
+  } else {
+    // Horizontal lap siding — 8" exposure
+    lapSiding(d, x, y + foundH, W, wallHt, 0.67);
   }
 
   // Roof gable + overhangs
   const plateY = y + foundH + wallHt;
-  d.drawLine(x - overhang, plateY, x + W + overhang, plateY);
+  d.setActiveLayer("EXTERIOR");
+  d.drawLine(x - overhang, plateY, x + W + overhang, plateY);      // eave line
   d.drawLine(x - overhang, plateY, x + W / 2, plateY + rise + 0.5);
   d.drawLine(x + W + overhang, plateY, x + W / 2, plateY + rise + 0.5);
-  d.drawLine(x + W / 2 - 0.15, plateY, x + W / 2 - 0.15, plateY + rise + 0.5);
-  d.drawLine(x + W / 2 + 0.15, plateY, x + W / 2 + 0.15, plateY + rise + 0.5);
+  d.drawLine(x + W / 2 - 0.2, plateY, x + W / 2 - 0.2, plateY + rise + 0.5); // ridge L
+  d.drawLine(x + W / 2 + 0.2, plateY, x + W / 2 + 0.2, plateY + rise + 0.5); // ridge R
+  // Soffit line under overhang
+  d.drawLine(x - overhang, plateY - 0.5, x, plateY - 0.5);
+  d.drawLine(x + W, plateY - 0.5, x + W + overhang, plateY - 0.5);
 
-  // Metal roofing ribs for barn types
+  // Roof material
   if (isBarn) {
-    const ribCount = Math.floor(W / 3);
-    for (let i = 1; i < ribCount; i++) {
-      const bx = x + i * (W / ribCount);
-      const brise = (bx <= x + W / 2) ? (bx - x) * pitch : (x + W - bx) * pitch;
-      d.drawLine(bx, plateY, bx, plateY + brise);
-    }
+    metalRoofLines(d, x, y, W, plateY, rise, pitch, overhang);
+  } else {
+    shingleLines(d, x, y, W, plateY, rise, pitch, overhang);
   }
+  d.setActiveLayer("EXTERIOR");
 
   // Front door
   d.setActiveLayer("DOORS");
@@ -330,18 +513,26 @@ function drawGableElevation(d: typeof Drawing, x: number, y: number, W: number, 
     d.drawLine(x + W * 0.58 - 0.3, winY, x + W * 0.58 + winW + 0.3, winY);
     d.drawLine(x + W * 0.74 - 0.3, winY, x + W * 0.74 + 3.3, winY);
   } else if (!isBarn) {
-    rect(d, x + W * 0.08, winY, winW, winHt);
-    rect(d, x + W * 0.72, winY, winW, winHt);
-    d.drawLine(x + W * 0.08 - 0.3, winY, x + W * 0.08 + winW + 0.3, winY);
-    d.drawLine(x + W * 0.72 - 0.3, winY, x + W * 0.72 + winW + 0.3, winY);
-    d.drawLine(x + W * 0.08 + winW / 2, winY, x + W * 0.08 + winW / 2, winY + winHt);
-    d.drawLine(x + W * 0.72 + winW / 2, winY, x + W * 0.72 + winW / 2, winY + winHt);
-    d.drawLine(x + W * 0.08, winY + winHt / 2, x + W * 0.08 + winW, winY + winHt / 2);
-    d.drawLine(x + W * 0.72, winY + winHt / 2, x + W * 0.72 + winW, winY + winHt / 2);
+    // Double-hung windows with sill and header
+    [[x + W * 0.08, winW], [x + W * 0.72, winW]].forEach(([wx, ww]) => {
+      // Sill and header projections
+      d.drawLine(wx - 0.45, winY - 0.3, wx + ww + 0.45, winY - 0.3);      // sill
+      d.drawLine(wx - 0.45, winY + winHt + 0.25, wx + ww + 0.45, winY + winHt + 0.25); // header
+      rect(d, wx, winY, ww, winHt);                                          // frame
+      d.drawLine(wx + ww / 2, winY, wx + ww / 2, winY + winHt);            // center mullion
+      d.drawLine(wx, winY + winHt / 2, wx + ww, winY + winHt / 2);         // rail
+      // Glass indication lines
+      d.drawLine(wx + 0.25, winY + 0.2, wx + ww / 2 - 0.1, winY + winHt / 2 - 0.15);
+      d.drawLine(wx + ww / 2 + 0.1, winY + 0.2, wx + ww - 0.25, winY + winHt / 2 - 0.15);
+    });
   } else {
-    // Barn side windows
-    rect(d, x + W * 0.12, winY, 3.5, 3.5);
-    rect(d, x + W * 0.72, winY, 3.5, 3.5);
+    // Barn side windows with sill
+    [[x + W * 0.12, 3.5], [x + W * 0.72, 3.5]].forEach(([wx, ww]) => {
+      d.drawLine(wx - 0.35, winY - 0.25, wx + ww + 0.35, winY - 0.25);
+      rect(d, wx, winY, ww, 3.5);
+      d.drawLine(wx + ww / 2, winY, wx + ww / 2, winY + 3.5);
+      d.drawLine(wx, winY + 1.75, wx + ww, winY + 1.75);
+    });
   }
 
   // Chimney (residential/cabin, not barns)
@@ -350,7 +541,10 @@ function drawGableElevation(d: typeof Drawing, x: number, y: number, W: number, 
     const chX = x + W * 0.7, chW = 2.5;
     const chTop = plateY + rise * 0.55 + 3.0;
     rect(d, chX, plateY - 1, chW, chTop - plateY + 1);
-    d.drawLine(chX - 0.4, chTop, chX + chW + 0.4, chTop);
+    d.drawLine(chX - 0.4, chTop, chX + chW + 0.4, chTop);     // chimney cap
+    d.drawLine(chX - 0.2, chTop - 0.35, chX + chW + 0.2, chTop - 0.35); // cap detail
+    // Flue opening
+    rect(d, chX + 0.5, chTop - 0.9, chW - 1.0, 0.55);
   }
 
   // Outbuilding overhead doors
@@ -368,8 +562,16 @@ function drawGableElevation(d: typeof Drawing, x: number, y: number, W: number, 
 
   d.setActiveLayer("DIMENSIONS");
   dim(d, x, y + foundH, x + W, y + foundH, -3.5, ft(W));
-  dim(d, x, y + foundH, x, plateY, -5.0, `PLATE: ${wallHt}'-0"`);
+  dim(d, x, y, x, y + foundH, -5.0, ft(foundH));             // foundation height
+  dim(d, x, y + foundH, x, plateY, -5.0, `${wallHt}'-0" PLATE`);
   dim(d, x + W, y + foundH, x + W, plateY + rise, 4.5, ft(wallHt + rise));
+  // Window header/sill heights
+  if (!isBarn && !hasGarage) {
+    const winY2 = y + foundH + 2.8;
+    d.setActiveLayer("DIMENSIONS");
+    dimI(d, x, y + foundH, x, winY2, -7.0, ft(2.8));
+    dimI(d, x, winY2, x, winY2 + winHt, -7.0, ft(winHt));
+  }
 
   elevFooter(d, x, y, W, foundH);
 }
@@ -1050,6 +1252,42 @@ function drawResidential(d: typeof Drawing, answers: ProjectAnswers, W: number, 
   d.drawLine(fpX + 0.5, H - 1.0, fpX + fpW - 0.5, H - 1.0);
   d.setActiveLayer("TEXT");
   d.drawText(fpX + fpW / 2 - 0.35, H - 0.85, 0.35, 0, "FP");
+
+  // ── Furniture ──────────────────────────────────────────────────────────────
+  d.setActiveLayer("FURNITURE");
+
+  // Master bedroom: queen bed + dresser
+  const mbrW = xB, mbrH = H - yC;
+  if (mbrW >= 8 && mbrH >= 9) {
+    bedQ(d, (mbrW - 5.2) / 2, yC + mbrH * 0.55, 5.2, 7.0);
+    dresser(d, mbrW * 0.07, yC + mbrH * 0.08, mbrW * 0.6);
+  }
+
+  // Bedroom(s) 2 / 3
+  if (bedrooms >= 3) {
+    const brW = rn(xB / 2);
+    bedT(d, brW * 0.12, yB + (yC - yB) * 0.25, Math.min(brW * 0.78, 3.5), Math.min((yC - yB) * 0.68, 6.5));
+    bedT(d, brW + (xB - brW) * 0.12, yB + (yC - yB) * 0.25, Math.min((xB - brW) * 0.78, 3.5), Math.min((yC - yB) * 0.68, 6.5));
+    dresser(d, brW * 0.08, yB + (yC - yB) * 0.05, Math.min(brW * 0.55, 3.5));
+  } else {
+    bedT(d, xB * 0.1, yB + (yC - yB) * 0.25, Math.min(xB * 0.78, 3.5), Math.min((yC - yB) * 0.68, 6.5));
+    dresser(d, xB * 0.08, yB + (yC - yB) * 0.05, Math.min(xB * 0.55, 3.5));
+  }
+
+  // Living room: sofa + coffee table + TV wall
+  const lrX = xC, lrW = W - xC, lrY = yC, lrH = H - yC;
+  if (lrW > 10) {
+    tvWall(d, lrX + lrW * 0.55, lrY + lrH - 1.2, lrW * 0.38);
+    const sfW = Math.min(lrW * 0.72, 9.0);
+    sofaH(d, lrX + (lrW - sfW) / 2, lrY + lrH * 0.40, sfW);
+    coffeeTable(d, lrX + lrW * 0.5, lrY + lrH * 0.65, Math.min(lrW * 0.38, 4.5));
+  }
+
+  // Dining room: table + chairs
+  const drX = xD, drW = W - xD, drY = yB, drH = yC - yB;
+  if (drW > 5 && drH > 5) {
+    diningSet(d, drX + drW / 2, drY + drH / 2, Math.min(drW * 0.68, 5.5), Math.min(drH * 0.65, 3.2));
+  }
 }
 
 // ─── Barndominium layout ──────────────────────────────────────────────────────
@@ -1167,6 +1405,34 @@ function drawBarndominium(d: typeof Drawing, answers: ProjectAnswers, W: number,
   dimI(d, W, 0, W, yEntry, 2.5, ft(yEntry));
   dimI(d, W, yEntry, W, yLiving, 2.5, ft(yLiving - yEntry));
   dimI(d, W, yLiving, W, yBeds, 2.5, ft(yBeds - yLiving));
+
+  // ── Furniture ──────────────────────────────────────────────────────────────
+  d.setActiveLayer("FURNITURE");
+
+  // Living / kitchen area: sofa + coffee table
+  const lrW2 = livingW, lrH2 = yLiving - yEntry;
+  if (lrW2 > 8 && lrH2 > 7) {
+    sofaH(d, shopW + lrW2 * 0.1, yEntry + lrH2 * 0.52, Math.min(lrW2 * 0.72, 8.5));
+    coffeeTable(d, shopW + lrW2 * 0.5, yEntry + lrH2 * 0.72, Math.min(lrW2 * 0.38, 4.2));
+  }
+
+  // Bedroom 2
+  bedT(d, shopW + bed1W * 0.1, yLiving + (yBeds - yLiving) * 0.22,
+    Math.min(bed1W * 0.8, 3.5), Math.min((yBeds - yLiving) * 0.68, 6.5));
+
+  // Bedroom 3
+  bedT(d, shopW + bed1W + bathW + bed2W * 0.1, yLiving + (yBeds - yLiving) * 0.22,
+    Math.min(bed2W * 0.8, 3.5), Math.min((yBeds - yLiving) * 0.68, 6.5));
+
+  // Master bedroom
+  if (bedrooms >= 3) {
+    const masterW2 = rn(livingW * 0.55);
+    bedQ(d, shopW + (masterW2 - 5.0) / 2, yBeds + (H - yBeds - 7.0) * 0.55, 5.0, 7.0);
+    dresser(d, shopW + masterW2 * 0.08, yBeds + (H - yBeds) * 0.08, Math.min(masterW2 * 0.55, 4.0));
+  } else {
+    bedQ(d, shopW + (livingW - 5.0) / 2, yBeds + (H - yBeds - 7.0) * 0.55, 5.0, 7.0);
+    dresser(d, shopW + livingW * 0.08, yBeds + (H - yBeds) * 0.08, Math.min(livingW * 0.55, 4.0));
+  }
 }
 
 // ─── Agricultural layout ──────────────────────────────────────────────────────
@@ -1819,38 +2085,49 @@ function drawHVACPlan(d: typeof Drawing, x: number, y: number, W: number, H: num
   if (cat === "residential") {
     const xB = rn(W*0.32), xC = rn(W*0.49), xD = rn(W*0.79);
     const yB = rn(H*0.20), yC = rn(H*0.50), yD = rn(H*0.75);
+    // Duct spine X coordinate (runs through hallway)
+    const spineX = x + xC - 0.55;
+    const spineY = y + yB*0.52;
 
     // AHU in utility area
     symAHU(d, x+xB*0.5, y+yB*0.52);
 
-    // Main trunk ducts
-    symDuctH(d, x+xB+0.5, y+yB*0.52, xC-xB-1.0, "10\" MAIN TRUNK");
-    symDuctH(d, x+xC, y+yB*0.52, W-xC-0.5, "8\" BRANCH");
-    symDuctV(d, x+xB*0.5, y+yB+0.5, yC-yB-1.0, "8\"");
-    symDuctV(d, x+xC*(0.85), y+yC, H-yC-0.5, "8\"");
+    // ── Supply duct routing ─────────────────────────────────────────────────
+    // Main horizontal trunk from AHU through hall
+    symDuctH(d, x+xB*0.5+2.8, spineY, xC-xB*0.5-3.3, "10\" SUPPLY TRUNK");
+    // Vertical spine down living side
+    symDuctV(d, spineX, y+yB*0.52+0.55, yC-yB*0.52-0.55, "10\"");
+    // Living room branch — horizontal
+    symDuctH(d, spineX+0.55, y+yC+(H-yC)*0.45-0.55, W-xC-1.5, "8\" BRANCH");
+    // Lower (bedroom) branch — horizontal
+    symDuctH(d, x, spineY+0.55, xB*0.5+0.3, "6\" BRANCH");
 
-    // Supply registers (near ext walls, in floor or low wall)
-    symSupplyReg(d, x+xC*0.5, y+yB-0.65);       // utility
-    symSupplyReg(d, x+xC+(W-xC)*0.5, y+yB-0.65); // foyer
-    symSupplyReg(d, x+0.65, y+yB+(yC-yB)*0.5);   // bed 2
-    symSupplyReg(d, x+xC+(xD-xC)*0.5, y+yB+0.65);// kitchen
-    symSupplyReg(d, x+xD+(W-xD)*0.5, y+yB+0.65); // dining
-    symSupplyReg(d, x+0.65, y+yC+(H-yC)*0.45);   // master bed
-    symSupplyReg(d, x+xC+(W-xC)*0.5, y+H-0.65);  // living
-    if (bedrooms >= 3) symSupplyReg(d, x+xB*0.75, y+yB+0.65); // bed 3
+    // Supply registers
+    symSupplyReg(d, x+xC+(W-xC)*0.32, y+yB*0.32);         // foyer
+    symSupplyReg(d, x+0.65, y+yB+(yC-yB)*0.5);             // bed 2
+    if (bedrooms >= 3) symSupplyReg(d, x+xB*0.75, y+yC-0.65); // bed 3
+    symSupplyReg(d, x+xC+(xD-xC)*0.55, y+yB+0.65);         // kitchen
+    symSupplyReg(d, x+W-0.65, y+yB+(yC-yB)*0.5);           // dining
+    symSupplyReg(d, x+0.65, y+yC+(H-yC)*0.45);             // master bed
+    symSupplyReg(d, x+xC+(W-xC)*0.25, y+yC+(H-yC)*0.45);  // living 1
+    symSupplyReg(d, x+W-0.65, y+yC+(H-yC)*0.72);           // living 2
 
-    // Return air grilles (central hall/living)
-    symReturnReg(d, x+xB+(xC-xB)*0.5, y+(yB+yC)*0.5);
-    symReturnReg(d, x+xC+(W-xC)*0.45, y+yC+(H-yC)*0.5);
+    // ── Return air ──────────────────────────────────────────────────────────
+    symReturnReg(d, x+xB+(xC-xB)*0.5, y+(yB+yC)*0.5);     // hall return
+    symReturnReg(d, x+xC+(W-xC)*0.55, y+yC+(H-yC)*0.72);  // living return
+    // Return duct back to AHU
+    symDuctH(d, x+xB+(xC-xB)*0.5+1.6, y+(yB+yC)*0.5-0.55, xC-xB-1.6, "8\" RETURN");
+    symDuctV(d, spineX, y+(yB+yC)*0.5, yB*0.52-(yB+yC)*0.5+0.1, "8\" RETURN");
 
-    // Thermostat (hallway)
-    symThermostat(d, x+xB+2.5, y+yC-2.2);
+    // Thermostat
+    symThermostat(d, x+xB+2.5, y+yC-2.5);
+    d.drawText(x+xB+3.5, y+yC-2.7, 0.28, 0, "PROGRAMMABLE T-STAT");
 
-    // Outdoor condenser (shown outside building below)
+    // Outdoor condenser (exterior below building)
     symCondenser(d, x+W*0.82, y-9.0);
     d.drawLine(x+W*0.82, y, x+W*0.82, y-6.5);
-    d.drawText(x+W*0.84, y-3.2, 0.3, 0, "REFRIG.");
-    d.drawText(x+W*0.84, y-3.8, 0.3, 0, "LINES");
+    d.drawText(x+W*0.78, y-7.5, 0.3, 0, "2\" REFRIG. LINES");
+    d.drawText(x+W*0.78, y-8.2, 0.3, 0, "IN CONDUIT");
 
   } else if (cat === "barndominium") {
     const shopW = rn(W*0.55);
@@ -1919,17 +2196,20 @@ export function generateFloorPlanDXF(
   const d = new Drawing();
   d.setUnits("Feet");
 
-  d.addLayer("EXTERIOR", Drawing.ACI.RED, "CONTINUOUS");
-  d.addLayer("WALLS", Drawing.ACI.WHITE, "CONTINUOUS");
-  d.addLayer("DOORS", Drawing.ACI.CYAN, "CONTINUOUS");
-  d.addLayer("WINDOWS", Drawing.ACI.GREEN, "CONTINUOUS");
-  d.addLayer("DIMENSIONS", Drawing.ACI.YELLOW, "CONTINUOUS");
-  d.addLayer("TEXT", Drawing.ACI.WHITE, "CONTINUOUS");
-  d.addLayer("TITLE", Drawing.ACI.WHITE, "CONTINUOUS");
-  d.addLayer("ELECTRICAL", Drawing.ACI.YELLOW, "CONTINUOUS");
-  d.addLayer("PLUMBING", Drawing.ACI.CYAN, "CONTINUOUS");
-  d.addLayer("HVAC", 6, "CONTINUOUS");
-  d.addLayer("MEP_BG", 8, "CONTINUOUS");
+  d.addLayer("EXTERIOR", Drawing.ACI.RED, "CONTINUOUS");       // red — bold exterior walls
+  d.addLayer("WALLS", 8, "CONTINUOUS");                         // dark gray — interior walls
+  d.addLayer("WALL_FILL", 250, "CONTINUOUS");                   // near-black — wall cavity hatch
+  d.addLayer("DOORS", Drawing.ACI.CYAN, "CONTINUOUS");          // cyan — doors
+  d.addLayer("WINDOWS", Drawing.ACI.GREEN, "CONTINUOUS");       // green — windows
+  d.addLayer("DIMENSIONS", Drawing.ACI.BLUE, "CONTINUOUS");     // blue — dim lines (was yellow)
+  d.addLayer("TEXT", 8, "CONTINUOUS");                          // dark gray — room labels
+  d.addLayer("TITLE", Drawing.ACI.BLUE, "CONTINUOUS");          // blue — title block
+  d.addLayer("FURNITURE", 8, "CONTINUOUS");                     // dark gray — furniture
+  d.addLayer("HATCH", 8, "CONTINUOUS");                         // dark gray — hatching
+  d.addLayer("ELECTRICAL", Drawing.ACI.BLUE, "CONTINUOUS");     // blue — electrical (was yellow)
+  d.addLayer("PLUMBING", Drawing.ACI.CYAN, "CONTINUOUS");       // cyan — plumbing
+  d.addLayer("HVAC", Drawing.ACI.MAGENTA, "CONTINUOUS");        // magenta — HVAC
+  d.addLayer("MEP_BG", 8, "CONTINUOUS");                        // dark gray — MEP background
 
   // Exterior shell
   d.setActiveLayer("EXTERIOR");
@@ -2015,6 +2295,9 @@ export function generateFloorPlanDXF(
   d.drawText(sheetX + 1, sheetY + sheetH - 3.5, 0.65, 0, "FLOOR PLAN + ELEVATIONS — SHEET A1");
   d.drawText(sheetX + 1, sheetY + sheetH - 4.4, 0.38, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
   d.drawText(sheetX + 1, sheetY + sheetH - 5.1, 0.35, 0, `PROJECT: ${projectName.substring(0, 30)}`);
+
+  // General notes block (lower left of sheet)
+  generalNotes(d, sheetX + 0.8, sheetY + 1.5);
 
   // ── MEP Sheets (E1, P1, M1) — placed to the right of A1 ──────────────────
   const mepPad = 8;
