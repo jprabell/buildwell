@@ -56,7 +56,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: "What structure types are supported?",
-        a: "Buildwell supports 16 structure types: Single-Family Home, Container Home, Tiny Home, Barndominium, Barn, Pole Barn, Log Cabin, A-Frame, Dome Home, Quonset Hut, Silo Conversion, Shed, Workshop, Garage, Earthship, and Passive Solar Home. Each structure type generates trade sequences and material lists specific to its construction method.",
+        a: "Buildwell supports 15 structure types: Single-Family Home, Container Home, Tiny Home, Barndominium, Barn, Pole Barn, Log Cabin, A-Frame, Dome Home, Quonset Hut, Silo Conversion, Shed, Workshop, Garage, and Passive Solar Home. Each structure type generates trade sequences and material lists specific to its construction method.",
       },
     ],
   },

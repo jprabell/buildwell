@@ -33,8 +33,6 @@ const CREATIVE_LINES: Record<string, string> = {
     "Where the sawdust settles and the sparks fly, real things get made — and this space is all yours.",
   GARAGE:
     "Four walls and a door wide enough for your ambitions — this is where great ideas park until they're ready.",
-  EARTHSHIP:
-    "Built from the earth itself, heated by the sun, fed by the rain — this isn't just a home, it's a declaration.",
   PASSIVE_SOLAR:
     "Every window becomes a furnace, every overhang a thermostat — when you build smart, nature pays the utility bill.",
 };
@@ -68,8 +66,6 @@ const DETAILED_DESCRIPTIONS: Record<string, string> = {
     "A purpose-built workshop is the ultimate multiplier for anyone who makes things. High ceilings, heavy electrical service, proper ventilation, and a floor that can take a beating — this is the space where hobbies become side hustles and side hustles become businesses.",
   GARAGE:
     "More than a parking spot — a garage is one of the highest-ROI structures on any residential property. Whether it's a single-car detached or a four-bay commercial-grade build, a proper garage adds storage, workspace, and immediate appraisal value.",
-  EARTHSHIP:
-    "Built from reclaimed tires packed with earth, glass bottles, and natural materials, an Earthship harvests its own water, generates its own power, and stays comfortable without mechanical heating or cooling. Radical sustainability meets raw building craftsmanship.",
   PASSIVE_SOLAR:
     "Passive solar design harnesses sunlight as a free heating system. South-facing glazing, thermal mass floors, proper overhangs, and strategic insulation work together to eliminate heating bills and slash cooling costs — without solar panels or mechanical systems.",
 };

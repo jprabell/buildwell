@@ -142,16 +142,6 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     image: "/images/structures/garage.jpg",
   },
   {
-    value: "EARTHSHIP",
-    label: "Earthship",
-    description: "Off-grid, earth-built sustainable home",
-    icon: "🌍",
-    category: "Sustainable",
-    costLevel: 4,
-    costNote: "$150–$350/sqft",
-    image: "/images/structures/earthship.jpg",
-  },
-  {
     value: "PASSIVE_SOLAR",
     label: "Passive Solar Home",
     description: "Optimized for natural heating and cooling",

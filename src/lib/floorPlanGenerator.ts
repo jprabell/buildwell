@@ -233,78 +233,119 @@ function titleBlock(d: typeof Drawing, x: number, y: number, projectName: string
   d.drawText(x + 0.3, y + 0.25, 0.25, 0, "NOT FOR CONSTRUCTION  ·  BUILDWELL LLC  ·  ibuildwell.com");
 }
 
-// ─── Front elevation ──────────────────────────────────────────────────────────
+// ─── Elevation helpers ────────────────────────────────────────────────────────
 
-function drawFrontElevation(d: typeof Drawing, x: number, y: number, W: number, structureType: string, answers: ProjectAnswers) {
+function elevFooter(d: typeof Drawing, x: number, y: number, W: number, foundH: number) {
+  d.setActiveLayer("TEXT");
+  d.drawLine(x - 3, y + foundH, x + W + 3, y + foundH);
+  d.drawText(x - 7.5, y + foundH - 0.3, 0.38, 0, "F.F.E.");
+  d.drawText(x + W / 2 - 5.5, y - 2.0, 0.55, 0, "FRONT ELEVATION");
+  d.drawText(x + W / 2 - 7.5, y - 2.9, 0.35, 0, "PRELIMINARY — NOT FOR CONSTRUCTION");
+}
+
+function elevFoundation(d: typeof Drawing, x: number, y: number, W: number, foundH: number) {
+  d.setActiveLayer("WALLS");
+  rect(d, x, y, W, foundH);
+  hatch(d, x + 0.1, y + 0.1, W - 0.2, foundH - 0.2, 1.2);
+}
+
+// Gable elevation — residential, barndominium, agricultural, outbuildings, log cabin, passive solar
+function drawGableElevation(d: typeof Drawing, x: number, y: number, W: number, structureType: string, answers: ProjectAnswers) {
   const cat = structureCategory(structureType);
-  const wallHt = 9.0;
+  const wallHt = structureType === "TINY_HOME" ? 8.0 : 9.0;
   const isBarn = cat === "barndominium" || cat === "agricultural";
   const pitch = isBarn ? 3 / 12 : 5.5 / 12;
   const rise = (W / 2) * pitch;
   const foundH = 2.0;
   const hasGarage = !s(answers.garageType, "none").startsWith("none");
+  const overhang = isBarn ? 1.0 : 2.0;
 
-  // Foundation (hatched)
-  d.setActiveLayer("WALLS");
-  rect(d, x, y, W, foundH);
-  hatch(d, x + 0.1, y + 0.1, W - 0.2, foundH - 0.2, 1.2);
+  elevFoundation(d, x, y, W, foundH);
 
   // Walls
   d.setActiveLayer("EXTERIOR");
   rect(d, x, y + foundH, W, wallHt);
+  // Log cabin horizontal courses
+  if (structureType === "LOG_CABIN") {
+    const logH = 0.65;
+    for (let ly = foundH + logH; ly < foundH + wallHt; ly += logH) {
+      d.drawLine(x, y + ly, x + W, y + ly);
+    }
+  }
 
   // Roof gable + overhangs
-  const overhang = 2.0;
   const plateY = y + foundH + wallHt;
   d.drawLine(x - overhang, plateY, x + W + overhang, plateY);
   d.drawLine(x - overhang, plateY, x + W / 2, plateY + rise + 0.5);
   d.drawLine(x + W + overhang, plateY, x + W / 2, plateY + rise + 0.5);
-  // Ridge line
   d.drawLine(x + W / 2 - 0.15, plateY, x + W / 2 - 0.15, plateY + rise + 0.5);
   d.drawLine(x + W / 2 + 0.15, plateY, x + W / 2 + 0.15, plateY + rise + 0.5);
 
+  // Metal roofing ribs for barn types
+  if (isBarn) {
+    const ribCount = Math.floor(W / 3);
+    for (let i = 1; i < ribCount; i++) {
+      const bx = x + i * (W / ribCount);
+      const brise = (bx <= x + W / 2) ? (bx - x) * pitch : (x + W - bx) * pitch;
+      d.drawLine(bx, plateY, bx, plateY + brise);
+    }
+  }
+
   // Front door
   d.setActiveLayer("DOORS");
-  const fdW = 3.0, fdH = 7.0;
+  const fdW = structureType === "TINY_HOME" ? 2.8 : 3.0;
+  const fdH = structureType === "TINY_HOME" ? 6.8 : 7.0;
   const fdX = x + W * 0.45;
   rect(d, fdX, y + foundH, fdW, fdH);
-  d.drawArc(fdX + fdW / 2, y + foundH + fdH, fdW / 2, 0, 180);
-  // Door panels
-  d.drawLine(fdX + fdW / 2, y + foundH, fdX + fdW / 2, y + foundH + fdH);
-  d.drawLine(fdX, y + foundH + fdH * 0.5, fdX + fdW, y + foundH + fdH * 0.5);
+  if (!isBarn) {
+    d.drawArc(fdX + fdW / 2, y + foundH + fdH, fdW / 2, 0, 180);
+    d.drawLine(fdX + fdW / 2, y + foundH, fdX + fdW / 2, y + foundH + fdH);
+    d.drawLine(fdX, y + foundH + fdH * 0.5, fdX + fdW, y + foundH + fdH * 0.5);
+  }
+
+  // Garage door (if applicable)
+  if (hasGarage) {
+    d.setActiveLayer("DOORS");
+    const gdW = W * 0.38, gdX2 = x + W * 0.05;
+    rect(d, gdX2, y + foundH, gdW, 8.0);
+    for (let p = 1; p < 5; p++) d.drawLine(gdX2, y + foundH + p * 2.0, gdX2 + gdW, y + foundH + p * 2.0);
+    for (let v = 1; v < 4; v++) d.drawLine(gdX2 + v * (gdW / 4), y + foundH, gdX2 + v * (gdW / 4), y + foundH + 8.0);
+  } else if (isBarn) {
+    // Sliding barn doors
+    d.setActiveLayer("DOORS");
+    const bdW = W * 0.35, bdX = x + (W - bdW) / 2;
+    rect(d, bdX, y + foundH, bdW, 12.0);
+    d.drawLine(bdX + bdW / 2, y + foundH, bdX + bdW / 2, y + foundH + 12.0);
+    d.drawLine(bdX, y + foundH + 6, bdX + bdW, y + foundH + 6);
+  }
 
   // Windows
   d.setActiveLayer("WINDOWS");
-  const winW = 4.0, winHt = 4.5;
+  const winW = structureType === "TINY_HOME" ? 2.5 : 4.0;
+  const winHt = structureType === "TINY_HOME" ? 3.0 : 4.5;
   const winY = y + foundH + 2.8;
   if (hasGarage) {
-    // Garage door on left
-    d.setActiveLayer("DOORS");
-    const gdW2 = W * 0.38, gdX2 = x + W * 0.05;
-    rect(d, gdX2, y + foundH, gdW2, 8.0);
-    for (let p = 1; p < 5; p++) d.drawLine(gdX2, y + foundH + p * 2.0, gdX2 + gdW2, y + foundH + p * 2.0);
-    for (let v = 1; v < 4; v++) d.drawLine(gdX2 + v * (gdW2 / 4), y + foundH, gdX2 + v * (gdW2 / 4), y + foundH + 8.0);
-    d.setActiveLayer("WINDOWS");
     rect(d, x + W * 0.58, winY, winW, winHt);
     rect(d, x + W * 0.74, winY, 3.0, winHt);
-    // Sill lines
     d.drawLine(x + W * 0.58 - 0.3, winY, x + W * 0.58 + winW + 0.3, winY);
     d.drawLine(x + W * 0.74 - 0.3, winY, x + W * 0.74 + 3.3, winY);
-  } else {
+  } else if (!isBarn) {
     rect(d, x + W * 0.08, winY, winW, winHt);
     rect(d, x + W * 0.72, winY, winW, winHt);
-    // Sill lines
     d.drawLine(x + W * 0.08 - 0.3, winY, x + W * 0.08 + winW + 0.3, winY);
     d.drawLine(x + W * 0.72 - 0.3, winY, x + W * 0.72 + winW + 0.3, winY);
-    // Muntins (window dividers)
     d.drawLine(x + W * 0.08 + winW / 2, winY, x + W * 0.08 + winW / 2, winY + winHt);
     d.drawLine(x + W * 0.72 + winW / 2, winY, x + W * 0.72 + winW / 2, winY + winHt);
     d.drawLine(x + W * 0.08, winY + winHt / 2, x + W * 0.08 + winW, winY + winHt / 2);
     d.drawLine(x + W * 0.72, winY + winHt / 2, x + W * 0.72 + winW, winY + winHt / 2);
+  } else {
+    // Barn side windows
+    rect(d, x + W * 0.12, winY, 3.5, 3.5);
+    rect(d, x + W * 0.72, winY, 3.5, 3.5);
   }
 
-  // Chimney (residential only, non-barndo)
-  if (cat === "residential") {
+  // Chimney (residential/cabin, not barns)
+  if (cat === "residential" && structureType !== "TINY_HOME") {
     d.setActiveLayer("WALLS");
     const chX = x + W * 0.7, chW = 2.5;
     const chTop = plateY + rise * 0.55 + 3.0;
@@ -312,18 +353,285 @@ function drawFrontElevation(d: typeof Drawing, x: number, y: number, W: number, 
     d.drawLine(chX - 0.4, chTop, chX + chW + 0.4, chTop);
   }
 
-  // Dimensions
+  // Outbuilding overhead doors
+  if (cat === "outbuilding") {
+    d.setActiveLayer("DOORS");
+    const bays = n(answers.garageBays, 1);
+    const bayW2 = W / Math.max(bays, 1);
+    for (let i = 0; i < bays; i++) {
+      const gdW2 = bayW2 * 0.72, gdX3 = x + i * bayW2 + (bayW2 - gdW2) / 2;
+      rect(d, gdX3, y + foundH, gdW2, 8.0);
+      for (let p = 1; p < 5; p++) d.drawLine(gdX3, y + foundH + p * 2.0, gdX3 + gdW2, y + foundH + p * 2.0);
+      for (let v = 1; v < 4; v++) d.drawLine(gdX3 + v * (gdW2 / 4), y + foundH, gdX3 + v * (gdW2 / 4), y + foundH + 8.0);
+    }
+  }
+
   d.setActiveLayer("DIMENSIONS");
   dim(d, x, y + foundH, x + W, y + foundH, -3.5, ft(W));
-  dim(d, x, y + foundH, x, plateY, -5.0, `PLATE: 9'-0"`);
+  dim(d, x, y + foundH, x, plateY, -5.0, `PLATE: ${wallHt}'-0"`);
   dim(d, x + W, y + foundH, x + W, plateY + rise, 4.5, ft(wallHt + rise));
 
-  // Grade + label
-  d.setActiveLayer("TEXT");
-  d.drawLine(x - 3, y + foundH, x + W + 3, y + foundH);
-  d.drawText(x - 7.5, y + foundH - 0.3, 0.38, 0, "F.F.E.");
-  d.drawText(x + W / 2 - 5.5, y - 2.0, 0.55, 0, "FRONT ELEVATION");
-  d.drawText(x + W / 2 - 7.5, y - 2.9, 0.35, 0, "PRELIMINARY — NOT FOR CONSTRUCTION");
+  elevFooter(d, x, y, W, foundH);
+}
+
+// A-Frame elevation — steep triangle, roof reaches to foundation
+function drawAFrameElevation(d: typeof Drawing, x: number, y: number, W: number) {
+  const foundH = 1.5;
+  const pitch = 1.1; // ~13:12 — true A-frame steepness
+  const rise = (W / 2) * pitch;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, W, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  // Roof slopes go directly to grade (no vertical wall)
+  d.drawLine(x + W / 2, baseY + rise, x, baseY);
+  d.drawLine(x + W / 2, baseY + rise, x + W, baseY);
+  d.drawLine(x, baseY, x + W, baseY);
+  // Slight overhang at ridge
+  d.drawLine(x + W / 2, baseY + rise, x + W / 2, baseY + rise + 0.8);
+
+  // Front door (centered at base)
+  d.setActiveLayer("DOORS");
+  const fdW = 3.0, fdH = 7.5;
+  rect(d, x + W / 2 - fdW / 2, baseY, fdW, fdH);
+  d.drawArc(x + W / 2, baseY + fdH, fdW / 2, 0, 180);
+  d.drawLine(x + W / 2, baseY, x + W / 2, baseY + fdH);
+
+  // Upper gable window (large glazing — classic A-frame feature)
+  d.setActiveLayer("WINDOWS");
+  const upWinW = W * 0.38, upWinH = rise * 0.38;
+  const upWinX = x + (W - upWinW) / 2;
+  const upWinY = baseY + rise * 0.52;
+  rect(d, upWinX, upWinY, upWinW, upWinH);
+  d.drawLine(upWinX + upWinW / 3, upWinY, upWinX + upWinW / 3, upWinY + upWinH);
+  d.drawLine(upWinX + upWinW * 2 / 3, upWinY, upWinX + upWinW * 2 / 3, upWinY + upWinH);
+  d.drawLine(upWinX, upWinY + upWinH / 2, upWinX + upWinW, upWinY + upWinH / 2);
+  // Lower side windows
+  const sWinW = 3.0, sWinH = 3.5, sWinY = baseY + 1.5;
+  rect(d, x + W * 0.07, sWinY, sWinW, sWinH);
+  rect(d, x + W * 0.78, sWinY, sWinW, sWinH);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
+  dim(d, x + W, baseY, x + W, baseY + rise, 4.5, ft(rise));
+
+  elevFooter(d, x, y, W, foundH);
+}
+
+// Dome elevation — hemisphere profile
+function drawDomeElevation(d: typeof Drawing, x: number, y: number, W: number) {
+  const foundH = 1.5;
+  const r = W / 2;
+  const cx = x + W / 2;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, W, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  d.drawArc(cx, baseY, r, 0, 180);
+  d.drawLine(x, baseY, x + W, baseY);
+  // Inner dome line (shell thickness)
+  d.drawArc(cx, baseY, r - 0.5, 0, 180);
+  // Geodesic triangulation lines
+  for (let i = 1; i < 4; i++) {
+    const ang = (i / 4) * 180;
+    const rad = (ang * Math.PI) / 180;
+    d.drawLine(cx, baseY, cx + r * Math.cos(Math.PI - rad), baseY + r * Math.sin(Math.PI - rad));
+  }
+
+  // Entry door (arched, centered at base)
+  d.setActiveLayer("DOORS");
+  const fdW = 3.5, fdH = 7.0;
+  rect(d, cx - fdW / 2, baseY, fdW, fdH);
+  d.drawArc(cx, baseY + fdH, fdW / 2, 0, 180);
+
+  // Circular porthole windows
+  d.setActiveLayer("WINDOWS");
+  d.drawCircle(cx - r * 0.52, baseY + r * 0.52, 2.2);
+  d.drawCircle(cx + r * 0.52, baseY + r * 0.52, 2.2);
+  // Skylight at apex
+  d.drawCircle(cx, baseY + r * 0.88, 1.5);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
+  dim(d, x + W, baseY, x + W, baseY + r, 4.5, `R: ${ft(r)}`);
+
+  elevFooter(d, x, y, W, foundH);
+}
+
+// Quonset hut elevation — semi-cylinder arch
+function drawQuonsetElevation(d: typeof Drawing, x: number, y: number, W: number) {
+  const foundH = 1.5;
+  const legH = W * 0.12; // short vertical leg walls
+  const archR = W / 2;
+  const cx = x + W / 2;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, W, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  d.drawLine(x, baseY, x, baseY + legH);
+  d.drawLine(x + W, baseY, x + W, baseY + legH);
+  d.drawArc(cx, baseY + legH, archR, 0, 180);
+  d.drawLine(x, baseY, x + W, baseY);
+  // Inner arch (shell thickness)
+  d.drawArc(cx, baseY + legH, archR - 0.5, 0, 180);
+  // Corrugation ribs on arch
+  const ribCount = 8;
+  for (let i = 1; i < ribCount; i++) {
+    const ang = (i / ribCount) * 180;
+    const rad = (ang * Math.PI) / 180;
+    const rx = cx + archR * Math.cos(Math.PI - rad);
+    const ry = baseY + legH + archR * Math.sin(Math.PI - rad);
+    d.drawLine(cx + (archR - 0.5) * Math.cos(Math.PI - rad), baseY + legH + (archR - 0.5) * Math.sin(Math.PI - rad), rx, ry);
+  }
+
+  // Roll-up door (centered, large)
+  d.setActiveLayer("DOORS");
+  const rdW = W * 0.58, rdH = Math.min(legH + archR * 0.72, 14.0);
+  const rdX = cx - rdW / 2;
+  rect(d, rdX, baseY, rdW, rdH);
+  for (let p = 1; p < 6; p++) d.drawLine(rdX, baseY + p * rdH / 6, rdX + rdW, baseY + p * rdH / 6);
+  for (let v = 1; v < 5; v++) d.drawLine(rdX + v * rdW / 5, baseY, rdX + v * rdW / 5, baseY + rdH);
+  // Walk door on right
+  const wdX = x + W * 0.86;
+  rect(d, wdX, baseY, 3.0, 7.0);
+
+  // Windows (porthole style)
+  d.setActiveLayer("WINDOWS");
+  d.drawCircle(cx - archR * 0.62, baseY + legH + archR * 0.52, 2.0);
+  d.drawCircle(cx + archR * 0.62, baseY + legH + archR * 0.52, 2.0);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
+  dim(d, x + W, baseY, x + W, baseY + legH + archR, 4.5, ft(legH + archR));
+
+  elevFooter(d, x, y, W, foundH);
+}
+
+// Container home elevation — flat/low roof, containers visible
+function drawContainerElevation(d: typeof Drawing, x: number, y: number, W: number, answers: ProjectAnswers) {
+  const foundH = 2.0;
+  const cH = 9.5; // standard HC container height
+  const count = Math.min(n(answers.containerCount, 2), 6);
+  const stacked = Math.ceil(count / 2);
+  const totalH = stacked * cH;
+  const cx = x + W / 2;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, W, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  for (let i = 0; i < stacked; i++) {
+    const cY = baseY + i * cH;
+    rect(d, x, cY, W, cH);
+    // Corrugation ribs
+    const ribCount = Math.floor(W / 5);
+    for (let r2 = 1; r2 < ribCount; r2++) d.drawLine(x + r2 * W / ribCount, cY, x + r2 * W / ribCount, cY + cH);
+  }
+  // Flat roof overhang
+  d.drawLine(x - 1.5, baseY + totalH, x + W + 1.5, baseY + totalH);
+  d.drawLine(x - 1.5, baseY + totalH - 0.5, x - 1.5, baseY + totalH);
+  d.drawLine(x + W + 1.5, baseY + totalH - 0.5, x + W + 1.5, baseY + totalH);
+
+  // Front door
+  d.setActiveLayer("DOORS");
+  const fdW = 3.0, fdH = 7.5;
+  rect(d, cx - fdW / 2, baseY, fdW, fdH);
+  d.drawLine(cx, baseY, cx, baseY + fdH);
+  d.drawLine(cx - fdW / 2, baseY + fdH * 0.45, cx + fdW / 2, baseY + fdH * 0.45);
+
+  // Windows per container level
+  d.setActiveLayer("WINDOWS");
+  const winW2 = 4.5, winHt2 = 4.0;
+  for (let i = 0; i < stacked; i++) {
+    const wBaseY = baseY + i * cH + 2.5;
+    rect(d, x + W * 0.08, wBaseY, winW2, winHt2);
+    rect(d, x + W * 0.68, wBaseY, winW2, winHt2);
+    d.drawLine(x + W * 0.08 + winW2 / 2, wBaseY, x + W * 0.08 + winW2 / 2, wBaseY + winHt2);
+    d.drawLine(x + W * 0.68 + winW2 / 2, wBaseY, x + W * 0.68 + winW2 / 2, wBaseY + winHt2);
+    d.drawLine(x + W * 0.08, wBaseY + winHt2 / 2, x + W * 0.08 + winW2, wBaseY + winHt2 / 2);
+    d.drawLine(x + W * 0.68, wBaseY + winHt2 / 2, x + W * 0.68 + winW2, wBaseY + winHt2 / 2);
+  }
+  // Container seam labels
+  if (stacked > 1) {
+    d.setActiveLayer("TEXT");
+    d.drawText(x + W + 1.5, baseY + cH - 0.3, 0.32, 0, "CONTAINER JOINT");
+  }
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
+  dim(d, x + W, baseY, x + W, baseY + totalH, 4.5, ft(totalH));
+
+  elevFooter(d, x, y, W, foundH);
+}
+
+// Silo elevation — cylindrical with dome cap
+function drawSiloElevation(d: typeof Drawing, x: number, y: number, W: number) {
+  const foundH = 2.0;
+  const cylH = Math.min(W * 2.2, 50); // tall but capped
+  const domR = W / 2;
+  const cx = x + W / 2;
+  const baseY = y + foundH;
+
+  elevFoundation(d, x, y, W, foundH);
+
+  d.setActiveLayer("EXTERIOR");
+  // Cylinder walls
+  d.drawLine(x, baseY, x, baseY + cylH);
+  d.drawLine(x + W, baseY, x + W, baseY + cylH);
+  d.drawLine(x, baseY, x + W, baseY);
+  // Dome cap
+  d.drawArc(cx, baseY + cylH, domR, 0, 180);
+  // Horizontal stave bands
+  const bandCount = 8;
+  for (let i = 1; i <= bandCount; i++) d.drawLine(x, baseY + i * cylH / bandCount, x + W, baseY + i * cylH / bandCount);
+  // Ladder on right face
+  const ladW = 1.2, ladX = x + W - ladW - 0.5;
+  d.drawLine(ladX, baseY + 2, ladX, baseY + cylH * 0.85);
+  d.drawLine(ladX + ladW, baseY + 2, ladX + ladW, baseY + cylH * 0.85);
+  for (let r3 = 0; r3 < 12; r3++) d.drawLine(ladX, baseY + 2 + r3 * (cylH * 0.83) / 12, ladX + ladW, baseY + 2 + r3 * (cylH * 0.83) / 12);
+
+  // Entry door
+  d.setActiveLayer("DOORS");
+  rect(d, cx - 1.5, baseY, 3.0, 7.0);
+  d.drawArc(cx, baseY + 7.0, 1.5, 0, 180);
+
+  // Ventilation port near top
+  d.setActiveLayer("WINDOWS");
+  d.drawCircle(cx, baseY + cylH * 0.82, 1.2);
+
+  d.setActiveLayer("DIMENSIONS");
+  dim(d, x, baseY, x + W, baseY, -3.5, ft(W));
+  dim(d, x + W, baseY, x + W, baseY + cylH, 4.5, ft(cylH));
+
+  elevFooter(d, x, y, W, foundH);
+}
+
+// ─── Front elevation dispatcher ───────────────────────────────────────────────
+
+function drawFrontElevation(d: typeof Drawing, x: number, y: number, W: number, structureType: string, answers: ProjectAnswers) {
+  switch (structureType) {
+    case "A_FRAME":
+      drawAFrameElevation(d, x, y, W);
+      break;
+    case "DOME_HOME":
+      drawDomeElevation(d, x, y, W);
+      break;
+    case "QUONSET_HUT":
+      drawQuonsetElevation(d, x, y, W);
+      break;
+    case "CONTAINER_HOME":
+      drawContainerElevation(d, x, y, W, answers);
+      break;
+    case "SILO":
+      drawSiloElevation(d, x, y, W);
+      break;
+    default:
+      drawGableElevation(d, x, y, W, structureType, answers);
+      break;
+  }
 }
 
 // ─── Residential layout ───────────────────────────────────────────────────────
@@ -752,7 +1060,7 @@ function drawDome(d: typeof Drawing, W: number, H: number) {
 
 // ─── Category helper ──────────────────────────────────────────────────────────
 
-type StructureCategory = "residential" | "barndominium" | "container" | "agricultural" | "outbuilding" | "dome" | "quonset" | "earthship";
+type StructureCategory = "residential" | "barndominium" | "container" | "agricultural" | "outbuilding" | "dome" | "quonset";
 
 function structureCategory(structureType: string): StructureCategory {
   const map: Record<string, StructureCategory> = {
@@ -771,7 +1079,6 @@ function structureCategory(structureType: string): StructureCategory {
     GARAGE: "outbuilding",
     DOME_HOME: "dome",
     QUONSET_HUT: "quonset",
-    EARTHSHIP: "earthship",
   };
   return map[structureType] ?? "residential";
 }
@@ -845,7 +1152,7 @@ export function generateFloorPlanDXF(
 
   // Front elevation (placed below floor plan)
   const elevGap = 20;
-  const elevTotalH = 28; // max expected elevation height
+  const elevTotalH = structureType === "SILO" ? 70 : 30; // silo elevations are very tall
   const elevY = -(elevGap + elevTotalH);
   drawFrontElevation(d, 0, elevY, W, structureType, answers);
 
