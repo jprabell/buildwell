@@ -9,7 +9,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Residential",
     costLevel: 3,
     costNote: "$150–$300/sq ft",
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "CONTAINER_HOME",
@@ -19,7 +19,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Residential",
     costLevel: 2,
     costNote: "$100–$175/sq ft",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "TINY_HOME",
@@ -29,7 +29,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Residential",
     costLevel: 1,
     costNote: "$30k–$80k total",
-    image: "https://images.unsplash.com/photo-1601760561441-16420502c7e0?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1499916078039-922301b0eb9b?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "BARNDOMINIUM",
@@ -39,7 +39,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Agricultural",
     costLevel: 2,
     costNote: "$95–$150/sq ft",
-    image: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "BARN",
@@ -59,7 +59,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Agricultural",
     costLevel: 1,
     costNote: "$20–$60/sq ft",
-    image: "https://images.unsplash.com/photo-1592977593409-5f7d85d08af0?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "LOG_CABIN",
@@ -89,7 +89,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Specialty",
     costLevel: 3,
     costNote: "$130–$250/sq ft",
-    image: "https://images.unsplash.com/photo-1536483945734-e8b96b01af6b?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "QUONSET_HUT",
@@ -99,7 +99,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Specialty",
     costLevel: 1,
     costNote: "$25–$70/sq ft",
-    image: "https://images.unsplash.com/photo-1591604129664-f9d1b8c36b48?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "SILO",
@@ -119,7 +119,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Outbuilding",
     costLevel: 1,
     costNote: "$15–$50/sq ft",
-    image: "https://images.unsplash.com/photo-1416169607655-0c2b3ce2e1cc?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "WORKSHOP",
@@ -129,7 +129,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Outbuilding",
     costLevel: 1,
     costNote: "$25–$75/sq ft",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "GARAGE",
@@ -149,7 +149,7 @@ export const STRUCTURE_OPTIONS: StructureOption[] = [
     category: "Sustainable",
     costLevel: 4,
     costNote: "$200–$400/sq ft",
-    image: "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?auto=format&fit=crop&w=600&q=80",
+    image: "https://images.unsplash.com/photo-1475087542963-13ab5e611954?auto=format&fit=crop&w=600&q=80",
   },
   {
     value: "PASSIVE_SOLAR",

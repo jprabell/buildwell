@@ -4,9 +4,9 @@ import Button from "@/components/ui/Button";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-amber-50">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200 shadow-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-amber-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl font-black text-stone-900 tracking-tight">
@@ -33,9 +33,9 @@ export default function LandingPage() {
       <section className="relative pt-32 pb-36 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80')" }}
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1920&q=80')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/70 via-stone-950/60 to-stone-950/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/60 via-stone-900/55 to-stone-950/70" />
         <div className="relative max-w-5xl mx-auto text-center text-white">
           <div className="inline-flex items-center gap-2 bg-amber-600/20 border border-amber-500/40 rounded-full px-4 py-1.5 text-amber-300 text-sm font-medium mb-8">
             🏗️ From sheds to custom homes — every structure type supported
@@ -81,7 +81,7 @@ export default function LandingPage() {
       </section>
 
       {/* Structure Types */}
-      <section id="structures" className="py-24 px-6 bg-stone-100">
+      <section id="structures" className="py-24 px-6 bg-amber-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl font-black text-stone-900 mb-4">Every Structure Type</h2>
@@ -254,7 +254,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6 bg-amber-50">
+      <section id="how-it-works" className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl font-black text-stone-900 mb-4">How Buildwell Works</h2>
@@ -299,7 +299,7 @@ export default function LandingPage() {
       </section>
 
       {/* Who It's For */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6 bg-amber-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl font-black text-stone-900 mb-4">Built for Everyone</h2>
@@ -341,7 +341,7 @@ export default function LandingPage() {
       <section className="relative py-28 px-6 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1920&q=80')" }}
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80')" }}
         />
         <div className="absolute inset-0 bg-amber-900/80" />
         <div className="relative max-w-3xl mx-auto text-center text-white">
