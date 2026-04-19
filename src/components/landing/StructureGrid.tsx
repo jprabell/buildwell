@@ -162,12 +162,12 @@ export default function StructureGrid() {
       {/* Modal */}
       {selected && structure && (
         <div
-          className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="model-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: "rgba(10, 8, 4, 0.85)", backdropFilter: "blur(6px)" }}
           onClick={() => setSelected(null)}
         >
           <div
-            className="modal-card relative bg-white rounded-3xl overflow-hidden w-full max-w-lg shadow-2xl"
+            className="model-card relative bg-white rounded-3xl overflow-hidden w-full max-w-lg shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Large image */}
