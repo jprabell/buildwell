@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -31,7 +32,9 @@ export default function RegisterPage() {
       setError(data.error || "Something went wrong.");
       setLoading(false);
     } else {
-      router.push("/login?registered=1");
+      // Auto sign-in and go straight to project creation
+      await signIn("credentials", { email, password, redirect: false });
+      router.push("/design");
     }
   }
 
