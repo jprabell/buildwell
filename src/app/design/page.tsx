@@ -196,7 +196,62 @@ export default function DesignPage() {
                   />
                 )}
 
-                {q.type === "select" && q.options && (
+                {/* Image card grid — for radio/multiselect/select when options have photos */}
+                {(q.type === "radio" || q.type === "multiselect" || q.type === "select") &&
+                  q.options?.some((o) => o.image) && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {q.options!.map((opt) => {
+                        const isSelected =
+                          q.type === "multiselect"
+                            ? ((answers[q.id] as string[]) || []).includes(opt.value)
+                            : answers[q.id] === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() =>
+                              q.type === "multiselect"
+                                ? handleMultiSelect(q.id, opt.value)
+                                : handleAnswer(q.id, opt.value)
+                            }
+                            className={cn(
+                              "rounded-xl border-2 overflow-hidden text-left transition-all",
+                              isSelected
+                                ? "border-amber-500 shadow-md ring-1 ring-amber-400"
+                                : "border-slate-200 hover:border-amber-300 hover:shadow-sm"
+                            )}
+                          >
+                            <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                              {opt.image ? (
+                                <img
+                                  src={opt.image}
+                                  alt={opt.label}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-300 text-2xl">
+                                  🏠
+                                </div>
+                              )}
+                            </div>
+                            <div
+                              className={cn(
+                                "px-3 py-2 text-xs font-semibold leading-tight",
+                                isSelected
+                                  ? "bg-amber-50 text-amber-800"
+                                  : "bg-white text-slate-700"
+                              )}
+                            >
+                              {q.type === "multiselect" && isSelected ? "✓ " : ""}
+                              {opt.label}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                {q.type === "select" && q.options && !q.options.some((o) => o.image) && (
                   <Select
                     value={(answers[q.id] as string) || ""}
                     onChange={(e) => handleAnswer(q.id, e.target.value)}
@@ -205,7 +260,7 @@ export default function DesignPage() {
                   />
                 )}
 
-                {q.type === "radio" && q.options && (
+                {q.type === "radio" && q.options && !q.options.some((o) => o.image) && (
                   <div className="grid grid-cols-2 gap-2">
                     {q.options.map((opt) => (
                       <button
@@ -225,7 +280,7 @@ export default function DesignPage() {
                   </div>
                 )}
 
-                {q.type === "multiselect" && q.options && (
+                {q.type === "multiselect" && q.options && !q.options.some((o) => o.image) && (
                   <div className="grid grid-cols-2 gap-2">
                     {q.options.map((opt) => {
                       const selected = ((answers[q.id] as string[]) || []).includes(opt.value);

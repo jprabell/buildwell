@@ -38,7 +38,7 @@ export interface Question {
   id: string;
   label: string;
   type: "text" | "number" | "select" | "multiselect" | "radio" | "textarea";
-  options?: { value: string; label: string }[];
+  options?: { value: string; label: string; image?: string }[];
   placeholder?: string;
   unit?: string;
   required?: boolean;
