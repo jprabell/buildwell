@@ -53,7 +53,7 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
             <Link href={`/projects/${id}`}>
               <Button variant="ghost" size="sm">← Project</Button>
             </Link>
-            {purchased && <FloorPlanDownloadButton projectId={id} />}
+            <FloorPlanDownloadButton projectId={id} isDraft={!purchased} />
           </div>
         </div>
       </nav>

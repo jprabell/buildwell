@@ -22,12 +22,11 @@ export async function GET(
 
   const answers = (project.answers ?? {}) as ProjectAnswers;
   const purchases = (answers._purchases as string[] | undefined) ?? [];
-  if (!purchases.includes("blueprint_set")) {
-    return NextResponse.json({ error: "Blueprint set not purchased" }, { status: 403 });
-  }
+  const isDraft = !purchases.includes("blueprint_set");
 
-  const dxf = generateFloorPlanDXF(answers, project.structureType, project.name);
-  const filename = `${project.name.replace(/[^a-z0-9]/gi, "_")}_floor_plan.dxf`;
+  const dxf = generateFloorPlanDXF(answers, project.structureType, project.name, isDraft);
+  const suffix = isDraft ? "_DRAFT" : "";
+  const filename = `${project.name.replace(/[^a-z0-9]/gi, "_")}_floor_plan${suffix}.dxf`;
 
   return new Response(dxf, {
     headers: {

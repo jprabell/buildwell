@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function FloorPlanDownloadButton({ projectId }: { projectId: string }) {
+export default function FloorPlanDownloadButton({ projectId, isDraft = false }: { projectId: string; isDraft?: boolean }) {
   const [loading, setLoading] = useState(false);
 
   async function handleDxf() {
@@ -38,14 +38,14 @@ export default function FloorPlanDownloadButton({ projectId }: { projectId: stri
             <span className="animate-spin text-xs">⏳</span> Generating…
           </>
         ) : (
-          <>⬇ Floor Plan (.dxf)</>
+          <>{isDraft ? "⬇ Draft Floor Plan (.dxf)" : "⬇ Floor Plan (.dxf)"}</>
         )}
       </button>
       <button
         onClick={() => window.print()}
         className="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg text-sm transition-colors"
       >
-        ⬇ Floor Plan (.pdf)
+        {isDraft ? "⬇ Draft Floor Plan (.pdf)" : "⬇ Floor Plan (.pdf)"}
       </button>
     </div>
   );

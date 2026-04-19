@@ -680,7 +680,8 @@ function drawDome(d: typeof Drawing, W: number, H: number) {
 export function generateFloorPlanDXF(
   answers: ProjectAnswers,
   structureType: string,
-  projectName: string
+  projectName: string,
+  isDraft = false
 ): string {
   const sqft = n(answers.squareFootage, 1500);
   const stories = Math.max(n(answers.stories, 1), 1);
@@ -760,6 +761,17 @@ export function generateFloorPlanDXF(
   rect(d, -5, -6, sheetW, sheetH);
   d.drawText(-4, sheetH - 6.3, 0.5, 0, "FLOOR PLAN — SHEET A1");
   d.drawText(-4, sheetH - 6.9, 0.35, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
+
+  // ── Draft watermark ──
+  if (isDraft) {
+    d.addLayer("DRAFT", Drawing.ACI.RED, "CONTINUOUS");
+    d.setActiveLayer("DRAFT");
+    const dh = Math.min(W, H) * 0.14;
+    d.drawText(W * 0.05, H * 0.12, dh, 38, "DRAFT");
+    d.drawText(W * 0.05, H * 0.55, dh, 38, "DRAFT");
+    d.drawText(W * 0.05, H * 0.35, dh * 0.55, 0, "NOT FOR CONSTRUCTION");
+    d.drawText(W * 0.05, H * 0.78, dh * 0.55, 0, "NOT FOR CONSTRUCTION");
+  }
 
   return d.toDxfString();
 }
