@@ -181,11 +181,19 @@ export default async function ProjectPage({ params }: { params: { id: string } }
 
                 {purchased ? (
                   <div className="space-y-2">
-                    <Link href={`/projects/${project.id}/${pkg.id === "material_list" ? "material-list" : `preview/${pkg.id}`}`}>
-                      <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
-                        {pkg.id === "material_list" ? "View Material List" : "Download Full Document"}
-                      </button>
-                    </Link>
+                    {pkg.id === "blueprint_set" ? (
+                      <a href={`/api/projects/${project.id}/floor-plan`} download>
+                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
+                          Download Blueprint Set (.dxf)
+                        </button>
+                      </a>
+                    ) : (
+                      <Link href={`/projects/${project.id}/${pkg.id === "material_list" ? "material-list" : `preview/${pkg.id}`}`}>
+                        <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
+                          {pkg.id === "material_list" ? "View Material List" : "Download Full Document"}
+                        </button>
+                      </Link>
+                    )}
                     <Link href={`/projects/${project.id}/preview/${pkg.id}`}>
                       <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
                         View Preview
