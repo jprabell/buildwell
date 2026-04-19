@@ -3,7 +3,7 @@ const Drawing = require("dxf-writer");
 
 import { ProjectAnswers } from "@/types";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Number helpers ───────────────────────────────────────────────────────────
 
 function n(val: string | number | string[] | undefined, fallback = 0): number {
   if (typeof val === "number") return val;
@@ -17,12 +17,20 @@ function s(val: string | number | string[] | undefined, fallback = ""): string {
   return fallback;
 }
 
-function r(v: number, decimals = 1): number {
+function rn(v: number, decimals = 1): number {
   const f = Math.pow(10, decimals);
   return Math.round(v * f) / f;
 }
 
-// ─── Drawing primitives ───────────────────────────────────────────────────────
+function ft(v: number): string {
+  const whole = Math.floor(Math.abs(v));
+  const inches = Math.round((Math.abs(v) - whole) * 12);
+  if (inches === 0) return `${whole}'-0"`;
+  if (inches === 12) return `${whole + 1}'-0"`;
+  return `${whole}'-${inches}"`;
+}
+
+// ─── Primitives ───────────────────────────────────────────────────────────────
 
 function rect(d: typeof Drawing, x: number, y: number, w: number, h: number) {
   d.drawLine(x, y, x + w, y);
@@ -31,133 +39,212 @@ function rect(d: typeof Drawing, x: number, y: number, w: number, h: number) {
   d.drawLine(x, y + h, x, y);
 }
 
-// Wall with door opening: draws two segments leaving a gap
-function wallWithGap(
-  d: typeof Drawing,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  gaps: { pos: number; width: number }[] // pos = 0..1 along the wall
-) {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
-  const sorted = [...gaps].sort((a, b) => a.pos - b.pos);
-
-  let prev = 0;
-  for (const gap of sorted) {
-    const gapStart = gap.pos;
-    const gapEnd = gap.pos + gap.width / len;
-    if (prev < gapStart) {
-      d.drawLine(
-        x1 + dx * prev, y1 + dy * prev,
-        x1 + dx * gapStart, y1 + dy * gapStart
-      );
-    }
-    prev = gapEnd;
-  }
-  if (prev < 1) {
-    d.drawLine(x1 + dx * prev, y1 + dy * prev, x2, y2);
-  }
+// Thickened wall: two parallel lines
+function wallH(d: typeof Drawing, x1: number, y: number, x2: number, t: number) {
+  d.drawLine(x1, y, x2, y);
+  d.drawLine(x1, y + t, x2, y + t);
 }
 
-// Door swing arc (quarter circle at hinge point)
+function wallV(d: typeof Drawing, x: number, y1: number, y2: number, t: number) {
+  d.drawLine(x, y1, x, y2);
+  d.drawLine(x + t, y1, x + t, y2);
+}
+
+// Door swing (hinge at hx,hy, radius, angles in degrees CCW from east)
 function doorSwing(
   d: typeof Drawing,
-  hingeX: number,
-  hingeY: number,
-  swingRadius: number,
-  startAngle: number,
-  endAngle: number
+  hx: number,
+  hy: number,
+  radius: number,
+  startDeg: number,
+  endDeg: number
 ) {
-  d.drawArc(hingeX, hingeY, swingRadius, startAngle, endAngle);
-  // door leaf line
-  const endRad = (endAngle * Math.PI) / 180;
-  d.drawLine(hingeX, hingeY, hingeX + swingRadius * Math.cos(endRad), hingeY + swingRadius * Math.sin(endRad));
+  d.drawArc(hx, hy, radius, startDeg, endDeg);
+  const endRad = (endDeg * Math.PI) / 180;
+  d.drawLine(hx, hy, hx + radius * Math.cos(endRad), hy + radius * Math.sin(endRad));
 }
 
-// Window symbol: gap with two short lines across it
-function windowSymbol(
-  d: typeof Drawing,
-  x: number,
-  y: number,
-  width: number,
-  isHorizontal: boolean,
-  inset = 0.2
-) {
-  if (isHorizontal) {
-    d.drawLine(x, y - inset, x, y + inset);
-    d.drawLine(x + width, y - inset, x + width, y + inset);
-    d.drawLine(x, y, x + width, y);
-    d.drawLine(x, y + inset * 0.5, x + width, y + inset * 0.5);
-  } else {
-    d.drawLine(x - inset, y, x + inset, y);
-    d.drawLine(x - inset, y + width, x + inset, y + width);
-    d.drawLine(x, y, x, y + width);
-    d.drawLine(x + inset * 0.5, y, x + inset * 0.5, y + width);
-  }
+// Window symbol: two parallel lines crossing the wall gap
+function winH(d: typeof Drawing, x: number, y: number, w: number, depth = 0.5) {
+  d.drawLine(x, y, x + w, y);
+  d.drawLine(x, y + depth, x + w, y + depth);
+  d.drawLine(x, y, x, y + depth);
+  d.drawLine(x + w, y, x + w, y + depth);
 }
 
-// Dimension line with arrows and text
-function dimension(
+function winV(d: typeof Drawing, x: number, y: number, h: number, depth = 0.5) {
+  d.drawLine(x, y, x, y + h);
+  d.drawLine(x + depth, y, x + depth, y + h);
+  d.drawLine(x, y, x + depth, y);
+  d.drawLine(x, y + h, x + depth, y + h);
+}
+
+// Dimension line with ticks
+function dim(
   d: typeof Drawing,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
+  x1: number, y1: number,
+  x2: number, y2: number,
   offset: number,
-  isHorizontal: boolean,
   label: string
 ) {
-  const tickLen = 0.3;
-  if (isHorizontal) {
-    const oy = y1 + offset;
-    d.drawLine(x1, oy, x2, oy);
-    d.drawLine(x1, y1, x1, oy + (offset > 0 ? tickLen : -tickLen));
-    d.drawLine(x2, y1, x2, oy + (offset > 0 ? tickLen : -tickLen));
-    d.drawText((x1 + x2) / 2 - label.length * 0.15, oy + (offset > 0 ? 0.15 : -0.5), 0.4, 0, label);
+  const isH = Math.abs(y2 - y1) < 0.01;
+  const tick = 0.4;
+  if (isH) {
+    const dy = y1 + offset;
+    d.drawLine(x1, dy, x2, dy);
+    d.drawLine(x1, y1, x1, dy + (offset > 0 ? tick : -tick));
+    d.drawLine(x2, y1, x2, dy + (offset > 0 ? tick : -tick));
+    const cx = (x1 + x2) / 2 - label.length * 0.13;
+    d.drawText(cx, dy + (offset > 0 ? 0.2 : -0.65), 0.45, 0, label);
   } else {
-    const ox = x1 + offset;
-    d.drawLine(ox, y1, ox, y2);
-    d.drawLine(x1, y1, ox + (offset > 0 ? tickLen : -tickLen), y1);
-    d.drawLine(x1, y2, ox + (offset > 0 ? tickLen : -tickLen), y2);
-    d.drawText(ox + (offset > 0 ? 0.15 : -0.8), (y1 + y2) / 2 - 0.2, 0.4, 90, label);
+    const dx = x1 + offset;
+    d.drawLine(dx, y1, dx, y2);
+    d.drawLine(x1, y1, dx + (offset > 0 ? tick : -tick), y1);
+    d.drawLine(x1, y2, dx + (offset > 0 ? tick : -tick), y2);
+    const cy = (y1 + y2) / 2 - 0.2;
+    d.drawText(dx + (offset > 0 ? 0.2 : -0.8), cy, 0.45, 90, label);
   }
 }
 
-// ─── Room label ───────────────────────────────────────────────────────────────
+// Room label: name on top, dimensions below
+function label(
+  d: typeof Drawing,
+  x: number, y: number, w: number, h: number,
+  name: string, dims = ""
+) {
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  const nameX = cx - name.length * 0.22;
+  d.drawText(nameX, cy + (dims ? 0.35 : 0), 0.5, 0, name);
+  if (dims) d.drawText(cx - dims.length * 0.14, cy - 0.3, 0.35, 0, dims);
+}
 
-function roomLabel(d: typeof Drawing, x: number, y: number, w: number, h: number, text: string) {
-  const cx = x + w / 2 - text.length * 0.2;
-  const cy = y + h / 2 - 0.2;
-  d.drawText(cx, cy, 0.5, 0, text);
+// ─── Bathroom fixtures ────────────────────────────────────────────────────────
+
+function bathFixtures(d: typeof Drawing, x: number, y: number, w: number, h: number) {
+  const m = 0.4; // margin from walls
+  // Toilet (oval)
+  const tcx = x + w * 0.25;
+  const tcy = y + m + 1.0;
+  d.drawCircle(tcx, tcy, 0.85);
+  d.drawCircle(tcx, tcy, 0.55);
+  d.drawLine(tcx - 0.85, tcy - 0.9, tcx + 0.85, tcy - 0.9);
+  d.drawLine(tcx - 0.85, tcy - 0.9, tcx - 0.85, tcy - 0.55);
+  d.drawLine(tcx + 0.85, tcy - 0.9, tcx + 0.85, tcy - 0.55);
+  d.drawArc(tcx, tcy - 0.55, 0.85, 0, 180);
+  // Sink
+  const scx = x + w * 0.72;
+  const scy = y + m + 0.9;
+  rect(d, scx - 0.8, scy - 0.75, 1.6, 1.5);
+  d.drawCircle(scx, scy + 0.1, 0.35);
+  // Tub / shower (if room tall enough)
+  if (h > 6.5) {
+    const tx = x + m;
+    const ty = y + h - m - 4.5;
+    const tw = w - m * 2;
+    const th = 3.8;
+    rect(d, tx, ty, tw, th);
+    d.drawLine(tx + 0.35, ty + 0.35, tx + tw - 0.35, ty + 0.35);
+    d.drawLine(tx + 0.35, ty + th - 0.35, tx + tw - 0.35, ty + th - 0.35);
+    d.drawLine(tx + 0.35, ty + 0.35, tx + 0.35, ty + th - 0.35);
+    d.drawLine(tx + tw - 0.35, ty + 0.35, tx + tw - 0.35, ty + th - 0.35);
+  }
+}
+
+// Small bath (toilet + sink only, no tub)
+function halfBathFixtures(d: typeof Drawing, x: number, y: number, w: number, h: number) {
+  const m = 0.3;
+  const tcx = x + w * 0.3;
+  const tcy = y + m + 1.0;
+  d.drawCircle(tcx, tcy, 0.8);
+  d.drawCircle(tcx, tcy, 0.5);
+  d.drawLine(tcx - 0.8, tcy - 0.85, tcx + 0.8, tcy - 0.85);
+  d.drawLine(tcx - 0.8, tcy - 0.85, tcx - 0.8, tcy - 0.5);
+  d.drawLine(tcx + 0.8, tcy - 0.85, tcx + 0.8, tcy - 0.5);
+  d.drawArc(tcx, tcy - 0.5, 0.8, 0, 180);
+  const scx = x + w * 0.72;
+  const scy = y + m + 0.75;
+  rect(d, scx - 0.65, scy - 0.6, 1.3, 1.2);
+  d.drawCircle(scx, scy + 0.1, 0.28);
+}
+
+// Kitchen counter (L-shape along north + west interior walls)
+function kitchenCounters(d: typeof Drawing, x: number, y: number, w: number, h: number) {
+  const cD = 1.8; // counter depth
+  // Counter along back (north) wall
+  d.drawLine(x, y + h - cD, x + w * 0.8, y + h - cD);
+  d.drawLine(x + w * 0.8, y + h, x + w * 0.8, y + h - cD);
+  // Counter along left (west) wall
+  d.drawLine(x + cD, y + h - cD, x + cD, y + h * 0.15);
+  d.drawLine(x, y + h * 0.15, x + cD, y + h * 0.15);
+  // Island in center
+  const iW = rn(w * 0.42);
+  const iH = rn(h * 0.28);
+  const iX = x + (w - iW) / 2 + 0.5;
+  const iY = y + (h - iH) / 2 - 0.5;
+  rect(d, iX, iY, iW, iH);
+}
+
+// WIC shelving lines
+function closetShelves(d: typeof Drawing, x: number, y: number, w: number, h: number) {
+  const shelfD = 1.2;
+  d.drawLine(x, y + shelfD, x + w, y + shelfD);
+  d.drawLine(x, y + shelfD * 2, x + w, y + shelfD * 2);
+  d.drawLine(x, y + h - shelfD, x + w, y + h - shelfD);
+  d.drawLine(x, y + h - shelfD * 2, x + w, y + h - shelfD * 2);
+}
+
+// Stair symbol (series of parallel lines with arrow)
+function stairs(d: typeof Drawing, x: number, y: number, w: number, h: number) {
+  const steps = 12;
+  const sh = h / steps;
+  for (let i = 0; i <= steps; i++) {
+    d.drawLine(x, y + i * sh, x + w, y + i * sh);
+  }
+  // Arrow indicating up direction
+  d.drawLine(x + w / 2, y + h * 0.1, x + w / 2, y + h * 0.9);
+  d.drawLine(x + w / 2, y + h * 0.9, x + w / 2 - 0.6, y + h * 0.75);
+  d.drawLine(x + w / 2, y + h * 0.9, x + w / 2 + 0.6, y + h * 0.75);
+  d.drawText(x + w / 2 - 0.2, y + h / 2 - 0.2, 0.4, 0, "UP");
+}
+
+// North arrow
+function northArrow(d: typeof Drawing, x: number, y: number) {
+  const shaft = 3.0;
+  d.drawLine(x, y, x, y + shaft);
+  d.drawLine(x, y + shaft, x - 0.7, y + shaft - 1.2);
+  d.drawLine(x, y + shaft, x + 0.7, y + shaft - 1.2);
+  d.drawCircle(x, y, 1.0);
+  d.drawText(x - 0.3, y + shaft + 0.3, 0.8, 0, "N");
 }
 
 // ─── Title block ─────────────────────────────────────────────────────────────
 
 function titleBlock(
   d: typeof Drawing,
-  x: number,
-  y: number,
+  x: number, y: number,
   projectName: string,
   structureType: string,
   sqft: number
 ) {
-  const w = 12;
-  const h = 4;
+  const w = 14, h = 5;
   rect(d, x, y, w, h);
-  d.drawLine(x, y + 2.5, x + w, y + 2.5);
-  d.drawText(x + 0.2, y + 3.2, 0.55, 0, projectName.substring(0, 28));
-  d.drawText(x + 0.2, y + 2.7, 0.35, 0, structureType.replace(/_/g, " "));
-  d.drawText(x + 0.2, y + 2.0, 0.32, 0, `TOTAL AREA: ${sqft.toLocaleString()} SQ FT`);
-  d.drawText(x + 0.2, y + 1.5, 0.32, 0, `SCALE: 1" = 10'-0"`);
-  d.drawText(x + 0.2, y + 1.0, 0.32, 0, `DATE: ${new Date().toLocaleDateString("en-US")}`);
-  d.drawText(x + 0.2, y + 0.5, 0.25, 0, "PRELIMINARY SCHEMATIC - NOT FOR CONSTRUCTION");
-  d.drawText(x + 0.2, y + 0.15, 0.25, 0, "BUILDWELL LLC - ibuildwell.com");
+  d.drawLine(x, y + 3.2, x + w, y + 3.2);
+  d.drawLine(x, y + 2.4, x + w, y + 2.4);
+  d.drawLine(x + 7, y, x + 7, y + 2.4);
+  d.drawText(x + 0.25, y + 4.3, 0.6, 0, projectName.substring(0, 24));
+  d.drawText(x + 0.25, y + 3.5, 0.4, 0, structureType.replace(/_/g, " "));
+  d.drawText(x + 0.25, y + 2.9, 0.35, 0, "FLOOR PLAN — SHEET 1 OF 1");
+  d.drawText(x + 0.25, y + 1.95, 0.35, 0, `TOTAL AREA:`);
+  d.drawText(x + 0.25, y + 1.45, 0.5, 0, `${sqft.toLocaleString()} SQ FT`);
+  d.drawText(x + 7.25, y + 1.95, 0.35, 0, `SCALE:`);
+  d.drawText(x + 7.25, y + 1.45, 0.5, 0, `1" = 10'-0"`);
+  d.drawText(x + 0.25, y + 0.9, 0.35, 0, `DATE: ${new Date().toLocaleDateString("en-US")}`);
+  d.drawText(x + 0.25, y + 0.4, 0.28, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
+  d.drawText(x + 0.25, y + 0.1, 0.28, 0, "BUILDWELL LLC · ibuildwell.com");
 }
 
-// ─── Structure-specific layouts ──────────────────────────────────────────────
+// ─── Residential layout ───────────────────────────────────────────────────────
 
 function drawResidential(
   d: typeof Drawing,
@@ -168,180 +255,424 @@ function drawResidential(
   bathrooms: number
 ) {
   const hasGarage = !s(answers.garageType, "none").startsWith("none");
-  const garageH = hasGarage ? H * 0.28 : 0;
-  const livingH = H - garageH;
 
-  // Zone split: left 42% = bedrooms/baths, right 58% = living
-  const leftW = W * 0.42;
-  const rightW = W - leftW;
-  const bedroomH = (livingH * 0.85) / Math.max(bedrooms, 1);
-  const bathW = leftW * 0.38;
+  // ── Grid column lines (x) ──
+  const xB = rn(W * 0.32);   // end of bedroom col
+  const xC = rn(W * 0.49);   // end of bath/hall col  (= start of living zone)
+  const xD = rn(W * 0.79);   // kitchen / dining split
 
-  // ── Bedroom zone ──
-  d.setActiveLayer("WALLS");
-  for (let i = 0; i < bedrooms; i++) {
-    const bY = garageH + i * bedroomH;
-    const bH = bedroomH;
-    const bW = leftW - bathW;
-    rect(d, 0, bY, bW, bH);
-    d.setActiveLayer("TEXT");
-    roomLabel(d, 0, bY, bW, bH, i === 0 ? "MASTER BR" : `BEDROOM ${i + 1}`);
-    d.setActiveLayer("WALLS");
-  }
+  // ── Grid row lines (y, 0=south/front, H=north/back) ──
+  const yB = rn(H * 0.20);   // front row top
+  const yC = rn(H * 0.50);   // mid row top  (= start of bedroom back zone)
+  const yD = rn(H * 0.75);   // master bath / WIC split
+  const yBh = rn(H * 0.35);  // hall / bath2 split within mid row
 
-  // ── Bath zone ──
-  const fullBaths = Math.floor(bathrooms);
-  const bathH = (livingH * 0.85) / Math.max(fullBaths, 1);
-  for (let i = 0; i < fullBaths; i++) {
-    const bY = garageH + i * bathH;
-    rect(d, leftW - bathW, bY, bathW, bathH);
-    d.setActiveLayer("TEXT");
-    roomLabel(d, leftW - bathW, bY, bathW, bathH, "BATH");
-    d.setActiveLayer("WALLS");
-  }
-
-  // Hallway label in remaining left zone
-  const hallY = garageH + livingH * 0.85;
-  const hallH = livingH * 0.15;
-  rect(d, 0, hallY, leftW, hallH);
-  d.setActiveLayer("TEXT");
-  roomLabel(d, 0, hallY, leftW, hallH, "HALL");
+  // ═══════════════════════════════════════════
+  // LAYER: WALLS
+  // ═══════════════════════════════════════════
   d.setActiveLayer("WALLS");
 
-  // ── Right zone: living, kitchen, dining ──
-  const livingZoneH = livingH * 0.45;
-  const kitchenH = livingH * 0.3;
-  const diningH = livingH - livingZoneH - kitchenH;
-  rect(d, leftW, garageH, rightW, livingZoneH);
-  rect(d, leftW, garageH + livingZoneH, rightW, kitchenH);
-  rect(d, leftW, garageH + livingZoneH + kitchenH, rightW, diningH);
-  d.setActiveLayer("TEXT");
-  roomLabel(d, leftW, garageH, rightW, livingZoneH, "LIVING ROOM");
-  roomLabel(d, leftW, garageH + livingZoneH, rightW, kitchenH, "KITCHEN");
-  roomLabel(d, leftW, garageH + livingZoneH + kitchenH, rightW, diningH, "DINING");
-  d.setActiveLayer("WALLS");
-
-  // ── Garage ──
+  // ── Front row (y=0..yB) ──
   if (hasGarage) {
-    rect(d, 0, 0, W, garageH);
+    rect(d, 0, 0, xC, yB);            // Garage
+    rect(d, xC, 0, W - xC, yB);       // Foyer / Entry
+  } else {
+    rect(d, 0, 0, xB, yB);            // Laundry
+    rect(d, xB, 0, xC - xB, yB);      // Utility / Mud
+    rect(d, xC, 0, W - xC, yB);       // Foyer
+  }
+
+  // ── Middle row (y=yB..yC) ──
+  if (bedrooms >= 3) {
+    const brW = rn(xB / 2);
+    rect(d, 0, yB, brW, yC - yB);          // Bedroom 2
+    rect(d, brW, yB, xB - brW, yC - yB);   // Bedroom 3
+  } else {
+    rect(d, 0, yB, xB, yC - yB);           // Bedroom 2 (wider)
+  }
+  rect(d, xB, yB, xC - xB, yBh - yB);     // Hall
+  rect(d, xB, yBh, xC - xB, yC - yBh);    // Bath 2
+  rect(d, xC, yB, xD - xC, yC - yB);      // Kitchen
+  rect(d, xD, yB, W - xD, yC - yB);       // Dining
+
+  // ── Back row (y=yC..H) ──
+  rect(d, 0, yC, xB, H - yC);             // Master Bedroom
+  rect(d, xB, yC, xC - xB, yD - yC);     // Master Bath
+  rect(d, xB, yD, xC - xB, H - yD);      // Walk-in Closet
+  rect(d, xC, yC, W - xC, H - yC);       // Living Room
+
+  // ═══════════════════════════════════════════
+  // LAYER: TEXT (room labels + sizes)
+  // ═══════════════════════════════════════════
+  d.setActiveLayer("TEXT");
+
+  if (hasGarage) {
+    label(d, 0, 0, xC, yB, "GARAGE", `${ft(xC)} × ${ft(yB)}`);
+    label(d, xC, 0, W - xC, yB, "FOYER / ENTRY", `${ft(W - xC)} × ${ft(yB)}`);
+  } else {
+    label(d, 0, 0, xB, yB, "LAUNDRY", `${ft(xB)} × ${ft(yB)}`);
+    label(d, xB, 0, xC - xB, yB, "UTILITY", "");
+    label(d, xC, 0, W - xC, yB, "FOYER", `${ft(W - xC)} × ${ft(yB)}`);
+  }
+
+  if (bedrooms >= 3) {
+    const brW = rn(xB / 2);
+    label(d, 0, yB, brW, yC - yB, "BEDROOM 2", `${ft(brW)} × ${ft(yC - yB)}`);
+    label(d, brW, yB, xB - brW, yC - yB, "BEDROOM 3", `${ft(xB - brW)} × ${ft(yC - yB)}`);
+  } else {
+    label(d, 0, yB, xB, yC - yB, "BEDROOM 2", `${ft(xB)} × ${ft(yC - yB)}`);
+  }
+  label(d, xB, yB, xC - xB, yBh - yB, "HALL", "");
+  label(d, xB, yBh, xC - xB, yC - yBh, "BATH", `${ft(xC - xB)} × ${ft(yC - yBh)}`);
+  label(d, xC, yB, xD - xC, yC - yB, "KITCHEN", `${ft(xD - xC)} × ${ft(yC - yB)}`);
+  label(d, xD, yB, W - xD, yC - yB, "DINING", `${ft(W - xD)} × ${ft(yC - yB)}`);
+  label(d, 0, yC, xB, H - yC, "MASTER BEDROOM", `${ft(xB)} × ${ft(H - yC)}`);
+  label(d, xB, yC, xC - xB, yD - yC, "M. BATH", `${ft(xC - xB)} × ${ft(yD - yC)}`);
+  label(d, xB, yD, xC - xB, H - yD, "W.I.C.", "");
+  label(d, xC, yC, W - xC, H - yC, "LIVING ROOM", `${ft(W - xC)} × ${ft(H - yC)}`);
+
+  // ═══════════════════════════════════════════
+  // LAYER: DOORS
+  // ═══════════════════════════════════════════
+  d.setActiveLayer("DOORS");
+  const dW = 3.0; // standard interior door width
+  const edW = 3.2; // exterior door width
+
+  // Front door (south wall, in foyer)
+  const fdX = xC + (W - xC) * 0.35;
+  doorSwing(d, fdX, 0, edW, 0, 90);
+
+  // Garage door — overhead (represented by lines)
+  if (hasGarage) {
+    const gdW = Math.min(xC * 0.6, 16);
+    const gdX = (xC - gdW) / 2;
+    rect(d, gdX, 0, gdW, 1.0);
     d.setActiveLayer("TEXT");
-    roomLabel(d, 0, 0, W, garageH, "GARAGE");
+    d.drawText(gdX + gdW / 2 - 3.5, -1.5, 0.4, 0, `OVERHEAD DOOR ${Math.round(gdW)}'-0"`);
+    d.setActiveLayer("DOORS");
+  }
+
+  // Bedroom 2 door (from hall into BR2, south wall of hall at y=yB)
+  if (bedrooms >= 3) {
+    const brW = rn(xB / 2);
+    doorSwing(d, brW - dW, yB, dW, 90, 180);   // BR2
+    doorSwing(d, xB - dW, yB, dW, 90, 180);    // BR3
+  } else {
+    doorSwing(d, xB / 2, yB, dW, 90, 180);     // BR2 single
+  }
+
+  // Hall door into bath2
+  doorSwing(d, xB, yBh + dW, dW, 270, 360);
+
+  // Master BR door (from hall at y=yC)
+  doorSwing(d, xB * 0.5, yC, dW, 0, 90);
+
+  // Master bath door (from master BR into bath)
+  doorSwing(d, xB, yC + dW, dW, 90, 180);
+
+  // WIC door
+  doorSwing(d, xB, yD + dW, dW, 90, 180);
+
+  // Living room from foyer
+  doorSwing(d, xC, yB * 0.5, dW, 90, 180);
+
+  // ═══════════════════════════════════════════
+  // LAYER: WINDOWS
+  // ═══════════════════════════════════════════
+  d.setActiveLayer("WINDOWS");
+  const winW = 4.0;
+  const winW2 = 3.0;
+  const winD = 0.5;
+
+  // South wall (y=0)
+  if (!hasGarage) {
+    winH(d, W * 0.08, 0, winW2, winD);
+  }
+  winH(d, xC + (W - xC) * 0.6, 0, winW, winD);
+
+  // North wall (y=H)
+  winH(d, W * 0.05, H - winD, winW2, winD);     // Master BR
+  winH(d, xC + (W - xC) * 0.1, H - winD, winW, winD); // Living room
+  winH(d, xC + (W - xC) * 0.55, H - winD, winW, winD); // Living room 2
+
+  // West wall (x=0)
+  winV(d, 0, yB + (yC - yB) * 0.35, winW2, winD);    // BR2
+  winV(d, 0, yC + (H - yC) * 0.4, winW2, winD);       // Master BR
+
+  // East wall (x=W)
+  winV(d, W - winD, yC + (H - yC) * 0.25, winW, winD); // Living room
+  winV(d, W - winD, yB + (yC - yB) * 0.45, winW2, winD); // Dining
+
+  // ═══════════════════════════════════════════
+  // FIXTURES (on WALLS layer for clarity)
+  // ═══════════════════════════════════════════
+  d.setActiveLayer("WALLS");
+
+  // Master Bath fixtures
+  bathFixtures(d, xB, yC, xC - xB, yD - yC);
+
+  // Bath 2 fixtures (smaller — halfBath if not enough space)
+  if ((xC - xB) * (yC - yBh) > 45) {
+    bathFixtures(d, xB, yBh, xC - xB, yC - yBh);
+  } else {
+    halfBathFixtures(d, xB, yBh, xC - xB, yC - yBh);
+  }
+
+  // Kitchen counters + island
+  kitchenCounters(d, xC, yB, xD - xC, yC - yB);
+
+  // WIC shelves
+  closetShelves(d, xB, yD, xC - xB, H - yD);
+
+  // Living room fireplace on north wall
+  const fpW = 5.0;
+  const fpX = xC + (W - xC) / 2 - fpW / 2;
+  rect(d, fpX, H - 1.3, fpW, 1.3);
+  d.drawLine(fpX + 0.5, H - 1.0, fpX + fpW - 0.5, H - 1.0);
+  d.setActiveLayer("TEXT");
+  d.drawText(fpX + fpW / 2 - 0.35, H - 0.85, 0.35, 0, "FP");
+}
+
+// ─── Agricultural layout ──────────────────────────────────────────────────────
+
+function drawAgricultural(
+  d: typeof Drawing,
+  answers: ProjectAnswers,
+  W: number,
+  H: number,
+  structureType: string
+) {
+  const stallCount = n(answers.stallCount, 0);
+  const postSpacing = n(answers.clearSpanWidth, 12) || 12;
+
+  // ── Perimeter walls (heavy) ──
+  d.setActiveLayer("EXTERIOR");
+  rect(d, 0, 0, W, H);
+
+  // ── Post symbols at bay intervals ──
+  d.setActiveLayer("WALLS");
+  const postSize = 0.75;
+  const cols = Math.ceil(W / postSpacing);
+  const rows = Math.ceil(H / postSpacing);
+
+  for (let c = 0; c <= cols; c++) {
+    const px = Math.min(c * postSpacing, W);
+    for (let r = 0; r <= rows; r++) {
+      const py = Math.min(r * postSpacing, H);
+      rect(d, px - postSize / 2, py - postSize / 2, postSize, postSize);
+      // Draw cross inside post
+      d.drawLine(px - postSize / 2, py - postSize / 2, px + postSize / 2, py + postSize / 2);
+      d.drawLine(px + postSize / 2, py - postSize / 2, px - postSize / 2, py + postSize / 2);
+    }
+  }
+
+  // ── Bay lines (dashed representation as lighter lines) ──
+  for (let c = 1; c < cols; c++) {
+    const bx = c * postSpacing;
+    d.drawLine(bx, 0, bx, H);
+  }
+  for (let r = 1; r < rows; r++) {
+    const by = r * postSpacing;
+    d.drawLine(0, by, W, by);
+  }
+
+  // ── Ridge line ──
+  d.setActiveLayer("TEXT");
+  d.drawText(W / 2 + 0.4, H / 2, 0.5, 90, "RIDGE LINE");
+  d.setActiveLayer("WALLS");
+  d.drawLine(W / 2 - 0.1, 0, W / 2 - 0.1, H);
+  d.drawLine(W / 2 + 0.1, 0, W / 2 + 0.1, H);
+
+  // ── Horse / livestock stalls ──
+  if (stallCount > 0 && structureType === "BARN") {
+    const stallW = Math.min(14, W * 0.22);
+    const stallH = Math.min(14, H * 0.25);
+    const stallsPerRow = Math.floor((W - 4) / stallW);
+    const actualStalls = Math.min(stallCount, stallsPerRow * 2);
+    const startX = (W - stallsPerRow * stallW) / 2;
+
+    for (let i = 0; i < actualStalls; i++) {
+      const col = i % stallsPerRow;
+      const row = Math.floor(i / stallsPerRow);
+      const sx = startX + col * stallW;
+      const sy = row === 0 ? H * 0.05 : H - H * 0.05 - stallH;
+      rect(d, sx, sy, stallW, stallH);
+      d.setActiveLayer("TEXT");
+      d.drawText(sx + stallW / 2 - 1.5, sy + stallH / 2 - 0.2, 0.4, 0, `STALL ${i + 1}`);
+      d.drawText(sx + stallW / 2 - 2.0, sy + stallH / 2 - 0.7, 0.3, 0, `${Math.round(stallW)}' × ${Math.round(stallH)}'`);
+      d.setActiveLayer("WALLS");
+    }
+
+    // Center aisle
+    const aisleW = 12;
+    const aisleX = (W - aisleW) / 2;
+    d.setActiveLayer("TEXT");
+    d.drawText(aisleX + aisleW / 2 - 1.5, H / 2 - 0.25, 0.5, 0, "CENTER AISLE");
+    d.drawText(aisleX + aisleW / 2 - 1.8, H / 2 - 0.85, 0.35, 0, `${Math.round(aisleW)}' WIDE`);
     d.setActiveLayer("WALLS");
   }
 
-  // ── Doors ──
+  // ── Large sliding doors on gable end (south) ──
   d.setActiveLayer("DOORS");
-  // Front door on south wall
-  const frontDoorX = W * 0.5 - 1.5;
-  const doorW = 3;
-  wallWithGap(d, 0, 0, W, 0, [{ pos: frontDoorX / W, width: doorW }]);
-  doorSwing(d, frontDoorX, 0.5, doorW, 0, 90);
-  // Bedroom doors
-  for (let i = 0; i < bedrooms; i++) {
-    const bY = garageH + i * bedroomH + bedroomH * 0.5;
-    d.drawLine(leftW - bathW - 0.05, bY, leftW - bathW + 2.8, bY); // passage door opening
-    doorSwing(d, leftW - bathW, bY, 2.8, 0, 90);
-  }
-
-  // ── Windows ──
-  d.setActiveLayer("WINDOWS");
-  // South wall windows (living + bedrooms face)
-  windowSymbol(d, W * 0.15, 0, 3, true);
-  windowSymbol(d, W * 0.65, 0, 3, true);
-  // North wall
-  windowSymbol(d, leftW * 0.1, H, 2.5, true);
-  windowSymbol(d, leftW + rightW * 0.2, H, 3, true);
-  windowSymbol(d, leftW + rightW * 0.6, H, 3, true);
-  // East wall
-  windowSymbol(d, W, garageH + livingH * 0.1, 2.5, false);
-  windowSymbol(d, W, garageH + livingZoneH * 0.5, 2.5, false);
-}
-
-function drawAgricultural(d: typeof Drawing, W: number, H: number, structureType: string) {
-  // Open plan with center ridge line and optional loft
-  d.setActiveLayer("WALLS");
-  const postSpacing = 8;
-  // Posts along perimeter
-  for (let x = 0; x <= W; x += postSpacing) {
-    d.drawLine(x, 0, x, 0); // column marker (point)
-    d.drawLine(x, H, x, H);
-    if (x > 0 && x < W) {
-      d.drawLine(x - 0.25, 0, x + 0.25, 0);
-      d.drawLine(x - 0.25, H, x + 0.25, H);
-    }
-  }
-  for (let y = 0; y <= H; y += postSpacing) {
-    if (y > 0 && y < H) {
-      d.drawLine(0, y - 0.25, 0, y + 0.25);
-      d.drawLine(W, y - 0.25, W, y + 0.25);
-    }
-  }
-  // Center ridge dashed (use regular line, label it)
-  d.drawLine(W / 2, 0, W / 2, H);
+  const bigDoorW = Math.min(W * 0.55, 20);
+  const bigDoorX = (W - bigDoorW) / 2;
+  // Sliding door symbol: rectangle with diagonal slash
+  rect(d, bigDoorX, 0, bigDoorW / 2, 1.5);
+  rect(d, bigDoorX + bigDoorW / 2, 0, bigDoorW / 2, 1.5);
+  d.drawLine(bigDoorX, 0, bigDoorX + bigDoorW / 2, 1.5);
+  d.drawLine(bigDoorX + bigDoorW / 2, 0, bigDoorX + bigDoorW, 1.5);
   d.setActiveLayer("TEXT");
-  d.drawText(W / 2 + 0.3, H / 2, 0.5, 90, "RIDGE LINE");
-  roomLabel(d, 0, 0, W, H, structureType === "BARN" ? "BARN / OPEN" : "POLE BARN / OPEN");
-  // Large doors on south end
-  d.setActiveLayer("DOORS");
-  const bigDoorW = Math.min(W * 0.5, 16);
-  d.drawLine(W / 2 - bigDoorW / 2, 0, W / 2 + bigDoorW / 2, 0);
-  d.drawText(W / 2 - bigDoorW / 4, -1.5, 0.4, 0, `SLIDING DOOR ${Math.round(bigDoorW)}'-0"`);
+  d.drawText(bigDoorX + bigDoorW / 2 - 3.5, -1.5, 0.4, 0, `SLIDING DOOR ${Math.round(bigDoorW)}'-0"`);
+
+  // ── Main label ──
+  d.setActiveLayer("TEXT");
+  const mainLabel = structureType === "BARN" ? "BARN" : structureType === "POLE_BARN" ? "POLE BARN" : "BARNDOMINIUM";
+  d.drawText(2, H * 0.5 - 0.3, 0.7, 0, mainLabel);
+  d.drawText(2, H * 0.5 - 1.1, 0.4, 0, `${ft(W)} × ${ft(H)} CLEAR SPAN`);
 }
+
+// ─── Container layout ─────────────────────────────────────────────────────────
 
 function drawContainer(d: typeof Drawing, answers: ProjectAnswers, W: number, H: number) {
   const containerSize = s(answers.containerSize, "40ft");
   const cLength = containerSize === "20ft" ? 20 : 40;
   const cWidth = 8;
-  const count = Math.ceil(n(answers.containerCount, 2));
+  const count = Math.min(n(answers.containerCount, 2), 6);
   const arrangement = s(answers.containerArrangement, "linear");
 
   d.setActiveLayer("WALLS");
-  if (arrangement === "stacked" || arrangement === "parallel") {
-    for (let i = 0; i < Math.min(count, 4); i++) {
-      const row = Math.floor(i / 2);
+
+  interface ContainerPos { x: number; y: number; rotated: boolean; }
+  const positions: ContainerPos[] = [];
+
+  if (arrangement === "l_shape") {
+    positions.push({ x: 0, y: 0, rotated: false });
+    positions.push({ x: 0, y: cWidth + 4, rotated: true });
+  } else if (arrangement === "stacked" || arrangement === "parallel") {
+    for (let i = 0; i < count; i++) {
       const col = i % 2;
-      const cx = col * (cLength + 2);
-      const cy = row * (cWidth + 2);
-      rect(d, cx, cy, cLength, cWidth);
-      d.setActiveLayer("TEXT");
-      roomLabel(d, cx, cy, cLength, cWidth, `CONTAINER ${i + 1}`);
-      d.setActiveLayer("WALLS");
+      const row = Math.floor(i / 2);
+      positions.push({ x: col * (cLength + 4), y: row * (cWidth + 4), rotated: false });
     }
-  } else if (arrangement === "l_shape") {
-    rect(d, 0, 0, cLength, cWidth);
-    rect(d, 0, cWidth + 2, cWidth, cLength);
-    d.setActiveLayer("TEXT");
-    roomLabel(d, 0, 0, cLength, cWidth, "CONTAINER 1");
-    roomLabel(d, 0, cWidth + 2, cWidth, cLength, "CONTAINER 2");
-    d.setActiveLayer("WALLS");
   } else {
     // linear
-    for (let i = 0; i < Math.min(count, 4); i++) {
-      const cx = i * (cLength + 1);
-      rect(d, cx, 0, cLength, cWidth);
-      d.setActiveLayer("TEXT");
-      roomLabel(d, cx, 0, cLength, cWidth, `CONTAINER ${i + 1}`);
-      d.setActiveLayer("WALLS");
+    for (let i = 0; i < count; i++) {
+      positions.push({ x: i * (cLength + 2), y: 0, rotated: false });
     }
   }
-  // Windows on each container
-  d.setActiveLayer("WINDOWS");
-  windowSymbol(d, cLength * 0.25, 0, 3, true);
-  windowSymbol(d, cLength * 0.65, 0, 3, true);
+
+  positions.forEach((p, i) => {
+    const cL = p.rotated ? cWidth : cLength;
+    const cW = p.rotated ? cLength : cWidth;
+    rect(d, p.x, p.y, cL, cW);
+    // Corrugation ribs (visual detail)
+    const ribSpacing = p.rotated ? cW / 8 : cL / 12;
+    const ribCount = p.rotated ? 8 : 12;
+    for (let r = 1; r < ribCount; r++) {
+      if (p.rotated) {
+        d.drawLine(p.x, p.y + r * ribSpacing, p.x + cL, p.y + r * ribSpacing);
+      } else {
+        d.drawLine(p.x + r * ribSpacing, p.y, p.x + r * ribSpacing, p.y + cW);
+      }
+    }
+    // Door on one end
+    d.setActiveLayer("DOORS");
+    doorSwing(d, p.x + cL - 3, p.y, 3.0, 0, 90);
+    // Window
+    d.setActiveLayer("WINDOWS");
+    winH(d, p.x + cL * 0.3, p.y, 2.5, 0.4);
+    winH(d, p.x + cL * 0.6, p.y, 2.5, 0.4);
+    d.setActiveLayer("WALLS");
+    // Label
+    d.setActiveLayer("TEXT");
+    label(d, p.x, p.y, cL, cW, `CONTAINER ${i + 1}`, `${cL}' × ${cW}'`);
+    d.setActiveLayer("WALLS");
+  });
 }
 
-function drawSimpleShell(d: typeof Drawing, W: number, H: number, label: string) {
+// ─── Simple outbuilding ───────────────────────────────────────────────────────
+
+function drawOutbuilding(d: typeof Drawing, answers: ProjectAnswers, W: number, H: number, structureLabel: string) {
+  const bays = n(answers.garageBays, 1);
+  const bayW = W / Math.max(bays, 1);
+
   d.setActiveLayer("WALLS");
   rect(d, 0, 0, W, H);
-  d.setActiveLayer("TEXT");
-  roomLabel(d, 0, 0, W, H, label);
+  // Wall thickness
+  const t = 0.5;
+  rect(d, t, t, W - 2 * t, H - 2 * t);
+
+  // Bay dividers
+  for (let i = 1; i < bays; i++) {
+    d.drawLine(i * bayW, 0, i * bayW, H * 0.4);
+    d.drawLine(i * bayW, H * 0.6, i * bayW, H);
+  }
+
+  // Overhead doors on south wall
   d.setActiveLayer("DOORS");
-  const doorX = W / 2 - 1.5;
-  doorSwing(d, doorX, 0.5, 3, 0, 90);
+  for (let i = 0; i < bays; i++) {
+    const gdW = bayW * 0.7;
+    const gdX = i * bayW + (bayW - gdW) / 2;
+    rect(d, gdX, 0, gdW, 1.2);
+    d.drawLine(gdX, 0, gdX + gdW, 1.2);
+    d.setActiveLayer("TEXT");
+    d.drawText(gdX + gdW / 2 - 3, -1.4, 0.4, 0, `OVERHEAD ${Math.round(gdW)}'-0"`);
+    d.setActiveLayer("DOORS");
+  }
+
+  // Walk door on east wall
+  doorSwing(d, W, H * 0.6, 3.0, 90, 180);
+
+  // Windows
   d.setActiveLayer("WINDOWS");
-  windowSymbol(d, W * 0.15, H, 2.5, true);
-  windowSymbol(d, W * 0.6, H, 2.5, true);
-  windowSymbol(d, W, H * 0.5, 2.5, false);
+  winH(d, W * 0.15, H - 0.5, 3.0, 0.5);
+  winH(d, W * 0.6, H - 0.5, 3.0, 0.5);
+  winV(d, W - 0.5, H * 0.5, 2.5, 0.5);
+
+  // Work bench (for workshop/garage)
+  if (structureLabel.includes("WORKSHOP") || structureLabel.includes("GARAGE")) {
+    d.setActiveLayer("WALLS");
+    d.drawLine(t + 0.1, H - t - 2.0, W - t - 0.1, H - t - 2.0);
+    d.drawLine(t + 0.1, H - t, t + 0.1, H - t - 2.0);
+    d.drawLine(W - t - 0.1, H - t, W - t - 0.1, H - t - 2.0);
+    d.setActiveLayer("TEXT");
+    d.drawText(W / 2 - 2.5, H - t - 1.2, 0.4, 0, "WORK BENCH");
+  }
+
+  d.setActiveLayer("TEXT");
+  label(d, 0, 0, W, H, structureLabel, `${ft(W)} × ${ft(H)}`);
+}
+
+// ─── Dome layout ──────────────────────────────────────────────────────────────
+
+function drawDome(d: typeof Drawing, W: number, H: number) {
+  const r = Math.min(W, H) / 2;
+  const cx = W / 2, cy = H / 2;
+  d.setActiveLayer("EXTERIOR");
+  d.drawCircle(cx, cy, r);
+  d.drawCircle(cx, cy, r - 0.5);
+  // Structural triangulation lines (geodesic pattern)
+  d.setActiveLayer("WALLS");
+  const freq = 4;
+  for (let i = 0; i < freq; i++) {
+    const a1 = (i / freq) * Math.PI * 2;
+    const a2 = ((i + 1) / freq) * Math.PI * 2;
+    const midA = (a1 + a2) / 2;
+    d.drawLine(cx, cy, cx + r * Math.cos(a1), cy + r * Math.sin(a1));
+    d.drawLine(cx + r * 0.5 * Math.cos(a1), cy + r * 0.5 * Math.sin(a1),
+      cx + r * Math.cos(midA), cy + r * Math.sin(midA));
+    d.drawLine(cx + r * 0.5 * Math.cos(a2), cy + r * 0.5 * Math.sin(a2),
+      cx + r * Math.cos(midA), cy + r * Math.sin(midA));
+  }
+  // Interior rooms (radial partitions)
+  d.drawLine(cx, cy - r * 0.5, cx, cy + r * 0.6);
+  d.drawLine(cx - r * 0.6, cy, cx + r * 0.6, cy);
+  d.setActiveLayer("TEXT");
+  label(d, cx - r * 0.4, cy - r * 0.4, r * 0.4, r * 0.4, "LIVING", "");
+  label(d, cx, cy - r * 0.4, r * 0.4, r * 0.4, "KITCHEN", "");
+  label(d, cx - r * 0.4, cy, r * 0.4, r * 0.4, "BEDROOM", "");
+  label(d, cx, cy, r * 0.4, r * 0.4, "BATH", "");
+  d.drawText(cx - 2.5, cy + r * 0.8, 0.6, 0, "DOME / GEODESIC");
 }
 
 // ─── Main export ──────────────────────────────────────────────────────────────
@@ -357,36 +688,35 @@ export function generateFloorPlanDXF(
   const bedrooms = n(answers.bedrooms, 3);
   const bathrooms = parseFloat(String(answers.bathrooms ?? "2")) || 2;
 
-  // Building footprint dimensions (slightly wider than deep)
-  const W = r(Math.sqrt(footprint * 1.4));
-  const H = r(Math.sqrt(footprint / 1.4));
+  // Building footprint: slightly wider than deep (1.4 aspect ratio)
+  const W = rn(Math.sqrt(footprint * 1.4));
+  const H = rn(Math.sqrt(footprint / 1.4));
 
   const d = new Drawing();
   d.setUnits("Feet");
 
   // Layers
+  d.addLayer("EXTERIOR", Drawing.ACI.RED, "CONTINUOUS");
   d.addLayer("WALLS", Drawing.ACI.WHITE, "CONTINUOUS");
   d.addLayer("DOORS", Drawing.ACI.CYAN, "CONTINUOUS");
   d.addLayer("WINDOWS", Drawing.ACI.GREEN, "CONTINUOUS");
   d.addLayer("DIMENSIONS", Drawing.ACI.YELLOW, "CONTINUOUS");
   d.addLayer("TEXT", Drawing.ACI.WHITE, "CONTINUOUS");
   d.addLayer("TITLE", Drawing.ACI.WHITE, "CONTINUOUS");
-  d.addLayer("EXTERIOR", Drawing.ACI.RED, "CONTINUOUS");
 
-  // ── Exterior shell ──
+  // ── Exterior shell with wall thickness ──
   d.setActiveLayer("EXTERIOR");
   rect(d, 0, 0, W, H);
-  // Wall thickness lines (0.5ft inset)
-  const t = 0.5;
-  rect(d, t, t, W - 2 * t, H - 2 * t);
+  const et = 0.5; // exterior wall thickness
+  rect(d, et, et, W - 2 * et, H - 2 * et);
 
-  // ── Interior layout ──
+  // ── Interior layout by category ──
   const cat = structureCategory(structureType);
 
   if (cat === "residential") {
     drawResidential(d, answers, W, H, bedrooms, bathrooms);
   } else if (cat === "agricultural") {
-    drawAgricultural(d, W, H, structureType);
+    drawAgricultural(d, answers, W, H, structureType);
   } else if (cat === "container") {
     drawContainer(d, answers, W, H);
   } else if (cat === "outbuilding") {
@@ -395,47 +725,46 @@ export function generateFloorPlanDXF(
       WORKSHOP: "WORKSHOP",
       GARAGE: "GARAGE",
     };
-    drawSimpleShell(d, W, H, labels[structureType] ?? "OUTBUILDING");
+    drawOutbuilding(d, answers, W, H, labels[structureType] ?? "OUTBUILDING");
   } else if (cat === "dome") {
-    d.setActiveLayer("EXTERIOR");
-    d.drawCircle(W / 2, H / 2, W / 2);
-    d.setActiveLayer("TEXT");
-    roomLabel(d, 0, 0, W, H, "DOME / GEODESIC");
-    d.setActiveLayer("WALLS");
-    d.drawCircle(W / 2, H / 2, W / 2 - 0.5);
+    drawDome(d, W, H);
   } else if (cat === "quonset") {
     d.setActiveLayer("EXTERIOR");
     d.drawArc(W / 2, 0, W / 2, 0, 180);
-    d.drawLine(0, 0, 0, H / 3);
-    d.drawLine(W, 0, W, H / 3);
+    d.drawLine(0, 0, 0, H * 0.3);
+    d.drawLine(W, 0, W, H * 0.3);
+    d.setActiveLayer("WALLS");
+    d.drawLine(0, H * 0.3, W, H * 0.3); // floor
     d.setActiveLayer("TEXT");
-    roomLabel(d, 0, 0, W, H * 0.5, "QUONSET / OPEN");
+    label(d, 0, 0, W, H * 0.6, "QUONSET HUT", `${ft(W)} × ${ft(H)}`);
   } else {
-    drawSimpleShell(d, W, H, structureType.replace(/_/g, " "));
+    drawOutbuilding(d, answers, W, H, structureType.replace(/_/g, " "));
   }
 
   // ── Dimension lines ──
   d.setActiveLayer("DIMENSIONS");
-  dimension(d, 0, 0, W, 0, -3, true, `${r(W, 0)}'-0"`);
-  dimension(d, 0, 0, 0, H, -3, false, `${r(H, 0)}'-0"`);
+  dim(d, 0, 0, W, 0, -4, `${ft(W)}`);
+  dim(d, 0, 0, 0, H, -4, `${ft(H)}`);
+
+  // ── North arrow ──
+  d.setActiveLayer("TITLE");
+  northArrow(d, W + 6, H / 2);
 
   // ── Title block ──
   d.setActiveLayer("TITLE");
   titleBlock(d, W + 4, 0, projectName, structureType, sqft);
 
   // ── Sheet border ──
-  d.setActiveLayer("TITLE");
-  const sheetW = W + 20;
-  const sheetH = H + 8;
-  rect(d, -4, -5, sheetW, sheetH);
-  // Sheet label
-  d.drawText(-3, sheetH - 5.5, 0.5, 0, "FLOOR PLAN — SHEET 1 OF 1");
-  d.drawText(-3, sheetH - 6.1, 0.35, 0, `PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION`);
+  const sheetW = W + 22;
+  const sheetH = H + 10;
+  rect(d, -5, -6, sheetW, sheetH);
+  d.drawText(-4, sheetH - 6.3, 0.5, 0, "FLOOR PLAN — SHEET A1");
+  d.drawText(-4, sheetH - 6.9, 0.35, 0, "PRELIMINARY SCHEMATIC — NOT FOR CONSTRUCTION");
 
   return d.toDxfString();
 }
 
-// ─── Category helper (mirrors materialCalculator) ─────────────────────────────
+// ─── Category helper ─────────────────────────────────────────────────────────
 
 type StructureCategory = "residential" | "container" | "agricultural" | "outbuilding" | "dome" | "quonset" | "earthship";
 
