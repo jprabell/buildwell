@@ -152,7 +152,7 @@ export default function LandingPage() {
               <div className="relative h-48 bg-stone-700 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80"
-                  alt="Blueprints"
+                  alt="Architectural blueprints"
                   className="w-full h-full object-cover opacity-60"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -184,8 +184,8 @@ export default function LandingPage() {
             <div className="bg-stone-800 rounded-2xl overflow-hidden border border-stone-700 hover:border-amber-500/60 transition-colors">
               <div className="relative h-48 bg-stone-700 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80"
-                  alt="Material List"
+                  src="https://images.unsplash.com/photo-1426927308491-6380b6a9936f?auto=format&fit=crop&w=600&q=80"
+                  alt="Building materials lumber yard"
                   className="w-full h-full object-cover opacity-60"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -218,7 +218,7 @@ export default function LandingPage() {
               <div className="relative h-48 bg-stone-700 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80"
-                  alt="Quote Package"
+                  alt="Contractor reviewing bid documents"
                   className="w-full h-full object-cover opacity-60"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -308,7 +308,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
+                image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=600&q=80",
                 title: "DIY Builders",
                 description: "Get the exact documents you need to pull permits, order materials, and manage your own build with confidence.",
               },
@@ -318,7 +318,7 @@ export default function LandingPage() {
                 description: "Streamline client projects with professional bid packages and material lists ready in minutes, not weeks.",
               },
               {
-                image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
+                image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80",
                 title: "Developers",
                 description: "Quickly scope multiple projects with accurate material estimates and professional documentation packages.",
               },
