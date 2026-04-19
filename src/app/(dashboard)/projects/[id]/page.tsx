@@ -5,6 +5,52 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import Button from "@/components/ui/Button";
+import PurchaseButton from "@/components/ui/PurchaseButton";
+
+const PACKAGES = [
+  {
+    id: "blueprint_set",
+    icon: "📐",
+    title: "Full Blueprint Set",
+    price: "$2,000",
+    includes: [
+      "Floor plan layout",
+      "Exterior elevations",
+      "Framing plan",
+      "Roofing & truss plan",
+      "Plumbing, Electrical & HVAC",
+      "Exterior detail sheets",
+    ],
+  },
+  {
+    id: "material_list",
+    icon: "📋",
+    title: "Material List + Spec Sheet",
+    price: "$250",
+    includes: [
+      "Full itemized material list",
+      "Quantities & specifications",
+      "Per-trade spec sheets",
+      "Framing, roofing, insulation",
+      "Windows, doors & finishes",
+      "Ready for supplier ordering",
+    ],
+  },
+  {
+    id: "quote_package",
+    icon: "💼",
+    title: "Quote Package + Bid Docs",
+    price: "$250",
+    includes: [
+      "Formatted quote documents",
+      "Vendor pricing included",
+      "Bid documents by trade",
+      "Framing, electrical, plumbing",
+      "HVAC & roofing bids",
+      "Ready to send to contractors",
+    ],
+  },
+];
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -18,13 +64,18 @@ export default async function ProjectPage({ params }: { params: { id: string } }
 
   const structure = STRUCTURE_OPTIONS.find((s) => s.value === project.structureType);
   const answers = project.answers as Record<string, unknown>;
+  const purchases = (answers._purchases as string[]) || [];
+
+  const displayAnswers = Object.entries(answers).filter(
+    ([key, v]) => !key.startsWith("_") && v !== "" && v !== null && v !== undefined
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Nav */}
-      <nav className="bg-white border-b border-slate-200 px-6 py-4">
+      <nav className="bg-white border-b border-stone-200 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-xl font-black text-slate-900">
+          <Link href="/" className="text-xl font-black text-stone-900">
             Build<span className="text-amber-600">well</span>
           </Link>
           <Link href="/dashboard">
@@ -33,14 +84,18 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex items-start justify-between mb-10">
           <div className="flex items-center gap-4">
-            <span className="text-5xl">{structure?.icon}</span>
+            {structure?.image ? (
+              <img src={structure.image} alt={structure.label} className="w-16 h-16 rounded-xl object-cover" />
+            ) : (
+              <span className="text-5xl">{structure?.icon}</span>
+            )}
             <div>
-              <h1 className="text-3xl font-black text-slate-900">{project.name}</h1>
-              <p className="text-slate-500">{structure?.label}</p>
+              <h1 className="text-3xl font-black text-stone-900">{project.name}</h1>
+              <p className="text-stone-500">{structure?.label} · {structure?.costNote}</p>
             </div>
           </div>
           <span
@@ -49,100 +104,107 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                 ? "bg-green-100 text-green-700"
                 : project.status === "IN_PROGRESS"
                 ? "bg-amber-100 text-amber-700"
-                : "bg-slate-100 text-slate-500"
+                : "bg-stone-100 text-stone-500"
             }`}
           >
-            {project.status === "COMPLETE"
-              ? "Complete"
-              : project.status === "IN_PROGRESS"
-              ? "In Progress"
-              : "Draft"}
+            {project.status === "COMPLETE" ? "Complete" : project.status === "IN_PROGRESS" ? "In Progress" : "Draft"}
           </span>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Project Summary */}
-          <div className="md:col-span-2 flex flex-col gap-6">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Project Summary</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {Object.entries(answers)
-                  .filter(([, v]) => v !== "" && v !== null && v !== undefined)
-                  .map(([key, value]) => {
-                    const label = key
-                      .replace(/([A-Z])/g, " $1")
-                      .replace(/^./, (s) => s.toUpperCase());
-                    const display = Array.isArray(value)
-                      ? (value as string[]).join(", ")
-                      : String(value);
-                    return (
-                      <div key={key} className="bg-slate-50 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">
-                          {label}
-                        </p>
-                        <p className="text-sm font-medium text-slate-800">{display}</p>
-                      </div>
-                    );
-                  })}
-              </div>
+        {/* Project Summary */}
+        {displayAnswers.length > 0 && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-stone-900">Project Summary</h2>
+              <Link href={`/design?edit=${project.id}`}>
+                <Button variant="outline" size="sm">Edit Answers</Button>
+              </Link>
             </div>
-
-            {/* Documents section — placeholder for Phase 2 */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-2">Documents</h2>
-              <p className="text-slate-400 text-sm mb-6">
-                Your material list, spec sheets, and quote-ready documents will be generated here.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { icon: "📋", title: "Bill of Materials", status: "Coming soon" },
-                  { icon: "📄", title: "Spec Sheets", status: "Coming soon" },
-                  { icon: "💰", title: "Quote Package", status: "Coming soon" },
-                  { icon: "🏗️", title: "Framing Summary", status: "Coming soon" },
-                ].map((doc) => (
-                  <div
-                    key={doc.title}
-                    className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100"
-                  >
-                    <span className="text-2xl">{doc.icon}</span>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-700">{doc.title}</p>
-                      <p className="text-xs text-slate-400">{doc.status}</p>
-                    </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {displayAnswers.map(([key, value]) => {
+                const label = key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+                const display = Array.isArray(value) ? (value as string[]).join(", ") : String(value);
+                return (
+                  <div key={key} className="bg-stone-50 rounded-xl p-3">
+                    <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-1">{label}</p>
+                    <p className="text-sm font-medium text-stone-800">{display}</p>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
+        )}
 
-          {/* Side panel */}
-          <div className="flex flex-col gap-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <h3 className="text-sm font-bold text-slate-900 mb-4">Actions</h3>
-              <div className="flex flex-col gap-2">
-                <Link href={`/design?edit=${project.id}`}>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Edit Answers
-                  </Button>
-                </Link>
-                <Button variant="ghost" size="sm" className="w-full opacity-50 cursor-not-allowed" disabled>
-                  Download BOM (soon)
-                </Button>
-                <Button variant="ghost" size="sm" className="w-full opacity-50 cursor-not-allowed" disabled>
-                  Download Quote Pkg (soon)
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-amber-50 rounded-2xl border border-amber-100 p-5">
-              <p className="text-sm font-semibold text-amber-800 mb-1">Document Generation</p>
-              <p className="text-xs text-amber-600 leading-relaxed">
-                Full Bill of Materials, spec sheets, and quote packages are coming in the next phase.
-                Your project answers are saved and ready.
-              </p>
-            </div>
-          </div>
+        {/* Document Packages */}
+        <div className="mb-4">
+          <h2 className="text-2xl font-black text-stone-900 mb-1">Document Packages</h2>
+          <p className="text-stone-500 text-sm mb-6">
+            Preview any document free. Purchase to unlock the full version.
+          </p>
         </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {PACKAGES.map((pkg) => {
+            const purchased = purchases.includes(pkg.id);
+            return (
+              <div
+                key={pkg.id}
+                className={`bg-white rounded-2xl border p-6 flex flex-col ${
+                  purchased ? "border-green-300 shadow-sm" : "border-stone-200"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-3xl">{pkg.icon}</span>
+                  {purchased && (
+                    <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      ✓ Purchased
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-black text-stone-900 mb-1">{pkg.title}</h3>
+                <p className="text-2xl font-black text-amber-600 mb-4">{pkg.price}</p>
+                <ul className="space-y-1.5 text-xs text-stone-500 mb-6 flex-1">
+                  {pkg.includes.map((item) => (
+                    <li key={item} className="flex items-start gap-1.5">
+                      <span className="text-amber-500 mt-0.5">✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+
+                {purchased ? (
+                  <div className="space-y-2">
+                    <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
+                      Download Full Document
+                    </button>
+                    <Link href={`/projects/${project.id}/preview/${pkg.id}`}>
+                      <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
+                        View Preview
+                      </button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <PurchaseButton
+                      packageType={pkg.id}
+                      projectId={project.id}
+                      label={`Purchase — ${pkg.price}`}
+                    />
+                    <Link href={`/projects/${project.id}/preview/${pkg.id}`}>
+                      <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
+                        Preview Free (watermarked)
+                      </button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Watermark note */}
+        <p className="text-center text-stone-400 text-xs mt-6">
+          Free previews include a "DRAFT DOCUMENT — OWNED BY BUILD-WELL LLC" watermark. Purchased documents are clean and ready to use.
+        </p>
       </div>
     </div>
   );
