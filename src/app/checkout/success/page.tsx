@@ -4,10 +4,12 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Stripe from "stripe";
 import Link from "next/link";
+import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const PACKAGE_LABELS: Record<string, string> = {
   blueprint_set: "Construction Planning Report",
@@ -43,7 +45,9 @@ export default async function CheckoutSuccessPage({
   const currentAnswers = (project.answers as Record<string, unknown>) || {};
   const currentPurchases = (currentAnswers._purchases as string[]) || [];
 
-  if (!currentPurchases.includes(packageType)) {
+  const isNewPurchase = !currentPurchases.includes(packageType);
+
+  if (isNewPurchase) {
     await db.project.update({
       where: { id: project_id },
       data: {
@@ -56,6 +60,51 @@ export default async function CheckoutSuccessPage({
   }
 
   const packageLabel = PACKAGE_LABELS[packageType] || packageType;
+
+  // Send confirmation email on new purchases only
+  if (isNewPurchase && session.user.email) {
+    const projectUrl = `${process.env.NEXTAUTH_URL || "https://ibuildwell.com"}/projects/${project_id}`;
+    await resend.emails.send({
+      from: "Buildwell <noreply@ibuildwell.com>",
+      to: session.user.email,
+      subject: `Your Buildwell document is ready: ${packageLabel}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fafaf9">
+          <h1 style="font-size:24px;font-weight:900;color:#1c1917;margin-bottom:4px">
+            Payment confirmed ✓
+          </h1>
+          <p style="color:#78716c;margin-bottom:24px;font-size:15px">
+            Thank you for your purchase. Your document is ready to view.
+          </p>
+
+          <div style="background:#fff;border:1px solid #e7e5e4;border-radius:12px;padding:20px 24px;margin-bottom:24px">
+            <p style="color:#a8a29e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px">
+              Document purchased
+            </p>
+            <p style="color:#92400e;font-size:17px;font-weight:800;margin:0">
+              ${packageLabel}
+            </p>
+          </div>
+
+          <a href="${projectUrl}"
+             style="display:inline-block;background:#d97706;color:white;font-weight:700;
+                    padding:13px 32px;border-radius:10px;text-decoration:none;font-size:15px">
+            View My Document →
+          </a>
+
+          <p style="color:#a8a29e;font-size:12px;margin-top:32px">
+            Your document is always accessible from your project page — no download needed.
+          </p>
+          <hr style="border:none;border-top:1px solid #e7e5e4;margin:24px 0"/>
+          <p style="color:#a8a29e;font-size:11px">
+            Buildwell LLC · ibuildwell.com
+          </p>
+        </div>
+      `,
+    }).catch(() => {
+      // Email failure should not break the success page
+    });
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 flex items-center justify-center px-6">
