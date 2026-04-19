@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import Stripe from "stripe";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const PACKAGE_LABELS: Record<string, string> = {
@@ -18,12 +20,12 @@ const PACKAGE_LABELS: Record<string, string> = {
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string; project_id?: string; package?: string };
+  searchParams: Promise<{ session_id?: string; project_id?: string; package?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
-  const { session_id, project_id, package: packageType } = searchParams;
+  const { session_id, project_id, package: packageType } = await searchParams;
 
   if (!session_id || !project_id || !packageType) redirect("/dashboard");
 
