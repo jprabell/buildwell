@@ -29,6 +29,7 @@ export default function LandingPage() {
             <Link href="#documents" className="hover:text-amber-600 transition-colors">Documents</Link>
             <Link href="#how-it-works" className="hover:text-amber-600 transition-colors">How It Works</Link>
             <Link href="/faq" className="hover:text-amber-600 transition-colors">FAQ</Link>
+            <Link href="/about" className="hover:text-amber-600 transition-colors">About</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -383,6 +384,7 @@ export default function LandingPage() {
             Build<span className="text-amber-500">well</span>
           </span>
           <div className="flex gap-8 text-stone-400">
+            <Link href="/about" className="hover:text-white transition-colors">About</Link>
             <Link href="/register" className="hover:text-white transition-colors">Get Started</Link>
             <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
           </div>
