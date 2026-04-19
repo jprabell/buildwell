@@ -6,6 +6,7 @@ import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import Button from "@/components/ui/Button";
 import PurchaseButton from "@/components/ui/PurchaseButton";
+import MaterialListThumbnail from "@/components/ui/MaterialListThumbnail";
 
 const PACKAGES = [
   {
@@ -163,6 +164,13 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                 </div>
                 <h3 className="font-black text-stone-900 mb-1">{pkg.title}</h3>
                 <p className="text-2xl font-black text-amber-600 mb-4">{pkg.price}</p>
+
+                {pkg.id === "material_list" && (
+                  <div className="mb-4 -mx-1">
+                    <MaterialListThumbnail />
+                  </div>
+                )}
+
                 <ul className="space-y-1.5 text-xs text-stone-500 mb-6 flex-1">
                   {pkg.includes.map((item) => (
                     <li key={item} className="flex items-start gap-1.5">
