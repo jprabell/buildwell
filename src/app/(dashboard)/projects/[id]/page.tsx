@@ -5,8 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import Button from "@/components/ui/Button";
-import PurchaseButton from "@/components/ui/PurchaseButton";
-import MaterialListThumbnail from "@/components/ui/MaterialListThumbnail";
+import PackagesSection from "@/components/ui/PackagesSection";
 
 const PACKAGES = [
   {
@@ -14,6 +13,7 @@ const PACKAGES = [
     icon: "📐",
     title: "Construction Planning Report",
     price: "$250",
+    priceNum: 250,
     badge: "Most Complete",
     includes: [
       "Room schedule with dimensions",
@@ -29,6 +29,7 @@ const PACKAGES = [
     icon: "📋",
     title: "Material & Specification List",
     price: "$100",
+    priceNum: 100,
     badge: null,
     includes: [
       "Full itemized material list",
@@ -44,6 +45,7 @@ const PACKAGES = [
     icon: "💼",
     title: "Contractor Bid Package",
     price: "$250",
+    priceNum: 250,
     badge: null,
     includes: [
       "Scope of work per trade",
@@ -59,6 +61,7 @@ const PACKAGES = [
     icon: "⭐",
     title: "Good / Better / Best Spec Report",
     price: "$75",
+    priceNum: 75,
     badge: null,
     includes: [
       "3-tier verified material options",
@@ -74,6 +77,7 @@ const PACKAGES = [
     icon: "📞",
     title: "Preferred Vendor List",
     price: "$40",
+    priceNum: 40,
     badge: null,
     includes: [
       "3 local contractors per trade",
@@ -178,81 +182,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {PACKAGES.map((pkg) => {
-            const purchased = purchases.includes(pkg.id);
-            return (
-              <div
-                key={pkg.id}
-                className={`bg-white rounded-2xl border p-6 flex flex-col ${
-                  purchased ? "border-green-300 shadow-sm" : "border-stone-200"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-3xl">{pkg.icon}</span>
-                  {purchased && (
-                    <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                      ✓ Purchased
-                    </span>
-                  )}
-                </div>
-                <h3 className="font-black text-stone-900 mb-1">{pkg.title}</h3>
-                <p className="text-2xl font-black text-amber-600 mb-4">{pkg.price}</p>
-
-                {pkg.id === "material_list" && (
-                  <div className="mb-4 -mx-1">
-                    <MaterialListThumbnail />
-                  </div>
-                )}
-
-                <ul className="space-y-1.5 text-xs text-stone-500 mb-6 flex-1">
-                  {pkg.includes.map((item) => (
-                    <li key={item} className="flex items-start gap-1.5">
-                      <span className="text-amber-500 mt-0.5">✓</span> {item}
-                    </li>
-                  ))}
-                </ul>
-
-                {purchased ? (
-                  <div className="space-y-2">
-                    <Link href={`/projects/${project.id}/${
-                      pkg.id === "material_list" ? "material-list"
-                      : pkg.id === "spec_tier" ? "spec-tier"
-                      : pkg.id === "vendor_list" ? "contractors"
-                      : `preview/${pkg.id}`
-                    }`}>
-                      <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors text-sm">
-                        {pkg.id === "blueprint_set" ? "View Planning Report"
-                         : pkg.id === "material_list" ? "View Material List"
-                         : pkg.id === "spec_tier" ? "View Spec Report"
-                         : pkg.id === "vendor_list" ? "View Vendor List"
-                         : "View Document"}
-                      </button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <PurchaseButton
-                      packageType={pkg.id}
-                      projectId={project.id}
-                      label={`Purchase — ${pkg.price}`}
-                    />
-                    <Link href={`/projects/${project.id}/${
-                      pkg.id === "material_list" ? "material-list"
-                      : pkg.id === "spec_tier" ? "spec-tier"
-                      : pkg.id === "vendor_list" ? "contractors"
-                      : `preview/${pkg.id}`
-                    }`}>
-                      <button className="w-full border border-stone-200 text-stone-600 hover:bg-stone-50 font-medium py-2 rounded-xl transition-colors text-sm">
-                        {pkg.id === "vendor_list" ? "Preview Vendor List" : "Preview Free (watermarked)"}
-                      </button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <PackagesSection
+          packages={PACKAGES.map((pkg) => ({
+            ...pkg,
+            viewPath: `/projects/${project.id}/${
+              pkg.id === "material_list" ? "material-list"
+              : pkg.id === "spec_tier" ? "spec-tier"
+              : pkg.id === "vendor_list" ? "contractors"
+              : `preview/${pkg.id}`
+            }`,
+          }))}
+          purchases={purchases}
+          projectId={project.id}
+        />
 
         {/* Watermark note */}
         <p className="text-center text-stone-400 text-xs mt-6">

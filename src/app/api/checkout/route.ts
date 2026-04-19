@@ -39,34 +39,42 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { packageType, projectId } = await req.json();
-  const pkg = DOCUMENT_PACKAGES[packageType as keyof typeof DOCUMENT_PACKAGES];
+  const body = await req.json();
+  const { projectId } = body;
 
-  if (!pkg) {
-    return NextResponse.json({ error: "Invalid package" }, { status: 400 });
+  // Accept either packageTypes (array) or packageType (single string, legacy)
+  const packageTypes: string[] = body.packageTypes
+    ? (body.packageTypes as string[])
+    : body.packageType
+    ? [body.packageType as string]
+    : [];
+
+  if (packageTypes.length === 0) {
+    return NextResponse.json({ error: "No packages selected" }, { status: 400 });
   }
+
+  const lineItems = packageTypes.map((pt) => {
+    const pkg = DOCUMENT_PACKAGES[pt as keyof typeof DOCUMENT_PACKAGES];
+    if (!pkg) throw new Error(`Invalid package: ${pt}`);
+    return {
+      price_data: {
+        currency: "usd",
+        product_data: { name: pkg.name, description: pkg.description },
+        unit_amount: pkg.price,
+      },
+      quantity: 1,
+    };
+  });
 
   const checkoutSession = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: pkg.name,
-            description: pkg.description,
-          },
-          unit_amount: pkg.price,
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
     mode: "payment",
-    success_url: `https://ibuildwell.com/checkout/success?session_id={CHECKOUT_SESSION_ID}&project_id=${projectId}&package=${packageType}`,
+    success_url: `https://ibuildwell.com/checkout/success?session_id={CHECKOUT_SESSION_ID}&project_id=${projectId}`,
     cancel_url: `https://ibuildwell.com/projects/${projectId}`,
     metadata: {
       projectId,
-      packageType,
+      packageTypes: packageTypes.join(","), // comma-separated list
       userEmail: session.user.email,
     },
   });
