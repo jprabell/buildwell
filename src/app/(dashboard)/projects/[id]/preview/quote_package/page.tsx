@@ -10,6 +10,8 @@ import { ProjectAnswers } from "@/types";
 import { StructureType } from "@/types";
 import Button from "@/components/ui/Button";
 import PrintButton from "../../material-list/PrintButton";
+import QuoteBoardClient, { QuoteMap, QuoteTrade } from "./QuoteBoardClient";
+import SendBidButton from "./SendBidButton";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Civil:      "bg-amber-100 text-amber-800",
@@ -42,9 +44,7 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
   const structure = STRUCTURE_OPTIONS.find((s) => s.value === project.structureType);
   const trades    = getTradesForStructure(project.structureType as StructureType);
 
-  // Estimate total project cost range from square footage for budget guidance
   const sqft = Number(answers.squareFootage ?? answers.squareFeet ?? 0) || 1500;
-  // Simple low/high multiplier by structure type category
   const costPerSqftLow  = 80;
   const costPerSqftHigh = 200;
   const totalLow  = sqft * costPerSqftLow;
@@ -65,6 +65,17 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
     if (!m) return 0;
     return totalHigh * (parseFloat(m[1]) / 100);
   }
+
+  // ── Saved quotes + contractor names ──────────────────────────────────────
+  const savedQuotes = ((answers as Record<string, unknown>)._quotes as QuoteMap) ?? {};
+  const savedContractorNames = ((answers as Record<string, unknown>)._contractorNames as [string, string, string]) ?? ["", "", ""];
+
+  const quoteTrades: QuoteTrade[] = trades.map(t => ({
+    trade: t.trade,
+    category: t.category,
+    budgetLow:  tradeBudgetLow(t.budgetPctRange),
+    budgetHigh: tradeBudgetHigh(t.budgetPctRange),
+  }));
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -152,7 +163,7 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
                   PREVIEW — Purchase to unlock the full bid package
                 </p>
                 <p className="text-xs text-amber-700">
-                  Get scope-of-work sections, bid request forms, and budget estimates per trade — print-ready to send to contractors.
+                  Get scope-of-work sections, bid request forms, and budget estimates per trade — email directly to contractors or print.
                 </p>
               </div>
               <Link href={`/projects/${id}`} className="shrink-0">
@@ -164,16 +175,15 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
           )}
         </div>
 
-        {/* Instructions box (purchased only) */}
+        {/* Instructions + floor plan link (purchased only) */}
         {purchased && (
           <>
             <div className="bg-stone-900 text-white rounded-2xl p-5 mb-4 print:rounded-none print:bg-white print:text-stone-900 print:border print:border-stone-300">
               <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2 print:text-amber-700">How to Use This Bid Package</p>
               <ol className="text-xs space-y-1 text-stone-300 print:text-stone-600 list-decimal list-inside leading-relaxed">
-                <li>Review the &ldquo;Specified Materials &amp; Standards&rdquo; in each trade section — these are your baseline specs.</li>
-                <li>Send one bid section per trade to a minimum of 3 licensed contractors.</li>
-                <li>Fill in the &ldquo;Base Bid Amount&rdquo; line per contractor before sending; include alternate pricing requests.</li>
-                <li>Compare returned bids — verify license, insurance, and references before awarding any contract.</li>
+                <li>Review the &ldquo;Specified Materials &amp; Standards&rdquo; in each trade section below — these are your baseline specs.</li>
+                <li>Use the <strong className="text-white print:text-stone-900">✉ Email to Contractor</strong> button on each section to send that scope directly to a contractor&apos;s inbox.</li>
+                <li>Send each trade to a minimum of 3 licensed contractors and enter bids in the Comparison Board above.</li>
                 <li>Award based on price, references, availability, and communication quality.</li>
               </ol>
             </div>
@@ -188,10 +198,33 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
                 </button>
               </Link>
             </div>
+
+            {/* ── Quote Comparison Board ── */}
+            <div className="mb-8 print:hidden">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="bg-amber-600 text-white text-xs font-black px-3 py-1 rounded-full">📊</span>
+                <h2 className="text-lg font-black text-stone-900">Bid Comparison Board</h2>
+                <span className="text-xs text-stone-400">Enter bids as you receive them</span>
+              </div>
+              <QuoteBoardClient
+                projectId={id}
+                trades={quoteTrades}
+                initialQuotes={savedQuotes}
+                contractorNames={savedContractorNames}
+              />
+            </div>
           </>
         )}
 
-        {/* Bid sections */}
+        {/* ── Trade Bid Sections ── */}
+        {purchased && (
+          <div className="flex items-center gap-3 mb-4">
+            <span className="bg-stone-800 text-white text-xs font-black px-3 py-1 rounded-full">📋</span>
+            <h2 className="text-lg font-black text-stone-900">Trade Bid Sections</h2>
+            <span className="text-xs text-stone-400">Email each section directly to contractors</span>
+          </div>
+        )}
+
         <div className="space-y-6">
           {trades.map((trade, ti) => {
             const isBlurred = !purchased && ti >= 3;
@@ -217,13 +250,26 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
                       </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    {budgetLow > 0 && budgetHigh > 0 && (
-                      <p className="text-xs text-amber-300 font-semibold">
-                        Est. {fmtMoney(budgetLow)} – {fmtMoney(budgetHigh)}
-                      </p>
+                  <div className="flex items-center gap-3">
+                    {purchased && (
+                      <SendBidButton
+                        projectId={id}
+                        tradeName={trade.trade}
+                        tradeDescription={trade.description}
+                        tradeCategory={trade.category}
+                        budgetLow={budgetLow}
+                        budgetHigh={budgetHigh}
+                        licenseNote={trade.licenseNote}
+                      />
                     )}
-                    <p className="text-xs text-stone-400">{trade.budgetPctRange} of total budget</p>
+                    <div className="text-right">
+                      {budgetLow > 0 && budgetHigh > 0 && (
+                        <p className="text-xs text-amber-300 font-semibold">
+                          Est. {fmtMoney(budgetLow)} – {fmtMoney(budgetHigh)}
+                        </p>
+                      )}
+                      <p className="text-xs text-stone-400">{trade.budgetPctRange} of total budget</p>
+                    </div>
                   </div>
                 </div>
 
@@ -311,7 +357,7 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
               {trades.length - 3} more bid sections are hidden
             </p>
             <p className="text-xs text-amber-700 mb-3">
-              Purchase to unlock all {trades.length} trade sections — complete with scope, budget estimates, and print-ready bid forms.
+              Purchase to unlock all {trades.length} trade sections — complete with scope, budget estimates, email-to-contractor, and a live bid comparison board.
             </p>
             <Link href={`/projects/${id}`}>
               <button className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-6 py-2 rounded-xl text-sm transition-colors">
