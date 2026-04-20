@@ -94,8 +94,15 @@ export async function findContractors(
       }
     );
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.error(`[googlePlaces] Places API error ${res.status}:`, errText.slice(0, 400));
+      return [];
+    }
     const data = await res.json();
+    if (!data.places?.length) {
+      console.warn(`[googlePlaces] No results for query: "${body.textQuery}" (${location})`);
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (data.places || []).map((p: any) => ({
