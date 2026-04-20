@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import { generatePlanningReport, CodeItem } from "@/lib/planningReport";
+import { generateFloorPlanSVG } from "@/lib/floorPlanSVG";
 import { ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
 import FloorPlanDownloadButton from "./FloorPlanDownloadButton";
@@ -40,6 +41,15 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
   const report = generatePlanningReport(answers, project.structureType, structure?.label ?? project.structureType, project.name);
 
   const totalRoomSqft = report.rooms.reduce((s, r) => s + r.sqft, 0);
+
+  const floorPlanSVG = generateFloorPlanSVG(
+    report.rooms,
+    project.name,
+    project.structureType,
+    report.squareFootage > 0 ? report.squareFootage : totalRoomSqft,
+    !purchased,
+    report.location,
+  );
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -138,6 +148,26 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* ── Floor Plan Drawing ── */}
+        <div className="mb-8 print:break-before-page">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="bg-stone-800 text-white text-xs font-black px-3 py-1 rounded-full">A1</span>
+            <h2 className="text-lg font-black text-stone-900">Floor Plan — Schematic Design</h2>
+            <span className="text-xs text-stone-400">Not for construction · {report.squareFootage > 0 ? report.squareFootage.toLocaleString() : totalRoomSqft.toLocaleString()} sq ft</span>
+          </div>
+          <div className="bg-white border border-stone-200 rounded-2xl overflow-auto">
+            <div
+              className="min-w-0"
+              dangerouslySetInnerHTML={{ __html: floorPlanSVG }}
+            />
+          </div>
+          {!purchased && (
+            <p className="text-xs text-amber-700 mt-2 text-center font-semibold">
+              DRAFT PREVIEW — Purchase to unlock the clean, print-ready floor plan.
+            </p>
+          )}
         </div>
 
         {/* ── Section 1: Room Schedule ── */}
