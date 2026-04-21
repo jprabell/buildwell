@@ -59,7 +59,7 @@ export default function SendBidButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-stone-700 hover:bg-stone-600 text-white transition-colors"
+        className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-900 transition-colors"
       >
         ✉ Email to Contractor
       </button>

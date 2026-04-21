@@ -6,6 +6,7 @@ import Link from "next/link";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import Button from "@/components/ui/Button";
 import PackagesSection from "@/components/ui/PackagesSection";
+import DownloadPackageButton from "./DownloadPackageButton";
 
 const PACKAGES = [
   {
@@ -212,6 +213,31 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           purchases={purchases}
           projectId={project.id}
         />
+
+        {/* Architect handoff download */}
+        {purchases.length > 0 && (
+          <div className="mt-8 bg-white border border-stone-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <h3 className="font-black text-stone-900 mb-1">Architect Handoff Package</h3>
+                <p className="text-sm text-stone-500 leading-relaxed">
+                  Download all your purchased documents in one zip — floor plan SVG, room schedule CSV, material list, construction schedule, and bid package. Ready to hand off to your architect, contractor, or lender.
+                </p>
+                <p className="text-xs text-stone-400 mt-2">
+                  Includes: {[
+                    purchases.includes("blueprint_set")         && "Floor Plan + Report",
+                    purchases.includes("material_list")         && "Material List",
+                    purchases.includes("construction_schedule") && "Schedule",
+                    purchases.includes("quote_package")         && "Bid Package",
+                  ].filter(Boolean).join(" · ")}
+                </p>
+              </div>
+              <div className="shrink-0">
+                <DownloadPackageButton projectId={project.id} />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Watermark note */}
         <p className="text-center text-stone-400 text-xs mt-6">
