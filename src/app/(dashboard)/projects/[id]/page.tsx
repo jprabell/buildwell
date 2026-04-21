@@ -7,6 +7,7 @@ import { STRUCTURE_OPTIONS } from "@/lib/structures";
 import Button from "@/components/ui/Button";
 import PackagesSection from "@/components/ui/PackagesSection";
 import DownloadPackageButton from "./DownloadPackageButton";
+import VersionHistoryPanel from "./VersionHistoryPanel";
 
 const PACKAGES = [
   {
@@ -114,6 +115,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   const project = await db.project.findFirst({
     where: { id, userId: session.user.id },
+    include: { versions: { orderBy: { version: "desc" } } },
   });
 
   if (!project) notFound();
@@ -173,7 +175,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-stone-900">Project Summary</h2>
               <Link href={`/design?edit=${project.id}`}>
-                <Button variant="outline" size="sm">Edit Answers</Button>
+                <Button variant="outline" size="sm">Update Project →</Button>
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -236,6 +238,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <DownloadPackageButton projectId={project.id} />
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Version History */}
+        {project.versions.length > 0 && (
+          <div className="mt-8">
+            <VersionHistoryPanel
+              projectId={project.id}
+              versions={project.versions}
+            />
           </div>
         )}
 

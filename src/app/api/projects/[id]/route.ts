@@ -42,7 +42,12 @@ export async function PUT(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const { name, structureType, answers } = await req.json();
+  const { name, structureType, answers, skipSnapshot } = await req.json() as {
+    name: string;
+    structureType: string;
+    answers: Record<string, unknown>;
+    skipSnapshot?: boolean;
+  };
 
   // Preserve existing _purchases when updating answers
   const existingAnswers = (existing.answers ?? {}) as Record<string, unknown>;
@@ -51,9 +56,22 @@ export async function PUT(
     _purchases: existingAnswers._purchases ?? [],
   };
 
+  // Snapshot current state as a new version (unless caller opts out)
+  if (!skipSnapshot) {
+    const versionCount = await db.projectVersion.count({ where: { projectId: id } });
+    await db.projectVersion.create({
+      data: {
+        projectId: id,
+        version: versionCount + 1,
+        name: existing.name,
+        answers: existing.answers ?? {},
+      },
+    });
+  }
+
   const project = await db.project.update({
     where: { id },
-    data: { name, structureType, answers: updatedAnswers },
+    data: { name, structureType: structureType as never, answers: updatedAnswers },
   });
 
   return NextResponse.json(project);
