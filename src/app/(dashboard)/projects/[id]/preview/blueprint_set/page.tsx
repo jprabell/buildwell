@@ -38,7 +38,8 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
 
   const answers = (project.answers ?? {}) as ProjectAnswers;
   const purchases = (answers._purchases as string[] | undefined) ?? [];
-  const purchased = purchases.includes("blueprint_set");
+  // BETA: free access during beta period
+  const purchased = true || purchases.includes("blueprint_set");
 
   const blueprintOrder = project.blueprintOrders[0] ?? null;
   const bpFiles = (blueprintOrder?.files as { name: string; url: string; format: string }[] | undefined) ?? [];
@@ -73,6 +74,19 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
           </div>
         </div>
       </nav>
+
+      {/* BETA banner */}
+      <div className="bg-amber-50 border-b border-amber-300 px-6 py-2.5 print:hidden">
+        <p className="max-w-6xl mx-auto text-xs font-bold text-amber-800 text-center">
+          BETA — This document is AI-generated and still being fine-tuned. NOT FOR CONSTRUCTION. Do not use for permitting, bidding, or building without independent professional review.
+        </p>
+      </div>
+      {/* BETA print watermark */}
+      <div className="hidden print:block bg-amber-100 border border-amber-400 rounded-xl px-5 py-3 mx-6 mt-4 text-center">
+        <p className="text-xs font-black text-amber-900 uppercase tracking-wide">
+          BETA — AI-Generated Document · Still Being Fine-Tuned · NOT FOR CONSTRUCTION
+        </p>
+      </div>
 
       <div className="max-w-6xl mx-auto px-6 py-10 print:py-4 print:px-0">
 

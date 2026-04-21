@@ -93,7 +93,7 @@ export default function SendBidButton({
                   <div>
                     <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wide block mb-1">Contractor Name (optional)</label>
                     <input
-                      className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:border-amber-500 outline-none"
+                      className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-900 focus:border-amber-500 outline-none"
                       placeholder="e.g. Smith Concrete LLC"
                       value={name}
                       onChange={e => setName(e.target.value)}
@@ -102,7 +102,7 @@ export default function SendBidButton({
                   <div>
                     <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wide block mb-1">Contractor Email *</label>
                     <input
-                      className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:border-amber-500 outline-none"
+                      className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-900 focus:border-amber-500 outline-none"
                       placeholder="contractor@example.com"
                       type="email"
                       value={email}
