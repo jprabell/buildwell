@@ -17,16 +17,44 @@ model User {
 }
 
 model Project {
-  id            String        @id @default(cuid())
-  name          String
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  structureType StructureType
-  status        ProjectStatus @default(DRAFT)
-  answers       Json          @default("{}")
-  summary       Json?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id             String          @id @default(cuid())
+  name           String
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  structureType  StructureType
+  status         ProjectStatus   @default(DRAFT)
+  answers        Json            @default("{}")
+  summary        Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bidInvitations BidInvitation[]
+}
+
+model BidInvitation {
+  id                String    @id @default(cuid())
+  token             String    @unique @default(cuid())
+  projectId         String
+  project           Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tradeName         String
+  tradeDescription  String
+  tradeCategory     String
+  budgetLow         Float     @default(0)
+  budgetHigh        Float     @default(0)
+  licenseNote       String    @default("")
+  contractorEmail   String
+  contractorName    String?
+  // Submitted bid data
+  bidAmount         Float?
+  durationWeeks     Int?
+  startDate         String?
+  companyName       String?
+  licenseNumber     String?
+  insuranceInfo     String?
+  materialsIncluded String?
+  exclusions        String?
+  notes             String?
+  submittedAt       DateTime?
+  createdAt         DateTime  @default(now())
 }
 
 enum StructureType {

@@ -29,6 +29,7 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
 
   const project = await db.project.findFirst({
     where: { id, userId: session.user.id },
+    include: { bidInvitations: { orderBy: { createdAt: "desc" } } },
   });
 
   if (!project) notFound();
@@ -65,6 +66,13 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
     if (!m) return 0;
     return totalHigh * (parseFloat(m[1]) / 100);
   }
+
+  // ── Bid invitations grouped by trade ─────────────────────────────────────
+  const bidInvitations = project.bidInvitations ?? [];
+  const bidsByTrade = bidInvitations.reduce<Record<string, typeof bidInvitations>>((acc, inv) => {
+    (acc[inv.tradeName] ??= []).push(inv);
+    return acc;
+  }, {});
 
   // ── Saved quotes + contractor names ──────────────────────────────────────
   const savedQuotes = ((answers as Record<string, unknown>)._quotes as QuoteMap) ?? {};
@@ -345,6 +353,46 @@ export default async function QuotePackagePage({ params }: { params: Promise<{ i
                     <div className="border-b border-stone-200 h-5 w-full" />
                   </div>
                 </div>
+
+                {/* Submitted bids for this trade */}
+                {purchased && (bidsByTrade[trade.trade] ?? []).length > 0 && (
+                  <div className="border-t border-stone-100 px-5 py-4 print:hidden">
+                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wide mb-3">
+                      Received Bids ({(bidsByTrade[trade.trade] ?? []).length})
+                    </p>
+                    <div className="space-y-2">
+                      {(bidsByTrade[trade.trade] ?? []).map(inv => (
+                        <div key={inv.id} className={`flex items-center justify-between rounded-xl px-4 py-2.5 text-sm ${inv.submittedAt ? "bg-green-50 border border-green-200" : "bg-stone-50 border border-stone-200"}`}>
+                          <div>
+                            <p className="font-semibold text-stone-800">
+                              {inv.companyName || inv.contractorName || inv.contractorEmail}
+                            </p>
+                            <p className="text-xs text-stone-400">
+                              {inv.submittedAt
+                                ? `Submitted ${new Date(inv.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                                : `Invited · ${inv.contractorEmail}`}
+                            </p>
+                            {inv.exclusions && (
+                              <p className="text-xs text-stone-500 mt-1 italic">{inv.exclusions}</p>
+                            )}
+                          </div>
+                          <div className="text-right shrink-0 ml-4">
+                            {inv.bidAmount ? (
+                              <p className="font-black text-green-700 text-base">
+                                {fmtMoney(inv.bidAmount)}
+                              </p>
+                            ) : (
+                              <span className="text-xs font-semibold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">Pending</span>
+                            )}
+                            {inv.durationWeeks && (
+                              <p className="text-xs text-stone-400">{inv.durationWeeks} wks</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
