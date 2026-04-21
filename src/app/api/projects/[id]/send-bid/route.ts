@@ -6,8 +6,6 @@ import { Resend } from "resend";
 import { getBidSpecs } from "@/lib/bidPackageSpecs";
 import { ProjectAnswers } from "@/types";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -158,6 +156,7 @@ export async function POST(
     </div>
   `;
 
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const result = await resend.emails.send({
     from: "Buildwell <noreply@ibuildwell.com>",
     to: contractorEmail,

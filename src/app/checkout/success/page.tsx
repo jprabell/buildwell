@@ -9,7 +9,6 @@ import { Resend } from "resend";
 export const dynamic = "force-dynamic";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const PACKAGE_LABELS: Record<string, string> = {
   blueprint_set: "Construction Planning Report",
@@ -78,6 +77,7 @@ export default async function CheckoutSuccessPage({
     const itemsList = packageLabels
       .map((l: string) => `<li style="margin:4px 0;color:#92400e;font-weight:700">${l}</li>`)
       .join("");
+    const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails
       .send({
         from: "Buildwell <noreply@ibuildwell.com>",
