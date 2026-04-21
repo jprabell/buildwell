@@ -29,6 +29,9 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
 
   const project = await db.project.findFirst({
     where: { id, userId: session.user.id },
+    include: {
+      blueprintOrders: { orderBy: { createdAt: "desc" }, take: 1 },
+    },
   });
 
   if (!project) notFound();
@@ -36,6 +39,9 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
   const answers = (project.answers ?? {}) as ProjectAnswers;
   const purchases = (answers._purchases as string[] | undefined) ?? [];
   const purchased = purchases.includes("blueprint_set");
+
+  const blueprintOrder = project.blueprintOrders[0] ?? null;
+  const bpFiles = (blueprintOrder?.files as { name: string; url: string; format: string }[] | undefined) ?? [];
 
   const structure = STRUCTURE_OPTIONS.find((s) => s.value === project.structureType);
   const report = generatePlanningReport(answers, project.structureType, structure?.label ?? project.structureType, project.name);
@@ -432,6 +438,105 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
             <span><span className="font-bold text-amber-600">Verify Local</span> — confirm with local jurisdiction</span>
             <span><span className="text-stone-400">N/A</span> — not applicable to this project</span>
           </div>
+        </div>
+
+        {/* ── Permit-Ready Blueprint CTA / Order Status ── */}
+        <div className="mt-8 print:hidden">
+          {blueprintOrder?.status === "COMPLETE" ? (
+            // Files ready for download
+            <div className="bg-green-50 border border-green-300 rounded-2xl p-6">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-green-100 rounded-full h-10 w-10 flex items-center justify-center shrink-0">
+                  <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-black text-green-900 mb-0.5">
+                    {blueprintOrder.tier === "permit" ? "Permit-Ready" : "Spec-Grade"} Blueprint Set Ready
+                  </p>
+                  <p className="text-sm text-green-700">
+                    Your blueprints are complete and ready to download. All files are PDF + DWG format.
+                  </p>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {bpFiles.map((f, i) => (
+                  <a
+                    key={i}
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between bg-white border border-green-200 rounded-xl px-4 py-3 hover:border-green-400 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-black text-green-700 bg-green-100 px-2 py-0.5 rounded-full uppercase">{f.format}</span>
+                      <span className="text-sm font-semibold text-stone-800">{f.name}</span>
+                    </div>
+                    <svg className="h-4 w-4 text-stone-400 group-hover:text-green-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : blueprintOrder?.status === "PROCESSING" || blueprintOrder?.status === "PAID" ? (
+            // Order in progress
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex items-center gap-5">
+              <div className="bg-blue-100 rounded-full h-12 w-12 flex items-center justify-center shrink-0">
+                <svg className="animate-spin h-6 w-6 text-blue-600" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-black text-blue-900 mb-0.5">
+                  {blueprintOrder.tier === "permit" ? "Permit-Ready" : "Spec-Grade"} Blueprints In Production
+                </p>
+                <p className="text-sm text-blue-700">
+                  {blueprintOrder.status === "PAID"
+                    ? "Your order has been received and is queued for design. You'll get an email when ready."
+                    : "Your blueprints are being generated. You'll receive an email with download links when complete."}
+                  {" "}Expected: {blueprintOrder.tier === "permit" ? "7–10" : "3–5"} business days.
+                </p>
+                <p className="text-xs text-blue-500 mt-1">Order ref: {blueprintOrder.id}</p>
+              </div>
+            </div>
+          ) : (
+            // No order yet — show the CTA
+            <div className="border-2 border-dashed border-stone-300 rounded-2xl p-6 bg-white">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-amber-600 text-white text-xs font-black px-3 py-1 rounded-full">NEW</span>
+                  <p className="font-black text-stone-900 text-lg">Need Permit-Ready Blueprints?</p>
+                </div>
+                <p className="text-sm text-stone-600 leading-relaxed mb-4">
+                  Your schematic floor plan above is great for planning and cost estimating — but most permitting offices require stamped, construction-ready drawings. Order a full permit-ready blueprint set generated from your exact specifications.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3 mb-5">
+                  {[
+                    { label: "Spec-Grade Set", price: "$699", badge: "AI-Generated", detail: "Floor plans, elevations, sections, site plan — PDF + DWG. 3–5 business days." },
+                    { label: "Permit-Ready Set", price: "$1,499", badge: "Architect Stamped", detail: "Everything above + licensed architect stamp for your state. 7–10 business days." },
+                  ].map(opt => (
+                    <div key={opt.label} className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-bold text-stone-900 text-sm">{opt.label}</p>
+                        <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{opt.badge}</span>
+                      </div>
+                      <p className="text-xs text-stone-500 mb-2 leading-relaxed">{opt.detail}</p>
+                      <p className="text-lg font-black text-stone-900">{opt.price}</p>
+                    </div>
+                  ))}
+                </div>
+                <Link href={`/projects/${id}/blueprints/order`}>
+                  <button className="bg-amber-600 hover:bg-amber-500 text-white font-black px-6 py-3 rounded-xl text-sm transition-colors">
+                    Start Blueprint Order →
+                  </button>
+                </Link>
+                <p className="text-xs text-stone-400 mt-3">Takes about 5 minutes. Detailed questionnaire collects everything the architect needs.</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Disclaimer */}

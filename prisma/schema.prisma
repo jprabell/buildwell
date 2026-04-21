@@ -17,18 +17,44 @@ model User {
 }
 
 model Project {
-  id             String          @id @default(cuid())
-  name           String
-  userId         String
-  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  structureType  StructureType
-  status         ProjectStatus   @default(DRAFT)
-  answers        Json            @default("{}")
-  summary        Json?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  bidInvitations BidInvitation[]
-  versions       ProjectVersion[]
+  id              String           @id @default(cuid())
+  name            String
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  structureType   StructureType
+  status          ProjectStatus    @default(DRAFT)
+  answers         Json             @default("{}")
+  summary         Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  bidInvitations  BidInvitation[]
+  versions        ProjectVersion[]
+  blueprintOrders BlueprintOrder[]
+}
+
+enum BlueprintOrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  COMPLETE
+  FAILED
+}
+
+model BlueprintOrder {
+  id                String               @id @default(cuid())
+  projectId         String
+  project           Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status            BlueprintOrderStatus @default(PENDING_PAYMENT)
+  tier              String               @default("spec")
+  architecturalData Json                 @default("{}")
+  files             Json                 @default("[]")
+  stripeSessionId   String?              @unique
+  externalOrderId   String?
+  paidAt            DateTime?
+  submittedAt       DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
 }
 
 model ProjectVersion {
