@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import { STRUCTURE_PAGE_DATA } from "@/lib/structurePageData";
 import { STRUCTURE_OPTIONS } from "@/lib/structures";
 
 export const metadata: Metadata = {
@@ -70,15 +69,14 @@ export default function StructuresIndexPage() {
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {structures.map((s) => {
-                  const pageData = STRUCTURE_PAGE_DATA.find((p) => p.value === s.value);
                   const slug = s.value.toLowerCase().replace(/_/g, "-");
                   return (
                     <Link key={s.value} href={`/structures/${slug}`} className="group">
                       <div className="bg-white rounded-2xl border border-stone-200 hover:border-amber-400 hover:shadow-[0_0_28px_rgba(217,119,6,0.15)] transition-all duration-300 overflow-hidden">
-                        {pageData?.heroImage && (
+                        {s.image && (
                           <div className="h-44 overflow-hidden relative">
                             <img
-                              src={pageData.heroImage}
+                              src={s.image}
                               alt={s.label}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
                             />
