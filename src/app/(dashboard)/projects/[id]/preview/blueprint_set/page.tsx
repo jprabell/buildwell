@@ -9,6 +9,7 @@ import { generateFloorPlanSVG } from "@/lib/floorPlanSVG";
 import { ProjectAnswers } from "@/types";
 import Button from "@/components/ui/Button";
 import FloorPlanDownloadButton from "./FloorPlanDownloadButton";
+import AIFloorPlanCard from "@/components/AIFloorPlanCard";
 
 function StatusBadge({ status }: { status: CodeItem["status"] }) {
   if (status === "required") return (
@@ -57,6 +58,13 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
     !purchased,
     report.location,
   );
+
+  // AI floor plan state (cached per-project in answers._aiFloorPlan)
+  const aiFloorPlanState = (answers._aiFloorPlan ?? null) as
+    | { status?: string; result?: { imageUrl: string; summary?: string; detailedDescription?: string; generatedAt: string; prompt: string } }
+    | null;
+  const aiResult = aiFloorPlanState?.status === "SUCCEEDED" ? aiFloorPlanState.result ?? null : null;
+  const aiStatus = aiFloorPlanState?.status ?? null;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -177,12 +185,20 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
             <h2 className="text-lg font-black text-stone-900">Floor Plan — Schematic Design</h2>
             <span className="text-xs text-stone-400">Not for construction · {report.squareFootage > 0 ? report.squareFootage.toLocaleString() : totalRoomSqft.toLocaleString()} sq ft</span>
           </div>
-          <div className="bg-white border border-stone-200 rounded-2xl overflow-auto">
-            <div
-              className="min-w-0"
-              dangerouslySetInnerHTML={{ __html: floorPlanSVG }}
-            />
-          </div>
+
+          <AIFloorPlanCard
+            projectId={id}
+            initial={aiResult}
+            initialStatus={aiStatus}
+          >
+            <div className="bg-white border border-stone-200 rounded-2xl overflow-auto">
+              <div
+                className="min-w-0"
+                dangerouslySetInnerHTML={{ __html: floorPlanSVG }}
+              />
+            </div>
+          </AIFloorPlanCard>
+
           {!purchased && (
             <p className="text-xs text-amber-700 mt-2 text-center font-semibold">
               DRAFT PREVIEW — Purchase to unlock the clean, print-ready floor plan.

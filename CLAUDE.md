@@ -51,6 +51,7 @@ Users answer a guided questionnaire about their project → Buildwell generates 
 - `_purchases: string[]` — tracks what the user has bought (e.g. `"blueprint_set"`, `"material_list"`, `"quote_package"`, `"vendor_list"`)
 - `_quotes: QuoteMap` — saved contractor bid comparison board data
 - `_contractorNames: [string, string, string]` — names for bid comparison board columns
+- `_aiFloorPlan: { status, runId, prompt, result?: { imageUrl, summary, ... } }` — cached Apify AI floor plan generation state
 - `zipCode`, `state`, `city` — location data
 - `squareFootage` / `squareFeet` — project size
 - `bedrooms`, `bathrooms`, `foundation`, `architecturalStyle`, etc.
@@ -114,7 +115,8 @@ Uses Google Places API (New) to find 3 local contractors per trade based on the 
 | `src/lib/materialCalculator.ts` | Generates Material List line items from project answers |
 | `src/lib/bidPackageSpecs.ts` | Generates trade-specific material specs for the Bid Package |
 | `src/lib/planningReport.ts` | Generates the full Construction Planning Report (rooms, structural, MEP, code checklist, etc.) |
-| `src/lib/floorPlanSVG.ts` | Generates the schematic floor plan SVG from room data |
+| `src/lib/floorPlanSVG.ts` | Generates the schematic floor plan SVG from room data (fallback while AI plan generates) |
+| `src/lib/apifyFloorPlan.ts` | Apify AI Floor Plan integration — `buildFloorPlanPrompt()` + `startApifyFloorPlanRun()` + `checkApifyFloorPlanRun()` |
 | `src/lib/structures.ts` | `STRUCTURE_OPTIONS` array with labels and values |
 | `src/lib/questions.ts` | Questionnaire question definitions |
 | `src/lib/auth.ts` | NextAuth configuration |
@@ -131,6 +133,7 @@ Uses Google Places API (New) to find 3 local contractors per trade based on the 
 | `/api/projects/[id]/send-bid` | POST | Send bid invitation email to contractor |
 | `/api/projects/[id]/quotes` | PATCH | Save bid comparison board data |
 | `/api/projects/[id]/material-list` | GET | Generate material list data |
+| `/api/projects/[id]/ai-floor-plan` | POST/GET/DELETE | Start AI floor plan run (POST), poll status (GET), clear cache (DELETE). Caches result in `answers._aiFloorPlan` |
 | `/api/blueprints/[orderId]` | GET/PATCH | Get order status / admin upload files (requires BLUEPRINT_ADMIN_SECRET) |
 | `/api/webhooks/blueprint-complete` | POST | AI service webhook to mark order complete (requires BLUEPRINT_WEBHOOK_SECRET) |
 | `/api/checkout` | POST | Create Stripe checkout session for document purchases |
@@ -153,6 +156,7 @@ Uses Google Places API (New) to find 3 local contractors per trade based on the 
 | `BLUEPRINT_ADMIN_SECRET` | Protects admin blueprint upload endpoint | ✅ Set on Netlify |
 | `BLUEPRINT_WEBHOOK_SECRET` | Protects AI service webhook | ✅ Set on Netlify |
 | `BLUEPRINT_ADMIN_EMAIL` | Where blueprint order notifications go | ✅ Set on Netlify |
+| `APIFY_API_TOKEN` | Apify AI Floor Plan actor (`calm_necessity/ai-floor-planner`) | ⚠️ Needs to be set on Netlify |
 
 **Note:** `NEXTAUTH_SECRET` should be changed to a proper random string before going fully live.
 **Note:** Stripe is still on test keys — switch to live keys when ready to take real payments.
@@ -244,9 +248,10 @@ The site should feel premium, bold, and confident — not corporate. Use:
 - [ ] `NEXTAUTH_SECRET` should be replaced with a proper random string
 - [ ] Stripe needs to be switched to live keys when ready for real payments
 - [ ] Resend domain needs to finish DNS verification (added, propagating)
-- [ ] Floor plan SVG generator needs improvement — user wants it to look more like real blueprints
+- [ ] Floor plan SVG still needs improvement as the fallback (AI plan now overlays it via Apify integration)
 - [ ] Google Places API key should be restricted in GCP to only Places + Geocoding APIs
-- [ ] No AI blueprint API integrated yet — blueprint orders currently handled manually by admin
+- [ ] Premium Blueprint Orders ($699 / $1,499) still handled manually — Apify AI floor plan only powers the free `blueprint_set` document
+- [ ] **APIFY_API_TOKEN must be set on Netlify** to enable AI floor plan generation. Without it, page shows the SVG only.
 
 ---
 
