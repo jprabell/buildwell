@@ -460,7 +460,8 @@ export function generateFloorPlanSVG(
   const parts: string[] = [];
   parts.push(`<?xml version="1.0" encoding="UTF-8"?>`);
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" `
-           + `width="${vbW}" height="${vbH}" style="background:#fff;font-family:'Courier New',Courier,monospace">`);
+           + `width="100%" height="auto" preserveAspectRatio="xMidYMid meet" `
+           + `style="background:#fff;font-family:'Courier New',Courier,monospace;max-width:100%;display:block">`);
   parts.push(defs);
 
   // ── Background ─────────────────────────────────────────────────────────────

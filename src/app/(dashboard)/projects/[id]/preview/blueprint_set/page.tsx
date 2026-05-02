@@ -191,9 +191,9 @@ export default async function BlueprintSetPage({ params }: { params: Promise<{ i
             initial={aiResult}
             initialStatus={aiStatus}
           >
-            <div className="bg-white border border-stone-200 rounded-2xl overflow-auto">
+            <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden p-4">
               <div
-                className="min-w-0"
+                className="w-full"
                 dangerouslySetInnerHTML={{ __html: floorPlanSVG }}
               />
             </div>
